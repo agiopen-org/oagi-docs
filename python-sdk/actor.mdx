@@ -1,0 +1,243 @@
+---
+title: 'Working with Actors'
+description: 'Fine-grained control over task execution with manual step management'
+icon: 'person'
+---
+
+# Actors
+
+Actors provide fine-grained control over task execution, allowing you to manage each step manually. Unlike the simplified `ShortTask` interface, Actors give you complete control over the execution loop.
+
+## Basic Actor Usage
+
+### Synchronous Actor
+
+```python
+from oagi import Actor, PyautoguiActionHandler, ScreenshotMaker
+
+# Create actor
+actor = Actor(api_key="your-key")
+
+# Initialize task
+actor.init_task("Navigate to settings page")
+
+# Manual step execution
+handler = PyautoguiActionHandler()
+screenshot_maker = ScreenshotMaker()
+
+for i in range(20):
+    # Capture current state
+    screenshot = screenshot_maker()
+
+    # Get next step
+    step = actor.step(screenshot)
+
+    # Display reasoning
+    print(f"Step {i+1}: {step.reason}")
+
+    # Check completion
+    if step.stop:
+        print("Task completed!")
+        break
+
+    # Execute actions
+    handler(step.actions)
+
+# Clean up
+actor.close()
+```
+
+
+<img
+  style={{ borderRadius: '0.5rem' }}
+  src="/images/actor-execution-loop.svg"
+/>
+
+### Async Actor
+
+For non-blocking operations and better concurrency:
+
+```python
+import asyncio
+from oagi import AsyncActor, AsyncPyautoguiActionHandler, AsyncScreenshotMaker
+
+async def main():
+    actor = AsyncActor(api_key="your-key")
+    await actor.init_task("Open browser")
+
+    handler = AsyncPyautoguiActionHandler()
+    screenshot_maker = AsyncScreenshotMaker()
+
+    for i in range(20):
+        screenshot = await screenshot_maker()
+        step = await actor.step(screenshot)
+
+        if step.stop:
+            break
+
+        await handler(step.actions)
+
+    await actor.close()
+
+asyncio.run(main())
+```
+
+## Context Managers
+
+Always use context managers for automatic cleanup:
+
+```python
+# Sync
+with Actor(api_key="key") as actor:
+    actor.init_task("task")
+    # ... use actor
+
+# Async
+async with AsyncActor(api_key="key") as actor:
+    await actor.init_task("task")
+    # ... use actor
+```
+
+## Actor Execution Flow
+
+The Actor follows a precise execution loop:
+
+1. **Initialize** - Create actor and set task description
+2. **Capture** - Take screenshot of current state
+3. **Analyze** - Send screenshot to Lux model for analysis
+4. **Receive** - Get step with reasoning and actions
+5. **Check** - Determine if task is complete
+6. **Execute** - Perform actions if not complete
+7. **Repeat** - Continue until completion or max steps
+
+## Advanced Features
+
+### Understanding the Step Object
+
+The `step` object contains all information about the next action:
+
+```python
+step = actor.step(screenshot)
+
+# Access components
+print(step.reason)     # Why these actions?
+print(step.actions)    # List of Action objects
+print(step.stop)       # Is task complete?
+
+# Iterate actions
+for action in step.actions:
+    print(f"Type: {action.type}")
+    print(f"Argument: {action.argument}")
+    print(f"Count: {action.count}")
+```
+
+### Custom Action Processing
+
+Filter or modify actions before execution:
+
+```python
+def process_step(step):
+    # Filter dangerous actions
+    safe_actions = []
+    for action in step.actions:
+        if action.type != ActionType.HOTKEY or "DELETE" not in action.argument:
+            safe_actions.append(action)
+
+    # Execute filtered actions
+    handler(safe_actions)
+
+# Use in loop
+for i in range(20):
+    screenshot = screenshot_maker()
+    step = actor.step(screenshot)
+
+    if step.stop:
+        break
+
+    process_step(step)  # Custom processing
+```
+
+### Logging and Debugging
+
+Track execution details for debugging:
+
+```python
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+with Actor(api_key="key") as actor:
+    actor.init_task("Debug task")
+
+    for i in range(10):
+        screenshot = screenshot_maker()
+        step = actor.step(screenshot)
+
+        # Log details
+        logger.info(f"Step {i+1}")
+        logger.info(f"  Reason: {step.reason}")
+        logger.info(f"  Actions: {len(step.actions)}")
+        logger.info(f"  Task ID: {actor.task_id}")
+
+        if step.stop:
+            logger.info("Task completed successfully")
+            break
+
+        handler(step.actions)
+```
+
+## Error Handling
+
+Handle API and network errors gracefully:
+
+```python
+from oagi import APIError, NetworkError
+
+try:
+    with Actor(api_key="key") as actor:
+        actor.init_task("task")
+        step = actor.step(screenshot)
+
+except APIError as e:
+    print(f"API error: {e.message}")
+    print(f"Status: {e.status_code}")
+
+except NetworkError as e:
+    print(f"Network issue: {e.message}")
+    # Implement retry logic
+```
+
+## When to Use Actors
+
+**Use Actors when you need:**
+- Fine-grained control over each step
+- Custom action filtering or modification
+- Detailed logging and debugging
+- Integration with existing automation frameworks
+- Custom retry or error handling logic
+
+**Use ShortTask when you need:**
+- Simple, automated task execution
+- Quick prototyping
+- Standard automation workflows
+
+## Best Practices
+
+1. **Always use context managers** to ensure proper cleanup
+2. **Set reasonable step limits** to prevent infinite loops
+3. **Log step reasoning** for debugging and monitoring
+4. **Filter dangerous actions** before execution
+5. **Handle errors gracefully** with appropriate retry logic
+6. **Use async actors** for better performance in concurrent scenarios
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Action Handlers" icon="hand" href="/python-sdk/handlers">
+    Learn about different ways to execute actions
+  </Card>
+  <Card title="Agents" icon="user-hat-tie" href="/python-sdk/agents">
+    Explore higher-level agent abstractions
+  </Card>
+</CardGroup>

@@ -1,0 +1,194 @@
+---
+title: 'Models'
+description: 'Choose the right model for your computer-use tasks'
+---
+
+# Lux Foundation Models
+
+OpenAGI provides two specialized foundation models for computer use, each optimized for different scenarios. Both models share the same API interface but offer distinct trade-offs between speed and reasoning depth.
+
+## Available Models
+
+<CardGroup cols={2}>
+  <Card title="lux-actor-1" icon="zap" color="#10b981">
+    **Fast & Responsive**
+    
+    Optimized for speed and real-time UI control. Perfect for direct action loops and high-throughput automation.
+  </Card>
+  <Card title="lux-thinker-1" icon="brain" color="#8b5cf6">
+    **Deep Reasoning**
+    
+    Optimized for complex planning and careful decision-making. Best for multi-step tasks and ambiguous scenarios.
+  </Card>
+</CardGroup>
+
+## When to Use Each Model
+
+### lux-actor-1: Speed & Responsiveness
+
+**Best for:**
+- Fast, responsive UI control
+- High-throughput automation
+- Short-horizon tasks
+- Real-time UX (CLI/desktop control loops)
+- Direct "observe → decide → act" loops
+
+**Typical usage:**
+```python
+# Quick, responsive actions
+task = ShortTask()
+completed = task.auto_mode(
+    "Click the submit button",
+    model="lux-actor-1",  # Fast execution
+    max_steps=3
+)
+```
+
+### lux-thinker-1: Careful Planning
+
+**Best for:**
+- Tasks requiring multi-step planning
+- Non-obvious action sequences
+- Brittle or complex workflows
+- Scenarios where errors are costly
+
+**Trade-offs:**
+- Higher latency per decision
+- Increased cost per action
+- Not ideal for tight control loops
+
+**Typical usage:**
+```python
+# Complex planning task
+task = ShortTask()
+completed = task.auto_mode(
+    "Research and compare three hotels, then book the cheapest one",
+    model="lux-thinker-1",  # Deep reasoning
+    max_steps=20
+)
+```
+
+## API Interface
+
+Both models share the same request/response structure:
+
+### Request Format
+```python
+{
+    "images": ["base64_screenshot"],  # One or more screenshots
+    "instruction": "Click the login button",  # Optional text context
+    "model": "lux-actor-1",  # or "lux-thinker-1"
+    "max_steps": 10
+}
+```
+
+### Response Format
+```python
+{
+    "action": {
+        "type": "click",
+        "coordinates": [450, 300],
+        "element": "login-button"
+    },
+    "reasoning": "Located login button in top-right corner",
+    "completed": false
+}
+```
+
+## Performance Characteristics
+
+| Feature | lux-actor-1 | lux-thinker-1 |
+|---------|-------------|---------------|
+| **Latency** | ~200-500ms | ~1-3s |
+| **Cost** | Lower | Higher |
+| **Accuracy** | High for simple tasks | Higher for complex tasks |
+| **Best Use** | Real-time control | Strategic planning |
+
+## Integration with Agents
+
+### Tasker Agent
+The built-in Tasker Agent uses **lux-actor-1** by default for executing To-Do steps, with lightweight reflection between actions to verify progress.
+
+```python
+from oagi import TaskerAgent
+
+agent = TaskerAgent()
+result = agent.execute("Book a flight to Tokyo")
+# Uses lux-actor-1 internally for fast execution
+```
+
+### Custom Agents
+You can build custom agents that strategically combine both models:
+
+```python
+# Hybrid approach: thinker for planning, actor for execution
+def hybrid_agent(complex_task):
+    # Use thinker for initial planning
+    plan = call_model("lux-thinker-1", f"Create a plan for: {complex_task}")
+    
+    # Use actor for fast execution of each step
+    for step in plan.steps:
+        result = call_model("lux-actor-1", step)
+```
+
+## Best Practices
+
+### Model Selection
+- **Start with lux-actor-1** unless you have evidence the task needs deeper reasoning
+- **Use lux-thinker-1 selectively** for planning, brittle flows, or where retries are expensive
+- **Consider hybrid approaches** for long tasks: thinker for planning, actor for execution
+
+### Environment Setup
+- Maintain stable initial UI state (limit open tabs, avoid obstructive modals)
+- Use reasonable screen resolution and scaling so targets are visible
+- Provide explicit instructions rather than vague ones
+
+### Error Handling
+```python
+# Add verification between critical steps
+task = ShortTask()
+task.auto_mode("Navigate to checkout", model="lux-actor-1")
+
+# Verify we're on the right page
+if not verify_page_title("Checkout"):
+    # Retry or use thinker for more careful navigation
+    task.auto_mode("Find and click checkout", model="lux-thinker-1")
+```
+
+## Pricing & Quotas
+
+<Note>
+  Models have different pricing tiers. Check the latest pricing information in your dashboard or contact support for enterprise pricing.
+</Note>
+
+- **lux-actor-1**: Optimized for cost-effective, high-volume automation
+- **lux-thinker-1**: Premium pricing for complex reasoning tasks
+
+## Migration Between Models
+
+### Moving from Actor to Thinker
+- Expect higher latency - consider using thinker for planning only
+- Re-run acceptance tests and tune timeouts
+- Adjust step budgets for longer reasoning time
+
+### Moving from Thinker to Actor  
+- Add verification checkpoints to maintain reliability
+- Test with faster decision cycles
+- Monitor for any accuracy regressions
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Try both models with a simple example
+  </Card>
+  <Card title="Python SDK" icon="code" href="/python-sdk/installation">
+    Learn how to specify models in your code
+  </Card>
+  <Card title="Best Practices" icon="shield" href="/safety/introduction">
+    Guidelines for production deployment
+  </Card>
+  <Card title="API Reference" icon="book" href="/api/reference">
+    Complete API documentation
+  </Card>
+</CardGroup>

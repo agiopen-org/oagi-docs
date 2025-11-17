@@ -1,0 +1,229 @@
+---
+title: 'Using Agents'
+description: 'High-level automation by managing the entire task execution workflow'
+icon: 'user-hat-tie'
+---
+
+# Using Agents
+
+Agents provide high-level automation by managing the entire task execution workflow. Unlike Actors, which require manual step management, Agents handle the complete automation process from start to finish.
+
+## AsyncDefaultAgent
+
+The standard agent for most automation tasks:
+
+```python
+from oagi import AsyncDefaultAgent, AsyncPyautoguiActionHandler, AsyncScreenshotMaker
+import asyncio
+
+async def main():
+    agent = AsyncDefaultAgent(
+        api_key="your-key",
+        model="lux-actor-1",  # or lux-thinker-1
+        max_steps=20,
+        temperature=0.7
+    )
+
+    success = await agent.execute(
+        instruction="Open email and check inbox",
+        action_handler=AsyncPyautoguiActionHandler(),
+        image_provider=AsyncScreenshotMaker()
+    )
+
+    print(f"Success: {success}")
+
+asyncio.run(main())
+```
+
+## Configuration Options
+
+Customize agent behavior with various parameters:
+
+```python
+agent = AsyncDefaultAgent(
+    api_key="your-key",              # Required
+    base_url="https://custom.api",   # Custom API endpoint
+    model="lux-actor-1",             # Vision model
+    max_steps=30,                    # Maximum iterations
+    temperature=0.7,                 # Creativity (0-1)
+    step_observer=observer           # Optional observer
+)
+```
+
+### Configuration Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `api_key` | str | Required | Your OAGI API key |
+| `base_url` | str | Default API | Custom API endpoint |
+| `model` | str | "lux-actor-1" | Foundation model to use |
+| `max_steps` | int | 20 | Maximum execution steps |
+| `temperature` | float | 0.7 | Model creativity (0-1) |
+| `step_observer` | callable | None | Step execution observer |
+
+## Custom Agents
+
+Implement the Agent protocol for specialized behavior:
+
+```python
+from oagi import AsyncAgent, AsyncActor
+
+class CustomAgent:
+    def __init__(self, api_key: str, **kwargs):
+        self.api_key = api_key
+        self.max_retries = kwargs.get('max_retries', 3)
+
+    async def execute(
+        self,
+        instruction: str,
+        action_handler,
+        image_provider
+    ) -> bool:
+        """Custom execution logic"""
+
+        actor = AsyncActor(api_key=self.api_key)
+
+        try:
+            await actor.init_task(instruction)
+
+            for attempt in range(self.max_retries):
+                for step_num in range(30):
+                    screenshot = await image_provider()
+                    step = await actor.step(screenshot)
+
+                    # Custom logic
+                    if self._should_retry(step):
+                        break
+
+                    if step.stop:
+                        return True
+
+                    await action_handler(step.actions)
+
+            return False
+
+        finally:
+            await actor.close()
+
+    def _should_retry(self, step):
+        # Custom retry logic
+        return "error" in step.reason.lower()
+```
+
+## Register Custom Agent
+
+Make your agent available through the factory system:
+
+```python
+from oagi.agent import async_agent_register
+
+@async_agent_register(mode="custom")
+def create_custom_agent(api_key: str):
+    return CustomAgent(api_key)
+
+# Use registered agent
+from oagi.agent import create_agent
+
+agent = create_agent(
+    api_key="xxx",
+    mode="custom",
+)
+```
+
+### CLI Integration
+
+Use registered agents from the command line:
+
+```bash
+oagi agent run "some task" --mode "custom"
+```
+
+## Agent vs Actor vs ShortTask
+
+Choose the right abstraction for your use case:
+
+| Feature | ShortTask | Actor | Agent |
+|---------|-----------|-------|-------|
+| **Control Level** | Minimal | Fine-grained | High-level |
+| **Setup Complexity** | Simple | Manual | Moderate |
+| **Customization** | Limited | Full | Configurable |
+| **Best For** | Quick tasks | Custom logic | Production workflows |
+
+## Best Practices
+
+### Error Handling
+```python
+try:
+    success = await agent.execute(
+        instruction="Complete checkout process",
+        action_handler=handler,
+        image_provider=provider
+    )
+    
+    if not success:
+        print("Task failed to complete")
+        
+except Exception as e:
+    print(f"Agent execution error: {e}")
+```
+
+### Step Observation
+Monitor agent execution with observers:
+
+```python
+def step_observer(step_num, step, screenshot):
+    print(f"Step {step_num}: {step.reason}")
+    # Log or analyze step details
+
+agent = AsyncDefaultAgent(
+    api_key="your-key",
+    step_observer=step_observer
+)
+```
+
+### Model Selection
+- Use **lux-actor-1** for fast, responsive tasks
+- Use **lux-thinker-1** for complex, multi-step workflows
+- Adjust **temperature** for creativity vs consistency
+
+## Advanced Patterns
+
+### Retry Logic
+```python
+class RetryAgent(CustomAgent):
+    async def execute_with_retry(self, instruction, handler, provider, max_retries=3):
+        for attempt in range(max_retries):
+            try:
+                success = await self.execute(instruction, handler, provider)
+                if success:
+                    return True
+                    
+                print(f"Attempt {attempt + 1} failed, retrying...")
+                
+            except Exception as e:
+                print(f"Attempt {attempt + 1} error: {e}")
+                
+        return False
+```
+
+### Conditional Execution
+```python
+class ConditionalAgent(CustomAgent):
+    def _should_continue(self, step, step_num):
+        # Custom logic to determine if execution should continue
+        if "login required" in step.reason.lower():
+            return False  # Stop if login is needed
+            
+        return step_num < self.max_steps
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Actors" icon="person" href="/python-sdk/actor">
+    Learn about fine-grained control with Actors
+  </Card>
+  <Card title="Action Handlers" icon="hand" href="/python-sdk/handlers">
+    Understand how actions are executed
+  </Card>
+</CardGroup>

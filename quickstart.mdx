@@ -1,79 +1,135 @@
 ---
 title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+description: "Get your first computer-use agent running in under 5 minutes"
 ---
 
 ## Get started in three steps
 
-Get your documentation site running locally and make your first customization.
+Build your first AI agent that can see, think, and act on any computer interface.
 
-### Step 1: Set up your local environment
+<Info>
+  **Prerequisites**: Python 3.10+ installed on your system
+</Info>
 
-<AccordionGroup>
-  <Accordion title="Clone your docs locally" icon="copy">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
+### Step 1: Install OpenAGI
 
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion title="Start the preview server" icon="rectangle-terminal">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
+Install the OAGI library with all features included:
 
-    <Tip>
-      Your preview updates automatically as you edit files.
-    </Tip>
-  </Accordion>
-</AccordionGroup>
+```bash
+pip install oagi
+```
 
-### Step 2: Deploy your changes
+<Tip>
+  This installs the complete SDK including desktop automation, server capabilities, and all dependencies.
+</Tip>
 
-<AccordionGroup>
-  <Accordion title="Install our GitHub app" icon="github">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
+### Step 2: Set up authentication
 
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-  </Accordion>
-  <Accordion title="Update your site name and colors" icon="palette">
-    For a first change, let's update the name and colors of your docs site.
+Get your API key and configure your environment:
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+```bash
+export OAGI_API_KEY="sk-..."
+export OAGI_BASE_URL="http://api.agiopen.org"
+```
 
-    <Tip>
-      Try changing the primary color to see an immediate difference!
-    </Tip>
-  </Accordion>
-</AccordionGroup>
+<Note>
+  Your API key provides access to Lux foundation models and includes free credits to get started.
+</Note>
 
-### Step 3: Go live
+### Step 3: Run your first agent
 
-<Accordion title="Publish your docs" icon="rocket">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+Launch a Lux computer-use agent with a single command:
+
+```bash
+oagi agent run "Open Chrome and navigate to https://agiopen.org" --model "lux-actor-1"
+```
+
+**What happens next:**
+- The agent takes a screenshot of your current screen
+- Lux analyzes the visual interface and plans the task
+- The agent executes actions (clicks, types, scrolls) to complete the goal
+- You'll see real-time feedback as the agent works
+
+## Advanced Usage
+
+### Start a local server
+
+For browser-based automation or custom integrations:
+
+```bash
+oagi server start
+```
+
+This starts a Socket.IO server that can communicate with browser extensions or custom clients.
+
+### Python SDK example
+
+For more control, use the Python SDK directly:
+
+```python
+from oagi import ShortTask, ScreenshotMaker, PyautoguiActionHandler
+
+# Initialize the task
+task = ShortTask()
+
+# Run in automated mode
+completed = task.auto_mode(
+    "Search for weather in Tokyo",
+    max_steps=10,
+    executor=PyautoguiActionHandler(),  # Executes actions
+    image_provider=ScreenshotMaker(),   # Captures screenshots
+)
+
+print(f"Task completed: {completed}")
+```
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
+Now that you have your first agent running, explore these capabilities:
 
 <CardGroup cols={2}>
-  <Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-    Learn MDX syntax and start writing your documentation.
+  <Card title="Python SDK" icon="code" href="/python-sdk/installation">
+    Learn the full Python SDK for building custom agents.
   </Card>
-  <Card title="Customize style" icon="palette" href="/essentials/settings">
-    Make your docs match your brand perfectly.
+  <Card title="Core Concepts" icon="lightbulb" href="/concepts/actors">
+    Understand actors, agents, and the computer-use architecture.
   </Card>
-  <Card title="Add code examples" icon="square-code" href="/essentials/code">
-    Include syntax-highlighted code blocks.
+  <Card title="Examples" icon="play" href="/examples/introduction">
+    See real-world examples and common automation patterns.
   </Card>
-  <Card title="API documentation" icon="code" href="/api-reference/introduction">
-    Auto-generate API docs from OpenAPI specs.
+  <Card title="Safety Guide" icon="shield" href="/safety/introduction">
+    Best practices for deploying agents safely.
   </Card>
 </CardGroup>
 
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Permission errors on macOS/Linux">
+    The agent needs accessibility permissions to control your computer:
+    
+    **macOS**: Go to System Preferences → Security & Privacy → Privacy → Accessibility and add your terminal application.
+    
+    **Linux**: Ensure your user has access to input devices or run with appropriate permissions.
+  </Accordion>
+  
+  <Accordion title="Agent not taking actions">
+    If the agent sees the screen but doesn't act:
+    
+    1. Check that `PyautoguiActionHandler` is installed: `pip install oagi[desktop]`
+    2. Verify your screen resolution is supported
+    3. Try a simpler task first to test the setup
+  </Accordion>
+  
+  <Accordion title="API key issues">
+    If you're getting authentication errors:
+    
+    1. Verify your API key starts with `sk-`
+    2. Check that `OAGI_BASE_URL` is set correctly
+    3. Ensure you have remaining credits in your account
+  </Accordion>
+</AccordionGroup>
+
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  **Need help?** Check our [Python SDK documentation](/python-sdk/installation) or explore [core concepts](/concepts/actors) to understand how computer-use agents work.
 </Note>

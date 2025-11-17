@@ -1,0 +1,105 @@
+---
+title: 'Installation'
+description: 'Install and set up the OAGI Python SDK'
+icon: 'code'
+---
+
+# Installation
+
+## Package Options
+
+OAGI Python SDK offers flexible installation options:
+
+### Full Installation (Recommended)
+
+```bash
+pip install oagi
+```
+
+Includes all features: desktop automation and server capabilities.
+
+### Core Only
+
+```bash
+pip install oagi-core
+```
+
+Minimal installation with core functionality only.
+
+### With Extras
+
+```bash
+# Desktop automation features
+pip install oagi-core[desktop]
+
+# Server features
+pip install oagi-core[server]
+
+# Both extras
+pip install oagi-core[desktop,server]
+```
+
+## Requirements
+
+- Python 3.10+
+- Operating System: Windows, macOS, or Linux
+- For desktop automation: Display access
+
+## Setup
+
+### 1. Get API Key
+
+Get your API key from OAGI Platform.
+
+### 2. Set Credentials
+
+**Environment Variables (Recommended):**
+
+```bash
+export OAGI_API_KEY="sk-..."
+export OAGI_BASE_URL="https://api.agiopen.org"
+```
+
+**In Code:**
+
+```python
+from oagi import AsyncDefaultAgent
+
+agent = AsyncDefaultAgent(
+    api_key="sk-...",
+    base_url="https://api.agiopen.org"
+)
+```
+
+### 3. Verify Installation
+
+```python
+import oagi
+print(oagi.__version__)
+
+# Test with CLI
+oagi version
+```
+
+## Package Structure
+
+- **oagi-core**: Core package with actual code
+- **oagi**: Metapackage that installs oagi-core with all extras
+
+Both packages use the same import:
+
+```python
+from oagi import AsyncDefaultAgent, Actor, Action
+```
+
+## Troubleshooting
+
+### Missing Features
+
+```bash
+# Check installed extras
+pip show oagi-core
+
+# Install missing extras
+pip install oagi-core[desktop,server]
+```

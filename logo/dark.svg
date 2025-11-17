@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="263px" height="26px" viewBox="0 0 263 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="258px" height="26px" viewBox="0 0 258 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 59.1 (86144) - https://sketch.com -->
     <title>Group</title>
     <desc>Created with Sketch.</desc>
@@ -12,8 +12,7 @@
             <text id="OpenAGI-Developers" font-family="Outfit-Thin_Bold, Outfit" font-size="23" font-weight="bold">
                 <tspan x="41" y="23" fill="#FFFFFF">OpenAGI</tspan>
                 <tspan x="139.44" y="23" fill="#000000"> </tspan>
-                <tspan x="143.81" y="23" font-family="Outfit-Thin_Regular, Outfit" font-weight="normal" fill="#505050"> </tspan>
-                <tspan x="148.5825" y="23" font-family="Outfit-Thin_Regular, Outfit" font-weight="normal" fill="#BEBEBE">Developers</tspan>
+                <tspan x="143.81" y="23" font-family="Outfit-Thin_Regular, Outfit" font-weight="normal" fill="#BEBEBE">Developers</tspan>
             </text>
         </g>
     </g>

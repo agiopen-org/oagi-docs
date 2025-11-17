@@ -1,0 +1,256 @@
+---
+title: 'Tasker'
+description: 'Hierarchical task execution with planning, reflection, and automatic strategy adjustment'
+icon: 'list-check'
+---
+
+# TaskerAgent
+
+Hierarchical task execution with planning, reflection, and automatic strategy adjustment.
+
+## Overview
+
+TaskerAgent breaks complex tasks into manageable todos, each executed by a specialized TaskeeAgent with intelligent planning and reflection capabilities.
+
+<img
+  style={{ borderRadius: '0.5rem' }}
+  src="/images/tasker-workflow.svg"
+/>
+
+## Components
+
+### TaskerAgent
+
+Main orchestrator that manages the workflow:
+
+```python
+from oagi.agent.tasker import TaskerAgent
+
+tasker = TaskerAgent(
+    api_key="your-key",
+    model="lux-actor-1",
+    max_steps=100,              # Total steps across all todos
+    reflection_interval=8,      # Reflect every 8 actions
+    temperature=0.7
+)
+```
+
+### PlannerMemory
+
+Shared state across all TaskeeAgents:
+
+```python
+# Automatically managed by TaskerAgent
+memory = tasker.get_memory()
+
+# Access execution state
+print(memory.task)              # Task description
+print(memory.todos)             # List of todos with status
+print(memory.deliverables)      # Expected outcomes
+print(memory.history)           # Execution history
+```
+
+### TaskeeAgent
+
+Executes individual todos with planning and reflection:
+
+- Converts todo to actionable instructions
+- Executes in subtasks with periodic reflection
+- Can pivot strategy if not making progress
+- Reports execution summary
+
+### Planner
+
+LLM-based planning engine:
+
+- **Initial planning**: todo → instructions
+- **Reflection**: assess progress and decide next steps
+- **Summary generation**: create execution reports
+
+## Writing Effective Todos
+
+### Guidelines
+
+```python
+# Good: Clear, atomic, measurable
+todos = [
+    "Navigate to Amazon homepage",
+    "Search for 'wireless headphones' in search bar",
+    "Apply filter for 4+ star ratings",
+    "Sort results by price low to high",
+    "Select first item under $50",
+    "Add item to cart"
+]
+
+# Bad: Vague, compound, unmeasurable
+bad_todos = [
+    "Go shopping",  # Too vague
+    "Search and filter and sort",  # Compound
+    "Find something good"  # Unmeasurable
+]
+```
+
+### Writing Deliverables
+
+```python
+# Good: Observable outcomes
+deliverables = [
+    "Item added to shopping cart",
+    "Cart shows 1 item",
+    "Item price is under $50"
+]
+
+# Bad: Internal states or vague goals
+bad_deliverables = [
+    "User is happy",  # Not observable
+    "Good deal found",  # Subjective
+    "Task complete"  # Too generic
+]
+```
+
+## Complete Example
+
+### E-commerce Workflow
+
+```python
+from oagi.agent.tasker import TaskerAgent
+from oagi import AsyncPyautoguiActionHandler, AsyncScreenshotMaker
+import asyncio
+
+async def shop_for_laptop():
+    # Create TaskerAgent
+    tasker = TaskerAgent(
+        api_key="your-key",
+        model="lux-v1",
+        max_steps=150,
+        reflection_interval=25
+    )
+
+    # Define structured task
+    tasker.set_task(
+        task="Purchase a laptop under $800 with good reviews",
+
+        todos=[
+            # Navigation
+            "Open web browser",
+            "Navigate to Amazon.com",
+
+            # Search
+            "Search 'laptop'",
+
+            # Filtering
+            "Set maximum price filter to $800, and Select '4 stars & up' in customer review filter",
+
+            # Add to cart
+            "Click on first laptop in results and add it to cart",
+        ],
+
+        deliverables=[
+            "Laptop under 800 and 4 starts up added to cart",
+        ]
+    )
+
+    # Execute
+    success = await tasker.execute(
+        instruction="Shop for a laptop following the requirements",
+        action_handler=AsyncPyautoguiActionHandler(),
+        image_provider=AsyncScreenshotMaker()
+    )
+
+    # Analyze results
+    memory = tasker.get_memory()
+
+    print(f"Task Success: {success}")
+    print("\nTodo Status:")
+    for i, todo in enumerate(memory.todos):
+        status_icon = {
+            "COMPLETED": "[✓]",
+            "SKIPPED": "[—]",
+            "PENDING": "[ ]"
+        }.get(todo.status.value, "[ ]")
+        print(f"{status_icon} {i+1}. {todo.description}")
+
+    print("\nDeliverables:")
+    for deliverable in memory.deliverables:
+        status = "[✓]" if deliverable.achieved else "[✗]"
+        print(f"{status} {deliverable.description}")
+
+    print(f"\nTotal Actions: {sum(len(h.actions) for h in memory.history)}")
+
+    return success
+
+# Run
+asyncio.run(shop_for_laptop())
+```
+
+## Workflow
+
+The TaskerAgent follows a sophisticated execution pattern:
+
+1. **Set Task** - Define task, todos, and deliverables
+2. **Initialize Memory** - Create shared PlannerMemory
+3. **Process Todos** - Execute each todo with TaskeeAgent
+4. **Plan & Execute** - Convert todo to instructions and execute
+5. **Reflect** - Assess progress and adjust strategy
+6. **Update Memory** - Track completion and history
+7. **Check Deliverables** - Verify expected outcomes
+
+### Reflection Logic
+
+During execution, the agent can:
+
+- **Continue** - Keep executing current strategy
+- **Pivot** - Generate new strategy if stuck
+- **Success** - Mark todo as complete
+- **Blocked** - Skip todo and move to next
+
+## Customization
+
+### Adjust Reflection Frequency
+
+```python
+# Frequent reflection for complex/uncertain tasks
+complex_tasker = TaskerAgent(
+    reflection_interval=10  # Every 10 actions
+)
+
+# Less frequent for straightforward tasks
+simple_tasker = TaskerAgent(
+    reflection_interval=30  # Every 30 actions
+)
+```
+
+### Model Selection
+
+```python
+# Use lux-thinker-1 for complex planning tasks
+planning_tasker = TaskerAgent(
+    model="lux-thinker-1",
+    reflection_interval=15
+)
+
+# Use lux-actor-1 for fast execution
+execution_tasker = TaskerAgent(
+    model="lux-actor-1",
+    reflection_interval=20
+)
+```
+
+## Best Practices
+
+1. **Write atomic todos** - Each todo should be a single, clear action
+2. **Define observable deliverables** - Use measurable outcomes
+3. **Set appropriate reflection intervals** - More frequent for complex tasks
+4. **Use descriptive task descriptions** - Help the planner understand context
+5. **Monitor memory state** - Check todo status and execution history
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Agents" icon="user-hat-tie" href="/python-sdk/agents">
+    Learn about other agent types
+  </Card>
+  <Card title="Actors" icon="person" href="/python-sdk/actor">
+    Understand the underlying Actor system
+  </Card>
+</CardGroup>

@@ -1,0 +1,25 @@
+---
+title: 'Step'
+description: 'A logical unit containing actions with reasoning'
+icon: 'stairs'
+---
+
+# Step
+
+A logical unit containing actions with reasoning.
+
+## Components
+
+- **reason**: Why these actions are needed
+- **actions**: List of Actions to execute
+- **stop**: Task complete? (true/false)
+
+## Example
+
+```json
+{
+  "reason": "Clicking submit to send the form",
+  "actions": [{"type": "CLICK", "argument": "750,450"}],
+  "stop": false
+}
+```

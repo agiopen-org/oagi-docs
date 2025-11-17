@@ -1,0 +1,328 @@
+---
+title: "Handlers"
+description: "Configure action execution and image capture for automation tasks"
+icon: "hand"
+---
+
+# Handlers
+
+Configure action execution and image capture for automation tasks.
+
+## Action Handlers
+
+### PyAutoGUI Handler
+
+Default handler for executing actions:
+
+```python
+from oagi import PyautoguiActionHandler, AsyncPyautoguiActionHandler
+
+# Sync
+handler = PyautoguiActionHandler()
+
+# Async
+async_handler = AsyncPyautoguiActionHandler()
+
+# Execute actions
+actions = [
+    Action(type=ActionType.CLICK, argument="500,300"),
+    Action(type=ActionType.TYPE, argument="Hello")
+]
+handler(actions)
+```
+
+### Configuration
+
+```python
+from oagi import PyautoguiConfig
+
+config = PyautoguiConfig(
+    drag_duration=1.0,      # Drag speed (seconds)
+    scroll_amount=50,       # Scroll distance
+    wait_duration=2.0,      # Wait action duration
+    action_pause=0.2,       # Pause between actions
+    hotkey_interval=0.15,   # Delay between key presses
+    capslock_mode="session" # "session" or "system"
+)
+
+handler = PyautoguiActionHandler(config=config)
+```
+
+### Configuration Profiles
+
+```python
+# Fast execution
+fast = PyautoguiConfig(drag_duration=0.2, action_pause=0.05)
+
+# Careful execution
+careful = PyautoguiConfig(drag_duration=2.0, action_pause=0.5)
+
+# Sensitive applications
+sensitive = PyautoguiConfig(drag_duration=1.5, action_pause=1.0)
+```
+
+## Action Types
+
+```python
+from oagi import Action, ActionType
+
+# Mouse actions
+Action(type=ActionType.CLICK, argument="500,300")
+Action(type=ActionType.LEFT_DOUBLE, argument="500,300")
+Action(type=ActionType.RIGHT_SINGLE, argument="500,300")
+Action(type=ActionType.DRAG, argument="100,100,500,500")
+
+# Keyboard actions
+Action(type=ActionType.TYPE, argument="Hello World")
+Action(type=ActionType.HOTKEY, argument="ctrl+c")
+
+# Navigation
+Action(type=ActionType.SCROLL, argument="0,-5")  # Up
+Action(type=ActionType.WAIT, argument="2")       # 2 seconds
+
+# Control
+Action(type=ActionType.FINISH, argument="Complete")
+Action(type=ActionType.CALL_USER, argument="Need input")
+```
+
+### Coordinate System
+
+OAGI uses normalized coordinates (0-1000):
+
+```python
+def denormalize(x, y, screen_width, screen_height):
+    """Convert OAGI coordinates to screen pixels"""
+    pixel_x = int(x * screen_width / 1000)
+    pixel_y = int(y * screen_height / 1000)
+    return pixel_x, pixel_y
+```
+
+## Custom Action Handler
+
+```python
+class CustomHandler:
+    def __call__(self, actions: list[Action]) -> None:
+        for action in actions:
+            if action.type == ActionType.CLICK:
+                x, y = map(int, action.argument.split(','))
+                self._safe_click(x, y)
+            elif action.type == ActionType.TYPE:
+                self._safe_type(action.argument)
+
+    def _safe_click(self, x, y):
+        # Add bounds checking
+        screen_w, screen_h = pyautogui.size()
+        x = max(0, min(x, screen_w - 1))
+        y = max(0, min(y, screen_h - 1))
+        pyautogui.click(x, y)
+
+    def _safe_type(self, text):
+        if len(text) < 1000:  # Safety check
+            pyautogui.typewrite(text)
+```
+
+### Action Filtering
+
+```python
+class FilteredHandler:
+    def __init__(self, base_handler):
+        self.base = base_handler
+        self.blocked = ["alt+f4", "cmd+q"]
+
+    def __call__(self, actions):
+        filtered = [
+            a for a in actions
+            if not (a.type == ActionType.HOTKEY
+                    and a.argument.lower() in self.blocked)
+        ]
+        self.base(filtered)
+```
+
+## Image Providers
+
+### Screenshot Makers
+
+```python
+from oagi import ScreenshotMaker, AsyncScreenshotMaker
+
+# Basic screenshot
+screenshot_maker = ScreenshotMaker()
+image = screenshot_maker()
+
+# Async version
+async_maker = AsyncScreenshotMaker()
+image = await async_maker()
+```
+
+### Image Configuration
+
+```python
+from oagi import ImageConfig
+
+config = ImageConfig(
+    format="JPEG",      # PNG or JPEG
+    quality=85,         # JPEG quality (1-100)
+    width=1280,         # Resize width
+    height=720,         # Resize height
+    resample="LANCZOS"  # Resample filter
+)
+
+screenshot_maker = AsyncScreenshotMaker(config)
+```
+
+### Optimization Profiles
+
+```python
+# High quality
+high_quality = ImageConfig(format="PNG", width=1920, height=1080)
+
+# Balanced
+balanced = ImageConfig(format="JPEG", quality=85, width=1280, height=720)
+
+# Fast/small
+fast = ImageConfig(format="JPEG", quality=70, width=800, height=600)
+```
+
+## PILImage
+
+Work with PIL images:
+
+```python
+from oagi import PILImage, ImageConfig
+
+# Load from file
+image = PILImage.from_file("screenshot.png")
+
+# Capture screenshot
+image = PILImage.from_screenshot()
+
+# Transform
+config = ImageConfig(format="JPEG", quality=90)
+transformed = image.transform(config)
+
+# Get bytes
+image_bytes = transformed.read()
+```
+
+## URLImage
+
+Use existing URLs without re-uploading:
+
+```python
+from oagi import URLImage
+
+# Use pre-uploaded image
+url_image = URLImage("https://example.com/screenshot.png")
+
+# No upload needed
+step = await actor.step(url_image)
+```
+
+## Custom Image Provider
+
+```python
+class CustomImageProvider:
+    def __init__(self):
+        self._last = None
+
+    def __call__(self) -> Image:
+        # Capture screenshot
+        screenshot = capture_custom_screenshot()
+        self._last = BytesImage(screenshot)
+        return self._last
+
+    def last_image(self) -> Image:
+        return self._last
+
+class BytesImage:
+    def __init__(self, data: bytes):
+        self.data = data
+
+    def read(self) -> bytes:
+        return self.data
+```
+
+### Caching
+
+```python
+class CachedProvider:
+    def __init__(self, cache_duration=1.0):
+        self._cache = None
+        self._cache_time = 0
+        self.cache_duration = cache_duration
+
+    async def __call__(self):
+        now = time.time()
+        if self._cache and (now - self._cache_time < self.cache_duration):
+            return self._cache
+
+        self._cache = await AsyncScreenshotMaker()()
+        self._cache_time = now
+        return self._cache
+```
+
+## Combined Usage
+
+Using handlers together:
+
+```python
+from oagi import AsyncDefaultAgent, AsyncPyautoguiActionHandler, AsyncScreenshotMaker
+from oagi import PyautoguiConfig, ImageConfig
+
+# Configure action execution
+action_config = PyautoguiConfig(
+    drag_duration=0.5,
+    action_pause=0.1
+)
+
+# Configure image capture
+image_config = ImageConfig(
+    format="JPEG",
+    quality=85,
+    width=1280,
+    height=720
+)
+
+# Create handlers
+action_handler = AsyncPyautoguiActionHandler(action_config)
+image_provider = AsyncScreenshotMaker(image_config)
+
+# Use with agent
+agent = AsyncDefaultAgent(api_key="key")
+success = await agent.execute(
+    "Complete task",
+    action_handler,
+    image_provider
+)
+```
+
+## Best Practices
+
+### Action Handler Configuration
+- Use **fast profiles** for responsive applications
+- Use **careful profiles** for sensitive or slow applications
+- **Filter dangerous actions** like system shutdown commands
+- **Add bounds checking** for click coordinates
+
+### Image Provider Optimization
+- Use **JPEG with quality 85** for balanced size/quality
+- **Resize images** to reduce API costs and latency
+- **Cache screenshots** for repeated use within short timeframes
+- Use **URLImage** when images are already hosted
+
+### Safety Considerations
+- **Validate coordinates** before clicking
+- **Limit text length** for type actions
+- **Block dangerous hotkeys** in production
+- **Test handlers** in safe environments first
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Actors" icon="person" href="/python-sdk/actor">
+    Learn how to use handlers with Actors
+  </Card>
+  <Card title="Agents" icon="user-hat-tie" href="/python-sdk/agents">
+    Integrate handlers with high-level Agents
+  </Card>
+</CardGroup>

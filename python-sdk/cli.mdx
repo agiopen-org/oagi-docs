@@ -1,0 +1,256 @@
+---
+title: 'CLI Commands'
+description: 'OAGI provides a command-line interface for quick automation and server management'
+icon: 'terminal'
+---
+
+# CLI Commands
+
+OAGI provides a command-line interface for quick automation and server management.
+
+## Installation
+
+The CLI is automatically installed with the package:
+
+```bash
+pip install oagi
+
+# Verify installation
+oagi version
+```
+
+## Commands Overview
+
+```bash
+oagi --help
+```
+
+**Commands:**
+- `version` - Show version information
+- `config` - Display configuration
+- `agent` - Run automation tasks
+- `server` - Start Socket.IO server
+
+## Version Command
+
+Display SDK and environment information:
+
+```bash
+oagi version
+```
+
+**Output:**
+```
+OAGI SDK version: 0.9.1
+Python version: 3.12.11
+Platform: darwin
+Installed extras: desktop, server
+```
+
+## Config Command
+
+Show current configuration:
+
+```bash
+oagi config show
+```
+
+## Agent Command
+
+### Basic Usage
+
+```bash
+# Run simple task
+oagi agent run "Open calculator"
+
+# With options
+oagi agent run "Search for weather" \
+    --model lux-v1 \
+    --max-steps 30 \
+    --temperature 0.7
+```
+
+### Command Options
+
+```bash
+oagi agent run [OPTIONS] INSTRUCTION
+```
+
+**Options:**
+- `--model TEXT` - Model to use (default: lux-v1)
+- `--max-steps INTEGER` - Maximum steps (default: 30)
+- `--temperature FLOAT` - Sampling temperature 0-1 (default: 0.7)
+- `--mode TEXT` - Agent mode: actor, tasker (default: actor)
+- `--oagi-api-key TEXT` - Override API key
+- `--oagi-base-url TEXT` - Override base URL
+- `--help` - Show help message
+
+### Examples
+
+```bash
+# Basic automation
+oagi agent run "Open browser and go to Google"
+
+# Complex task with options
+oagi agent run "Fill out the registration form" \
+    --max-steps 50 \
+    --temperature 0.5
+
+# Using TaskerAgent mode
+oagi agent run "Research and compare laptops" \
+    --mode tasker \
+    --max-steps 100
+
+# Override credentials
+oagi agent run "Check email" \
+    --oagi-api-key "sk-different-key" \
+    --oagi-base-url "https://custom.api"
+```
+
+### Example Output
+
+The CLI provides detailed execution summaries:
+
+```
+                                Agent Execution Summary                                
+┏━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┓
+┃  Step  ┃ Reasoning                                                                                                                                                                  ┃ Actions                             ┃  Status  ┃
+┡━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━┩
+│   1    │ Agent session initialized with planning                                                                                                                                    │                                     │    →     │
+├────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┼─────────────────────────────────────┼──────────┤
+│   2    │ I need to navigate to Amazon, so I will click on the Chrome browser's address bar to enter a new URL.                                                                     │ click(167, 90)                      │    →     │
+├────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┼─────────────────────────────────────┼──────────┤
+│   3    │ I typed 'amazon.com' into the address bar and pressed Enter to navigate to the Amazon website.                                                                             │ type(amazon.com)                    │    →     │
+├────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┼─────────────────────────────────────┼──────────┤
+│   4    │ I will click on the first search suggestion to navigate to Amazon.                                                                                                         │ click(167, 127)                     │    →     │
+├────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┼─────────────────────────────────────┼──────────┤
+│   5    │ Task completed successfully - navigated to Amazon homepage.                                                                                                                │ finish()                            │    ✓     │
+└────────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┴─────────────────────────────────────┴──────────┘
+```
+
+## Environment Variables
+
+Set defaults via environment:
+
+```bash
+export OAGI_API_KEY="your-key"
+export OAGI_BASE_URL="https://api.agiopen.org"
+export OAGI_LOG_LEVEL="DEBUG"
+
+# Now run without specifying credentials
+oagi agent run "Open notepad"
+```
+
+## Server Command
+
+### Start Server
+
+```bash
+# Basic start
+oagi server start
+
+# With configuration
+oagi server start \
+    --host 0.0.0.0 \
+    --port 8000
+
+# All options
+oagi server start \
+    --host 0.0.0.0 \
+    --port 8000 \
+    --oagi-api-key "your-key" \
+    --oagi-base-url "https://api.agiopen.org"
+```
+
+### Server Options
+
+```bash
+oagi server start [OPTIONS]
+```
+
+**Options:**
+- `--host TEXT` - Server host (default: 0.0.0.0)
+- `--port INTEGER` - Server port (default: 8000)
+- `--oagi-api-key TEXT` - API key for OAGI
+- `--oagi-base-url TEXT` - OAGI API base URL
+- `--help` - Show help message
+
+### Server Environment
+
+Configure via environment variables:
+
+```bash
+# API Configuration
+export OAGI_API_KEY="your-key"
+export OAGI_BASE_URL="https://api.agiopen.org"
+
+# Server Settings
+export OAGI_SERVER_HOST="0.0.0.0"
+export OAGI_SERVER_PORT="8000"
+export OAGI_MAX_STEPS="30"
+export OAGI_DEFAULT_MODEL="lux-v1"
+
+# Start with environment config
+oagi server start
+```
+
+## Logging
+
+### Log Levels
+
+Control verbosity:
+
+```bash
+# Minimal output
+export OAGI_LOG_LEVEL="ERROR"
+
+# Standard output
+export OAGI_LOG_LEVEL="INFO"
+
+# Detailed debugging
+export OAGI_LOG_LEVEL="DEBUG"
+
+# Run with debug logging
+OAGI_LOG_LEVEL=DEBUG oagi agent run "Test task"
+```
+
+## Configuration Summary
+
+### Environment Variables Reference
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `OAGI_API_KEY` | Your OAGI API key | Required |
+| `OAGI_BASE_URL` | API base URL | https://api.agiopen.org |
+| `OAGI_LOG_LEVEL` | Logging verbosity | INFO |
+| `OAGI_SERVER_HOST` | Server host | 0.0.0.0 |
+| `OAGI_SERVER_PORT` | Server port | 8000 |
+| `OAGI_MAX_STEPS` | Default max steps | 30 |
+| `OAGI_DEFAULT_MODEL` | Default model | lux-v1 |
+
+### Common Workflows
+
+```bash
+# Quick automation
+oagi agent run "Open calculator and compute 2+2"
+
+# Research task with TaskerAgent
+oagi agent run "Research the top 3 laptops under $1000" --mode tasker
+
+# Start development server
+oagi server start --port 3000
+
+# Debug a failing task
+OAGI_LOG_LEVEL=DEBUG oagi agent run "Complex task" --max-steps 50
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Python SDK" icon="code" href="/python-sdk/installation">
+    Learn the programmatic API
+  </Card>
+  <Card title="Agents" icon="user-hat-tie" href="/python-sdk/agents">
+    Understand agent modes and configuration
+  </Card>
+</CardGroup>
