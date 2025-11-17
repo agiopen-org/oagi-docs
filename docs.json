@@ -3,9 +3,9 @@
   "theme": "mint",
   "name": "OpenAGI Developer Docs",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#4EACDB",
+    "light": "#4EACDB",
+    "dark": "#4EACDB"
   },
   "favicon": "/favicon.svg",
   "navigation": {

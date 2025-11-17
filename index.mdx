@@ -1,97 +1,119 @@
 ---
 title: "Introduction"
-description: "Welcome to the new home for your documentation"
+description: "Developer documentation OpenAGI's foundation model for computer use"
 ---
 
-## Setting up
+# Lux: Foundation Model for Computer Use
 
-Get your documentation site up and running in minutes.
+Welcome to the developer documentation for **Lux**, OpenAGI's foundation model that enables AI agents to operate computers just like humans do.
+
+## What is Computer Use?
+
+Computer Use represents one of the newest and most exciting areas of AI. Unlike traditional AI models that only process text or images, **computer use models** understand and interact with graphical user interfaces—all the buttons, menus, text boxes, and windows you see on your screen.
+
+Think of it as an AI agent that can:
+- **See** your screen through screenshots
+- **Understand** goals given in natural language  
+- **Act** by clicking, typing, and scrolling to complete tasks
+
+### How It Works
+
+Computer use models are **multimodal**, processing multiple types of information simultaneously:
+
+**🎯 The Goal**
+```
+"Find the cheapest flight to Tokyo for next weekend"
+"Summarize new emails from my boss and draft a reply"  
+"Take this spreadsheet and create a chart from the data"
+```
+
+**👁️ The Vision**
+The model takes screenshots to "see" the current state of the screen
+
+**🤖 The Actions**
+Instead of just text responses, the model outputs specific actions:
+- `click(x, y)` on buttons or links
+- `type("text")` into input fields  
+- `scroll()` to navigate pages
+- `drag_and_drop(item, location)` to move elements
+
+This runs in a continuous loop: **action → screenshot → next action** until the goal is complete.
+
+## Why Computer Use Matters
+
+### Beyond Chat Interfaces
+
+**Traditional AI**: You give it text, it gives you text back. It lives inside a chat window.
+
+**Computer Use AI**: You give it a task, and it leaves the chat to use any application on your computer—browsers, email clients, spreadsheets, design tools—to accomplish real work.
+
+### True Digital Assistance
+
+This technology enables **general-purpose agents** that can learn to use any software interface, moving from simple automation scripts to intelligent assistants that adapt to new applications.
+
+## Get Started with Lux
+
+Build your first computer use agent in minutes.
 
 <Card
-  title="Start here"
+  title="Quick Start Guide"
   icon="rocket"
   href="/quickstart"
   horizontal
 >
-  Follow our three step quickstart guide.
+  Install the SDK and create your first agent in 5 minutes.
 </Card>
 
-## Make it yours
+```bash
+pip install oagi
+```
 
-Design a docs site that looks great and empowers your users.
+## Developer Resources
 
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
-
-## Create beautiful pages
-
-Everything you need to create world-class documentation.
+Everything you need to build with Lux.
 
 <Columns cols={2}>
   <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
+    title="Python SDK"
     icon="code"
-    href="/essentials/code"
+    href="/sdk/introduction"
   >
-    Add sample code to demonstrate how to use your product.
+    Official Python client library with examples and best practices.
   </Card>
   <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
+    title="API Reference"
+    icon="book"
+    href="/api/reference"
   >
-    Display images and other media.
+    Complete API documentation for all endpoints and parameters.
   </Card>
   <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
+    title="Examples & Tutorials"
+    icon="play"
+    href="/examples/introduction"
   >
-    Write once and reuse across your docs.
+    Step-by-step guides for common computer use patterns.
+  </Card>
+  <Card
+    title="Safety & Best Practices"
+    icon="shield"
+    href="/safety/introduction"
+  >
+    Guidelines for deploying computer use agents safely in production.
   </Card>
 </Columns>
 
-## Need inspiration?
+## The Computer Use Landscape
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+Major AI labs are actively building computer use capabilities:
+
+- **Google**: Gemini 2.5 Computer Use model for UI navigation
+- **OpenAI**: Computer-Using Agent (CUA) with GPT-4o  
+- **Amazon**: Nova Act for autonomous web browser actions
+- **Microsoft**: Magma for interface interpretation
+
+**Lux** by OpenAGI provides developers with production-ready access to this cutting-edge technology.
+
+---
+
+**Ready to build agents that can use any software?** Start with our [Quick Start Guide](/quickstart) or explore the [Python SDK documentation](/sdk/introduction).
