@@ -1,5 +1,5 @@
 ---
-title: 'Models'
+title: 'OpenAGI Models'
 description: 'Choose the right model for your computer-use tasks'
 ---
 
@@ -33,15 +33,23 @@ OpenAGI provides two specialized foundation models for computer use, each optimi
 - Real-time UX (CLI/desktop control loops)
 - Direct "observe → decide → act" loops
 
-**Typical usage:**
+**Typical usage (via TaskerAgent):**
 ```python
-# Quick, responsive actions
-task = ShortTask()
-completed = task.auto_mode(
-    "Click the submit button",
-    model="lux-actor-1",  # Fast execution
-    max_steps=3
-)
+import asyncio
+
+from oagi import TaskerAgent
+from oagi import AsyncPyautoguiActionHandler, AsyncScreenshotMaker
+
+async def run_actor_agent():
+    agent = TaskerAgent(model="lux-actor-1")
+    agent.set_task(task="Submit the form", todos=["Open form", "Fill fields", "Click submit"])
+    await agent.execute(
+        instruction="Complete the submission",
+        action_handler=AsyncPyautoguiActionHandler(),
+        image_provider=AsyncScreenshotMaker(),
+    )
+
+asyncio.run(run_actor_agent())
 ```
 
 ### lux-thinker-1: Careful Planning
@@ -57,49 +65,33 @@ completed = task.auto_mode(
 - Increased cost per action
 - Not ideal for tight control loops
 
-**Typical usage:**
+**Typical usage (hybrid via TaskerAgent):**
 ```python
-# Complex planning task
-task = ShortTask()
-completed = task.auto_mode(
-    "Research and compare three hotels, then book the cheapest one",
-    model="lux-thinker-1",  # Deep reasoning
-    max_steps=20
-)
-```
+import asyncio
 
-## API Interface
+from oagi import TaskerAgent
+from oagi import AsyncPyautoguiActionHandler, AsyncScreenshotMaker
 
-Both models share the same request/response structure:
+async def run_thinker_plan():
+    agent = TaskerAgent(model="lux-thinker-1", max_steps=60)
+    agent.set_task(
+        task="Compare hotels and book wisely",
+        todos=["Open booking site", "Research three hotels", "Pick cheapest option", "Complete checkout"],
+    )
+    await agent.execute(
+        instruction="Finish the research and booking flow",
+        action_handler=AsyncPyautoguiActionHandler(),
+        image_provider=AsyncScreenshotMaker(),
+    )
 
-### Request Format
-```python
-{
-    "images": ["base64_screenshot"],  # One or more screenshots
-    "instruction": "Click the login button",  # Optional text context
-    "model": "lux-actor-1",  # or "lux-thinker-1"
-    "max_steps": 10
-}
-```
-
-### Response Format
-```python
-{
-    "action": {
-        "type": "click",
-        "coordinates": [450, 300],
-        "element": "login-button"
-    },
-    "reasoning": "Located login button in top-right corner",
-    "completed": false
-}
+asyncio.run(run_thinker_plan())
 ```
 
 ## Performance Characteristics
 
 | Feature | lux-actor-1 | lux-thinker-1 |
 |---------|-------------|---------------|
-| **Latency** | ~200-500ms | ~1-3s |
+| **Latency** | Lower | Higher |
 | **Cost** | Lower | Higher |
 | **Accuracy** | High for simple tasks | Higher for complex tasks |
 | **Best Use** | Real-time control | Strategic planning |
@@ -145,14 +137,39 @@ def hybrid_agent(complex_task):
 
 ### Error Handling
 ```python
-# Add verification between critical steps
-task = ShortTask()
-task.auto_mode("Navigate to checkout", model="lux-actor-1")
+import asyncio
 
-# Verify we're on the right page
-if not verify_page_title("Checkout"):
-    # Retry or use thinker for more careful navigation
-    task.auto_mode("Find and click checkout", model="lux-thinker-1")
+from oagi import TaskerAgent, AsyncPyautoguiActionHandler, AsyncScreenshotMaker
+
+def verify_checkout():
+    # Custom verification based on your UI (DOM queries, OCR, etc.)
+    ...
+
+async def guarded_checkout():
+    handler = AsyncPyautoguiActionHandler()
+    screenshots = AsyncScreenshotMaker()
+
+    # Fast path with lux-actor-1
+    agent = TaskerAgent(model="lux-actor-1", max_steps=15)
+    agent.set_task("Navigate to checkout", ["Open cart", "Review items", "Go to checkout"])
+
+    success = await agent.execute(
+        instruction="Reach the checkout page",
+        action_handler=handler,
+        image_provider=screenshots,
+    )
+
+    if not success or not verify_checkout():
+        # Fall back to deeper reasoning with lux-thinker-1
+        thinker = TaskerAgent(model="lux-thinker-1", max_steps=40)
+        thinker.set_task("Find checkout reliably", ["Search navigation", "Open checkout", "Confirm page"])
+        await thinker.execute(
+            instruction="Find and click checkout",
+            action_handler=handler,
+            image_provider=screenshots,
+        )
+
+asyncio.run(guarded_checkout())
 ```
 
 ## Pricing & Quotas

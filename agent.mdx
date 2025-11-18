@@ -1,0 +1,64 @@
+---
+title: Build your first agent
+description: Use the TaskerAgent to orchestrate multi-step computer-use workflows
+---
+
+# The TaskerAgent
+
+If you want the easiest way to use **lux-actor-1**, is to use the **TaskerAgent** instead of calling the model directly. TaskerAgent wraps the Lux Actor model with planning, screenshot capture, and action streaming so you can focus on describing tasks, not wiring loops.
+
+<Callout>
+  **Why TaskerAgent?** You get the same low-latency reasoning from lux-actor-1, plus automatic todo management, progress memory, and retries. No need to stitch together screenshot uploads or action execution yourself.
+</Callout>
+
+## Minimal setup
+
+1. Install the SDK ([Installation](/python-sdk/installation)) and load your OAGI API key.
+2. Pick an action handler + image provider (see [Handlers](/python-sdk/handlers)).
+3. Describe the overall task and todos, then call `execute()`.
+
+```python
+import asyncio
+
+from oagi import TaskerAgent
+from oagi import AsyncPyautoguiActionHandler, AsyncScreenshotMaker
+
+async def main():
+    agent = TaskerAgent(api_key="YOUR_KEY", model="lux-actor-1")
+
+    agent.set_task(
+        task="Check build status and post update",
+        todos=[
+            "Open CI dashboard",
+            "Verify latest build",
+            "Post summary in chat"
+        ],
+    )
+
+    await agent.execute(
+        instruction="Run through the checklist",
+        action_handler=AsyncPyautoguiActionHandler(),
+        image_provider=AsyncScreenshotMaker(),
+    )
+
+asyncio.run(main())
+```
+
+That’s it: behind the scenes, TaskerAgent talks to lux-actor-1 for you, keeps a PlannerMemory of todos/deliverables, and routes every action to your client-side handler.
+
+## What developers need to remember
+
+- **Stay on TaskerAgent unless you need custom loops.** Direct lux-actor-1 usage requires manual screenshot uploads, action parsing, retries, and state management. TaskerAgent already handles those concerns.
+- **Bring your own execution layer.** TaskerAgent emits structured actions and screenshot requests; your desktop bridge (PyAutoGUI, Socket.IO client, etc.) simply plugs into those interfaces.
+- **Inspect memory for status.** Call `agent.get_memory()` to see which todos succeeded, summaries, and remaining work—perfect for UI surfaces or alerts.
+
+Want more control later? You can extend TaskerAgent with custom planners, different handlers, or observers, but the minimal flow above is enough to put lux-actor-1 to work in minutes.
+
+<CardGroup cols={2}>
+  <Card title="Python SDK – Agents" icon="code" href="/python-sdk/agents">
+    Explore advanced agent patterns
+  </Card>
+  <Card title="Desktop Application" icon="window" href="/python-sdk/desktop-application">
+    Learn how to run TaskerAgent across remote machines
+  </Card>
+</CardGroup>

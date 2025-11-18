@@ -1,0 +1,110 @@
+---
+title: Build your first agent
+description: Use the TaskerAgent to orchestrate multi-step computer-use workflows
+---
+
+# Build your first agent
+
+The fastest way to ship an end-to-end automation experience with OpenAGI is to start from the **TaskerAgent** (`oagi.agent.tasker.TaskerAgent`). It is an async, hierarchical agent that:
+
+- Breaks work into todos and deliverables using an internal Planner/Memory system
+- Delegates each todo to a TaskeeAgent that talks to the Lux models (defaults to `lux-actor-1` per @models.mdx#109-118)
+- Streams actions via any `AsyncActionHandler` (e.g., your Socket.IO desktop bridge) and requests screenshots through an `AsyncImageProvider`
+
+This guide walks through wiring those pieces together so you can run your first agent locally or behind the remote server described in the Desktop Application docs.
+
+## Prerequisites
+
+- Python project with `oagi` installed (see [Installation](/python-sdk/installation))
+- Action handler that can execute actions locally (PyAutoGUI handler or a custom implementation from [Handlers](/python-sdk/handlers))
+- Image provider that can capture or forward screenshots
+- OAGI API key and base URL (defaults to `https://api.agiopen.org`)
+
+## Quick start (async)
+
+```python
+import asyncio
+
+from oagi import TaskerAgent
+from oagi import AsyncPyautoguiActionHandler, AsyncScreenshotMaker
+
+async def main():
+    agent = TaskerAgent(
+        api_key="YOUR_KEY",
+        model="lux-actor-1",
+        max_steps=40,
+    )
+
+    agent.set_task(
+        task="Book a flight to Tokyo",
+        todos=[
+            "Open the airline site",
+            "Search for flights",
+            "Fill traveler details",
+            "Confirm booking"
+        ],
+        deliverables=["Confirmation screenshot"],
+    )
+
+    success = await agent.execute(
+        instruction="Complete the booking workflow",
+        action_handler=AsyncPyautoguiActionHandler(),
+        image_provider=AsyncScreenshotMaker(),
+    )
+
+    print("Workflow complete" if success else "Some todos failed")
+
+asyncio.run(main())
+```
+
+### How it works
+
+1. **PlannerMemory** stores the overall task, todos, deliverables, and execution history.
+2. `TaskerAgent.set_task()` seeds that memory; you can also append todos/deliverables later.
+3. `TaskerAgent.execute()` loops through todos. For each one it spawns a `TaskeeAgent`, which:
+   - Sends screenshots to the Lux model via the SDK’s `AsyncDefaultAgent` pipeline
+   - Receives actions and passes them to your handler (often a Socket.IO bridge)
+   - Reflects on progress every few steps (configurable via `reflection_interval`)
+4. After each todo, the planner memory is updated with summaries so future todos inherit context.
+
+If `execute()` returns `False`, at least one todo failed. You can inspect `agent.get_memory()` to view histories, completion summaries, and add remediation todos before retrying.
+
+## Customizing the experience
+
+| Capability | How to customize |
+|------------|------------------|
+| **Model + temperature** | Pass `model`, `temperature`, and `max_steps` to `TaskerAgent` to align with the guidance in the Models page. |
+| **Action execution** | Wrap `AsyncPyautoguiActionHandler` or provide a custom handler that emits Socket.IO events to a remote desktop. |
+| **Screenshot capture** | Use `AsyncScreenshotMaker`, `URLImage`, or a bespoke provider that uploads via the server’s `request_screenshot` contract. |
+| **Observability** | Provide an `AsyncStepObserver` when instantiating the agent to stream reasoning/steps into your telemetry stack. |
+| **Dynamic todos** | Call `append_todo()` or `append_deliverable()` mid-run to inject new work. |
+
+## Architecture refresher
+
+```
+┌─────────────┐    ┌────────────────┐    ┌─────────┐
+│  TaskerAgent│───▶│ TaskeeAgent(s) │───▶│  Actor  │
+│  (Planner)  │    │ (per todo)     │    │ (Lux API│
+└─────────────┘    └────────────────┘    └─────────┘
+        │                    │                 │
+        │                    │         ┌──────────────┐
+        │                    └────────▶│ActionHandler │
+        │                              │ (Desktop)    │
+        │                              └──────────────┘
+        │
+        └──────────────────────────────▶│ImageProvider│
+                                        └──────────────┘
+```
+
+The TaskerAgent keeps memory and planning on the client side while leveraging the same action/image abstractions you already use with Actors. That means you can run it entirely locally (PyAutoGUI + direct API calls) or route it through the Socket.IO server for remote desktops.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Python SDK – Agents" icon="code" href="/python-sdk/agents">
+    See additional agent helpers and utilities
+  </Card>
+  <Card title="Handlers" icon="hand" href="/python-sdk/handlers">
+    Configure action and image providers for your TaskerAgent
+  </Card>
+</CardGroup>

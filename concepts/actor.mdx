@@ -1,6 +1,6 @@
 ---
 title: 'Actor'
-description: 'The core component that manages conversations with OAGI API for step-by-step task execution'
+description: 'The core component that manages conversations with the OAGI API for step-by-step task execution'
 icon: 'person'
 ---
 
@@ -36,15 +36,18 @@ Init Task → Send Screenshot → Get Step → (You Execute) → Repeat
 ## When to Use Actor
 
 **Choose Actor when you need:**
-- Manual control over each execution step
+- Manual control over each execution step (10–20 steps)
 - Custom action filtering or processing
 - Integration with existing automation systems
 - Detailed logging and debugging capabilities
 
-**Choose ShortTask when you need:**
-- Automated end-to-end execution
-- Quick prototyping and simple tasks
-- Minimal setup and configuration
+**Choose TaskerAgent when you need:**
+- Longer workflows that should be broken into a to-do list
+- Automatic orchestration of Actors for each sub-task
+- Guardrails around retries, memory, and progress summaries
+- The same fine-grained control as Actor, but without writing the loop yourself
+
+TaskerAgent uses Actors under the hood: it decomposes a goal into todos, dispatches each to an Actor, and relays screenshots/actions through the same handlers you already use. Reach for Tasker when you want automation with structure; fall back to raw Actor when you need to inspect or modify every step yourself.
 
 ## Core Components
 

@@ -16,7 +16,7 @@ OAGI Python SDK offers flexible installation options:
 pip install oagi
 ```
 
-Includes all features: desktop automation and server capabilities.
+Installs the `oagi-core` package **plus** every optional extra. Use this when you want the quickest path to a complete setup (desktop + server) with one command.
 
 ### Core Only
 
@@ -24,7 +24,7 @@ Includes all features: desktop automation and server capabilities.
 pip install oagi-core
 ```
 
-Minimal installation with core functionality only.
+This installs only the core SDK and no optional dependencies. Choose this if you’re building your own tooling around the HTTP client/agents and don’t need desktop or server stacks. You can always layer extras later (see below).
 
 ### With Extras
 
@@ -38,6 +38,14 @@ pip install oagi-core[server]
 # Both extras
 pip install oagi-core[desktop,server]
 ```
+
+| Extra | Installs | When to choose |
+|-------|----------|----------------|
+| `desktop` | PyAutoGUI, screenshot helpers, and other local-execution deps | You are building a desktop bridge or client app that captures screenshots and executes actions locally. |
+| `server` | FastAPI, Uvicorn, python-socketio, pydantic-settings | You plan to run the Socket.IO coordination server and need the web stack but not the desktop UI libraries. |
+| `desktop,server` | Both sets above | You are developing on one machine that needs to run the remote server and a desktop executor (e.g., for local testing). |
+
+Keeping them separate prevents desktop-only devs from pulling server frameworks (and vice versa) while still making it easy to install both when required.
 
 ## Requirements
 

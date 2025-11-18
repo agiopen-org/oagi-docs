@@ -33,7 +33,7 @@ export OAGI_BASE_URL="http://api.agiopen.org"
 ```
 
 <Note>
-  Your API key provides access to Lux foundation models and includes free credits to get started.
+  Your API key provides access to Lux foundation models and includes free credits to get started. Retrieve it from the OpenAGI Platform dashboard at [main.d1z3jyp67cosi.amplifyapp.com](https://main.d1z3jyp67cosi.amplifyapp.com/) and see more information in the <Link href="/python-sdk/authentication">Authentication guide</Link>.
 </Note>
 
 ### Step 3: Run your first agent
@@ -50,38 +50,9 @@ oagi agent run "Open Chrome and navigate to https://agiopen.org" --model "lux-ac
 - The agent executes actions (clicks, types, scrolls) to complete the goal
 - You'll see real-time feedback as the agent works
 
-## Advanced Usage
-
-### Start a local server
-
-For browser-based automation or custom integrations:
-
-```bash
-oagi server start
-```
-
-This starts a Socket.IO server that can communicate with browser extensions or custom clients.
-
-### Python SDK example
-
-For more control, use the Python SDK directly:
-
-```python
-from oagi import ShortTask, ScreenshotMaker, PyautoguiActionHandler
-
-# Initialize the task
-task = ShortTask()
-
-# Run in automated mode
-completed = task.auto_mode(
-    "Search for weather in Tokyo",
-    max_steps=10,
-    executor=PyautoguiActionHandler(),  # Executes actions
-    image_provider=ScreenshotMaker(),   # Captures screenshots
-)
-
-print(f"Task completed: {completed}")
-```
+<Warning>
+  For the most reliable execution, declutter the desktop before running agents. Keep distracting apps closed, make sure key windows (like Chrome) are clearly visible, and avoid overlapping UI elements so the model can recognize targets quickly.
+</Warning>
 
 ## Next steps
 

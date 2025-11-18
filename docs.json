@@ -18,7 +18,9 @@
             "pages": [
               "index",
               "quickstart",
-              "models"
+              "agent",
+              "models",
+              "authentication"
             ]
           },
           
@@ -28,7 +30,7 @@
               "concepts/action",
               "concepts/step",
               "concepts/actor",
-              "concepts/agent"
+              "concepts/server-architecture"
             ]
           },
           {
@@ -41,8 +43,13 @@
               "python-sdk/thinker",
               "python-sdk/handlers",
               "python-sdk/cli",
-              "python-sdk/desktop-application",
-              "python-sdk/authentication"
+              "python-sdk/desktop-application"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "Deploying to Production"
             ]
           },
           {

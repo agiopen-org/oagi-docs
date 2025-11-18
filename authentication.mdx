@@ -1,0 +1,43 @@
+---
+title: 'Authentication'
+description: 'Create and manage API keys for the OpenAGI platform'
+icon: 'key'
+---
+
+## Get your API key
+
+1. Visit the **OpenAGI Developer Platform** dashboard at [main.d1z3jyp67cosi.amplifyapp.com](https://main.d1z3jyp67cosi.amplifyapp.com/).
+2. Sign in with your developer account.
+3. Navigate to **API Keys → Create key** and copy the generated value (keys start with `sk-`).
+4. Store the key securely—treat it like a password.
+
+<Warning>
+  Do not embed API keys directly in repositories or client-side code. Use environment variables or a secrets manager instead.
+</Warning>
+
+## Configure environment variables
+
+Set your credentials before running the SDK or CLI:
+
+```bash
+export OAGI_API_KEY="sk-your-key"
+export OAGI_BASE_URL="https://api.agiopen.org"
+```
+
+If you are using a `.env` file (supported by `ServerConfig` and most examples):
+
+```bash
+echo "OAGI_API_KEY=sk-your-key" >> .env
+echo "OAGI_BASE_URL=https://api.agiopen.org" >> .env
+```
+
+## Rotate or revoke keys
+
+1. Return to the Developer Platform dashboard.
+2. Delete any compromised key and issue a new one.
+3. Update your deployment secrets immediately to avoid downtime.
+
+## Next steps
+
+- Follow the [Installation guide](/python-sdk/installation) to finish SDK setup.
+- Review the [Quickstart](/quickstart) to launch your first agent.
