@@ -5,55 +5,24 @@ description: "Developer documentation OpenAGI's foundation model for computer us
 
 # Lux: Foundation Model for Computer Use
 
-Welcome to the developer documentation for **Lux**, OpenAGI's foundation model that enables AI agents to operate computers just like humans do.
+**Lux** is an AI model that operates computers like a human. It views the screen, understands natural language goals, and outputs actions (clicks, typing, scrolling) to complete tasks across any application.
 
-## What is Computer Use?
+## How It Works
 
-Computer Use represents one of the newest and most exciting areas of AI. Unlike traditional AI models that only process text or images, **computer use models** understand and interact with graphical user interfaces—all the buttons, menus, text boxes, and windows you see on your screen.
+Lux operates in a continuous **Action-Observation Loop**:
 
-Think of it as an AI agent that can:
-- **See** your screen through screenshots
-- **Understand** goals given in natural language  
-- **Act** by clicking, typing, and scrolling to complete tasks
+1.  **Goal**: The agent receives a task (e.g., "Book a flight to NYC").
+2.  **Vision**: It analyzes a screenshot of the current screen state.
+3.  **Action**: It generates the next specific UI interaction (click, type, etc.).
+4.  **Feedback**: The action is executed, a new screenshot is taken, and the loop repeats.
 
-### How It Works
+<img
+  src="/images/cua-loop.png"
+  alt="Computer Use Loop: Goal -> Vision -> Action -> Screenshot"
+  style={{ borderRadius: '0.5rem', marginTop: '1rem', marginBottom: '1rem' }}
+/>
 
-Computer use models are **multimodal**, processing multiple types of information simultaneously:
-
-**The Goal**
-```
-"Open Chrome, search for today's weather, and copy the forecast into Slack"
-"Scroll through Jira, open ticket #1234, and leave a comment saying it is complete"
-"Download a CSV, open it in Sheets, and copy all data to a new sheet"
-```
-
-**The Vision**
-The model takes screenshots to "see" the current state of the screen
-
-**The Actions**
-Instead of just text responses, the model outputs specific actions:
-- `click(x, y)` on buttons or links
-- `type("text")` into input fields  
-- `scroll()` to navigate pages
-- `drag_and_drop(item, location)` to move elements
-
-This runs in a continuous loop: **action → screenshot → next action** until the goal is complete.
-
-## Why Computer Use Matters
-
-### Beyond Chat Interfaces
-
-**Traditional AI**: You give it text, it gives you text back. It lives inside a chat window.
-
-**Computer Use AI**: You give it a task, and it leaves the chat to use any application on your computer—browsers, email clients, spreadsheets, design tools—to accomplish real work.
-
-### True Digital Assistance
-
-This technology enables **general-purpose agents** that can learn to use any software interface, moving from simple automation scripts to intelligent assistants that adapt to new applications.
-
-## Get Started with Lux
-
-Build your first computer use agent in minutes.
+## Next Step
 
 <Card
   title="Quick Start Guide"
@@ -63,63 +32,3 @@ Build your first computer use agent in minutes.
 >
   Install the SDK and create your first agent in 5 minutes.
 </Card>
-
-```bash
-pip install oagi
-```
-
-## Developer Resources
-
-Everything you need to build with Lux.
-
-<Columns cols={2}>
-  <Card
-    title="Python SDK"
-    icon="code"
-    href="/python-sdk/installation"
-  >
-    Official Python client library with examples and best practices.
-  </Card>
-  <Card
-    title="API Reference"
-    icon="book"
-    href="/api-reference/introduction"
-  >
-    Complete API documentation for all endpoints and parameters.
-  </Card>
-  <Card
-    title="Examples & Tutorials"
-    icon="play"
-    href="/examples/introduction"
-  >
-    Step-by-step guides for common computer use patterns.
-  </Card>
-  <Card
-    title="Safety & Best Practices"
-    icon="shield"
-    href="/safety/introduction"
-  >
-    Guidelines for deploying computer use agents safely in production.
-  </Card>
-</Columns>
-
-## The Computer Use Landscape
-
-Major AI labs are actively building computer use capabilities:
-
-- **Google**: Gemini 2.5 Computer Use model for UI navigation
-- **OpenAI**: Computer-Using Agent (CUA) with GPT-4o  
-- **Amazon**: Nova Act for autonomous web browser actions
-- **Microsoft**: Magma for interface interpretation
-
-**Lux** by OpenAGI provides developers with production-ready access to this cutting-edge technology with the highest accuracy performance based on evaluations in Online-Mind2Web.
-
-<img
-  style={{ borderRadius: '0.5rem' }}
-  src="/images/online-mind2web.png"
-/>
-
-
----
-
-**Ready to build agents that can use any software?** Start with our [Quick Start Guide](/quickstart) or explore the [Python SDK documentation](/sdk/introduction).
