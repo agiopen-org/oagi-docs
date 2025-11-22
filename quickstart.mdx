@@ -36,7 +36,34 @@ export OAGI_BASE_URL="http://api.agiopen.org"
   Your API key provides access to Lux foundation models and includes free credits to get started. Retrieve it from the OpenAGI Platform dashboard at [main.d1z3jyp67cosi.amplifyapp.com](https://main.d1z3jyp67cosi.amplifyapp.com/) and see more information in the <Link href="/python-sdk/authentication">Authentication guide</Link>.
 </Note>
 
+### Before you run: Prepare your desktop
+
+For the best results, your desktop environment needs to be clean and simple. The agent "sees" your screen just like you do.
+
+<img className="block dark:hidden" src="/images/good-setup.png" alt="Good desktop setup" />
+<img className="hidden dark:block" src="/images/good-setup.png" alt="Good desktop setup" />
+
+**Good Setup:**
+- Single, large Chrome window
+- Clean desktop background
+- Minimal distractions
+
+<img className="block dark:hidden" src="/images/bad-setup.png" alt="Bad desktop setup" />
+<img className="hidden dark:block" src="/images/bad-setup.png" alt="Bad desktop setup" />
+
+**Bad Setup (Avoid this):**
+- **Too many tabs:** 20+ tabs make it hard to find the right one.
+- **Small window:** The agent needs to see page content clearly.
+- **Messy desktop:** Multiple overlapping apps confuse the visual analysis.
+
 ### Step 3: Run your first agent
+
+<Warning>
+  **macOS Users:** You will likely see a permission error the first time you run this.
+  
+  You must grant **Accessibility** and **Screen Recording** permissions to your terminal app (e.g., Terminal, iTerm2, VS Code).
+  Go to **System Settings > Privacy & Security** to enable these, then restart your terminal.
+</Warning>
 
 <Warning>
   For the most reliable execution, declutter the desktop before running agents. Keep distracting apps closed, make sure key windows (like Chrome) are clearly visible, and avoid overlapping UI elements so the model can recognize targets quickly.
