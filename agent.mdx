@@ -16,25 +16,35 @@ The easiest way to use **lux-actor-1** is with the **TaskerAgent**, which wraps 
 ## Minimal setup
 
 1. Install the SDK ([Installation](/python-sdk/installation)) and load your OAGI API key.
-2. Pick an action handler + image provider (see [Handlers](/python-sdk/handlers)).
-3. Describe the overall task and todos, then call `execute()`.
+2. Describe the overall task and todos, then call `execute()`.
+
+<Tip>
+  **Before you run:** Ensure your desktop is clean and your browser is open. The agent needs to "see" the screen clearly to interact with it.
+</Tip>
 
 ```python
 import asyncio
 
+# Captures the screenshot from your local computer
+from oagi import AsyncScreenshotMaker 
+
+# Controls your local keyboard and mouse based on the model predicted actions
+from oagi import AsyncPyautoguiActionHandler 
 from oagi import TaskerAgent
-from oagi import AsyncPyautoguiActionHandler, AsyncScreenshotMaker
 
 async def main():
     agent = TaskerAgent(api_key="YOUR_KEY", model="lux-actor-1")
 
     agent.set_task(
-        task="Check build status and post update",
-        todos=[
+        task="Check build status and post update", # Brief summary of the task
+        todos=[     # Step-by-step todos
             "Open CI dashboard",
             "Verify latest build",
             "Post summary in chat"
         ],
+        deliverables=[ # Results that you want the agents to deliver
+            "Build status summary"  
+        ]
     )
 
     await agent.execute(
@@ -48,17 +58,59 @@ asyncio.run(main())
 
 That’s it: behind the scenes, TaskerAgent talks to lux-actor-1 for you, keeps a PlannerMemory of todos/deliverables, and routes every action to your client-side handler.
 
-## What developers need to remember
+## Understanding Tasks
 
-- **Stay on TaskerAgent unless you need custom loops.** Direct lux-actor-1 usage requires manual screenshot uploads, action parsing, retries, and state management. TaskerAgent already handles those concerns.
-- **Bring your own execution layer.** TaskerAgent emits structured actions and screenshot requests; your desktop bridge (PyAutoGUI, Socket.IO client, etc.) simply plugs into those interfaces.
-- **Inspect memory for status.** Call `agent.get_memory()` to see which todos succeeded, summaries, and remaining work—perfect for UI surfaces or alerts.
+To get the best results from TaskerAgent, it helps to understand how it plans and executes work.
 
-Want more control later? You can extend TaskerAgent with custom planners, different handlers, or observers, but the minimal flow above is enough to put lux-actor-1 to work in minutes.
+- **Task**: The high-level goal you want to achieve. This sets the context for the entire session.
+- **Todos**: A sequential list of steps the agent should follow. Think of this as a checklist you would give to a human intern.
+- **Deliverables**: The tangible outputs you expect at the end, such as a file, a screenshot, or a piece of information.
+
+### Best Practices for Todos
+- **Be specific**: Instead of "Research", say "Search for 3 competitor pricing models".
+- **Start with verbs**: "Open", "Click", "Type", "Verify".
+- **Keep it linear**: Break complex workflows into simple, logical steps.
+
+## Examples
+
+Here are two examples of how to structure your tasks:
+
+### Example 1: Data Entry
+```python
+agent.set_task(
+    task="Transfer leads from spreadsheet to CRM",
+    todos=[
+        "Open the 'Leads' Google Sheet",
+        "Copy the first row of data",
+        "Open Salesforce in a new tab",
+        "Create a new lead and paste the data",
+        "Save the lead"
+    ],
+    deliverables=[
+        "Screenshot of the saved lead in Salesforce"
+    ]
+)
+```
+
+### Example 2: Market Research
+```python
+agent.set_task(
+    task="Research pricing for 'Project X'",
+    todos=[
+        "Go to amazon.com",
+        "Search for 'Project X'",
+        "Find the top 3 rated products",
+        "Record their prices in a text file"
+    ],
+    deliverables=[
+        "Text file with pricing list"
+    ]
+)
+```
 
 <CardGroup cols={2}>
-  <Card title="Python SDK – Agents" icon="code" href="/python-sdk/agents">
-    Explore advanced agent patterns
+  <Card title="Customized Agent Examples" icon="robot" href="/python-sdk/agents#custom-agents">
+    See how to build custom agents with specialized logic
   </Card>
   <Card title="Desktop Application" icon="window" href="/python-sdk/desktop-application">
     Learn how to run TaskerAgent across remote machines
