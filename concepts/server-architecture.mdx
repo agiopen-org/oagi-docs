@@ -1,106 +1,69 @@
 ---
 title: 'Server Architecture'
-description: 'How the Socket.IO server bridges remote desktops with OAGI agents'
+description: 'Running the OAGI server for remote automation'
 icon: 'server'
 ---
 
 # Server Architecture
 
-Understand how the deployable Socket.IO server, desktop bridge, and hosted OAGI API collaborate to run remote automation sessions.
+The OAGI server acts as a bridge between your agents and the desktop environment. While you can run agents locally (as shown in the Quickstart), running a dedicated server is useful for:
+- **Remote Automation**: Controlling a desktop on a different machine.
+- **Centralized Management**: Handling API keys and configuration in one place.
+- **Session Persistence**: Keeping track of long-running automation tasks.
 
-## Why run the server separately?
+## Running the Server
 
-Running the server outside of the desktop keeps OAGI credentials, rate limiting, and session orchestration in a central place. Desktop frontends can be lightweight—focused only on capturing screenshots and executing actions locally—while the server:
+You can start the server using the CLI or programmatically via the Python SDK.
 
-- Hosts REST health/admin endpoints via FastAPI and mounts the Socket.IO ASGI app (@oagi-python/src/oagi/server/main.py#34-146)
-- Loads deployment settings (API keys, model defaults, Socket.IO timeouts) through `ServerConfig`, so you can override via env vars or CLI (@oagi-python/src/oagi/server/config.py#17-47)
-- Manages long-lived sessions with in-memory metadata and idle cleanup logic (@oagi-python/src/oagi/server/session_store.py#15-116)
+### Option 1: Using the CLI (Recommended)
 
-## Key components
-
-| Component | Responsibility | Notes |
-|-----------|----------------|-------|
-| FastAPI app | Provides `/`, `/health`, and `/sessions/*` endpoints, then mounts the Socket.IO application. | Useful for probes and dashboards. |
-| `AsyncServer` + `SessionNamespace` | Handles Socket.IO events per session namespace (e.g. `/session/ses_x`). On connect, it attaches to the session and instantiates the OAGI client. | @oagi-python/src/oagi/server/socketio_server.py#41-121 |
-| Agent wrappers | `SocketIOActionHandler` and `SocketIOImageProvider` translate between agent protocols and Socket.IO events. | @oagi-python/src/oagi/server/agent_wrappers.py#23-98 |
-| OAGI AsyncClient | Talks to the hosted `/v2/message` and `/v1/file/upload` APIs on behalf of each session. | @oagi-python/src/oagi/server/socketio_server.py#65-170 |
-| Desktop handler | The desktop/bridge process listens for events. The PyAutoGUI handler is the local template for executing clicks, drags, hotkeys, etc. | @oagi-python/src/oagi/handler/pyautogui_action_handler.py#81-269 |
-
-## Lifecycle overview
-
-1. **Session created** – Via CLI, SDK, or desktop UI, you allocate a session entry in `SessionStore`. Each session has an ID, status, instruction, and (once connected) a Socket.IO SID.
-2. **Desktop connects** – The desktop client connects to `/<namespace>` and immediately receives a namespace-specific `SessionNamespace`. The server ensures an `AsyncClient` is ready for OAGI API calls.
-3. **Init event** – Client emits `init` with instruction, model, etc. The server validates payload, updates the session, and spawns an `AsyncDefaultAgent` configured with deployment defaults.
-4. **Agent loop** – The agent alternates between:
-   - Requesting a screenshot: `SocketIOImageProvider` fetches an S3 presigned URL from OAGI, asks the desktop to upload, then returns the resulting URL to the agent.
-   - Emitting actions: `SocketIOActionHandler` forwards each action (click/type/drag/hotkey/etc.) to the desktop over Socket.IO and waits for ACKs.
-5. **Completion** – When the agent signals `FINISH` or errors, the namespace emits `finish`/`error` events, updates session status, and—after a timeout—cleans up connections plus any instantiated OAGI clients.
-
-```
-Desktop UI ── Socket.IO ──> OAGI Server ── AsyncClient ──> OAGI Cloud
-    ^                           │                       │
-    └──── Screenshot upload <───┘                       │
-    └──── Action execution ◄────────────────────────────┘
-```
-
-## Building your own desktop bridge
-
-- Start from the PyAutoGUI handler if you need a local-only executor. Replace its low-level calls with your own (e.g., browser automation, RDP relays, robotic arms) while conforming to the action schema.
-- Mirror the Screenshot provider contract: accept `request_screenshot` events with presigned URLs, capture/encode your screen, upload to S3, then ACK with success/error.
-- Keep the Socket.IO connection alive and report errors via the `error` event so the server can surface them back to the agent/UI.
-
-## Running the reference server quickly
-
-### Start a local Socket.IO server
-
-For browser-based automation or custom integrations, launch the bundled server (requires `oagi-core[server]`):
+The easiest way to start the server is with the `oagi` command-line tool. This comes installed with the `oagi` package.
 
 ```bash
+# Start the server on the default port (8000)
 oagi server start
 ```
 
-This spins up the FastAPI + Socket.IO stack described above so remote clients can connect via namespaces like `/session/<id>`.
+You can customize the host and port if needed:
 
-### Direct SDK usage on the desktop bridge
-
-When running the desktop bridge locally without Socket.IO, you can still exercise the same handler contracts via the SDK:
-
-```python
-from oagi import TaskerAgent, AsyncScreenshotMaker, AsyncPyautoguiActionHandler
-
-agent = TaskerAgent(model="lux-actor-1")
-
-agent.set_task(
-    task="Search for weather in Tokyo",
-    todos=["Open browser", "Search for weather", "Read forecast"],
-)
-
-async def run():
-    await agent.execute(
-        instruction="Get the latest forecast",
-        action_handler=AsyncPyautoguiActionHandler(),
-        image_provider=AsyncScreenshotMaker(),
-    )
-
-# asyncio.run(run())
+```bash
+oagi server start --host 0.0.0.0 --port 8080
 ```
 
-This mirrors what happens when the desktop connects to the server: the handler executes actions locally while the agent orchestrates screenshots and reasoning against the Lux models.
+### Option 2: Using the Python SDK
 
-## Deployment considerations
+For more control, or to integrate the server into an existing Python application, you can use the `Server` class directly.
 
-- **Scaling** – Run multiple server instances behind a load balancer; ensure sticky routing per session namespace or share the `SessionStore` (e.g., Redis) instead of the in-memory default.
-- **Security** – Terminate TLS, restrict CORS origins, and guard the `/sessions/*` endpoints with auth if exposing publicly.
-- **Monitoring** – Scrape `/health`, log session lifecycle events, and surface metrics like actions executed per session, screenshot latency, and cleanup counts.
-- **Extensibility** – You can swap the default `AsyncDefaultAgent` with custom `create_agent` calls pointing to other models, or wrap additional event types if your desktop requires bespoke commands.
+```python
+import uvicorn
+from oagi.server import create_app
 
-## Related reading
+# Create the FastAPI app
+app = create_app()
+
+if __name__ == "__main__":
+    # Run with uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+```
+
+## Connecting Clients
+
+Once the server is running, desktop clients (the "bridge") can connect to it via Socket.IO.
+
+1. **Desktop Client Connects**: The client connects to the server URL (e.g., `http://localhost:8000`).
+2. **Session Created**: The server creates a unique session for that connection.
+3. **Agent Loop**: The server spins up an agent (like `TaskerAgent`) to handle the automation logic, sending commands to the desktop client and receiving screenshots back.
+
+## Deployment Tips
+
+- **Security**: If exposing the server to the internet, ensure you set up proper authentication and use HTTPS.
+- **Scaling**: For high-volume deployments, you can run multiple server instances behind a load balancer.
 
 <CardGroup cols={2}>
   <Card title="Desktop Application" icon="window" href="/python-sdk/desktop-application">
-    Learn how to run the reference desktop bridge
+    Learn how to run the desktop bridge that connects to this server
   </Card>
-  <Card title="Handlers" icon="hand" href="/python-sdk/handlers">
-    Implement custom ActionHandlers and ImageProviders
+  <Card title="Python SDK" icon="code" href="/python-sdk/installation">
+    Explore the full SDK documentation
   </Card>
 </CardGroup>

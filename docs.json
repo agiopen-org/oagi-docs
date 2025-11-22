@@ -23,13 +23,14 @@
               "authentication"
             ]
           },
-          
           {
             "group": "Concepts",
             "pages": [
               "concepts/action",
               "concepts/step",
               "concepts/actor",
+              "concepts/screenshot-provider",
+              "concepts/action-handler",
               "concepts/server-architecture"
             ]
           },
@@ -107,20 +108,20 @@
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://main.d1z3jyp67cosi.amplifyapp.com/"
+      "href": "https://developer.agiopen.org/"
     }
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {

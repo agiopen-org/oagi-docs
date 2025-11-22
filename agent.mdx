@@ -36,19 +36,20 @@ async def main():
     agent = TaskerAgent(api_key="YOUR_KEY", model="lux-actor-1")
 
     agent.set_task(
-        task="Check build status and post update", # Brief summary of the task
-        todos=[     # Step-by-step todos
-            "Open CI dashboard",
-            "Verify latest build",
-            "Post summary in chat"
+        task="Find out when Python was created", 
+        todos=[
+            "Open Safari",
+            "Go to google.com", 
+            "Search for 'Python programming language creation date'",
+            "Take a screenshot of the answer"
         ],
-        deliverables=[ # Results that you want the agents to deliver
-            "Build status summary"  
+        deliverables=[
+            "Screenshot of the creation date"
         ]
     )
 
     await agent.execute(
-        instruction="Run through the checklist",
+        instruction="Research the creation date of Python",
         action_handler=AsyncPyautoguiActionHandler(),
         image_provider=AsyncScreenshotMaker(),
     )

@@ -1,0 +1,99 @@
+---
+title: 'Screenshot Provider'
+description: 'Giving your agent eyes to see the screen'
+icon: 'camera'
+---
+
+# Screenshot Provider
+
+The Screenshot Provider is the component responsible for capturing the visual state of the environment. It acts as the "eyes" of the agent, providing the raw visual data that the model analyzes to make decisions.
+
+## Available Implementations
+
+OpenAGI provides two standard implementations out of the box:
+
+### 1. AsyncScreenshotMaker (Recommended)
+The `AsyncScreenshotMaker` is the standard choice for most agent applications. It wraps the screenshot capture in a thread pool to ensure that taking a screenshot (which is an I/O bound operation) does not block your agent's async event loop.
+
+```python
+from oagi import AsyncScreenshotMaker
+
+# Non-blocking capture
+image_provider = AsyncScreenshotMaker()
+image = await image_provider()
+```
+
+### 2. ScreenshotMaker (Synchronous)
+The `ScreenshotMaker` is the synchronous version, suitable for simple scripts or blocking contexts where async execution isn't required.
+
+```python
+from oagi import ScreenshotMaker
+
+# Blocking capture
+image_provider = ScreenshotMaker()
+image = image_provider()
+```
+
+## Configuration
+
+You can customize how screenshots are captured using `ImageConfig`. This is crucial for balancing **performance** (speed/latency) and **quality** (model accuracy).
+
+### ImageConfig Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `format` | Image format (JPEG, PNG) | `JPEG` |
+| `width` | Target width to resize to | `1260` |
+| `height` | Target height to resize to | `700` |
+| `quality` | JPEG quality (1-100) | `85` |
+
+### Why Resize?
+Sending full-resolution screenshots (e.g., 4K or Retina) to VLM (Vision Language Models) can be slow and expensive.
+- **Latency**: Larger images take longer to encode and upload.
+- **Cost**: More pixels often mean higher token usage.
+- **Accuracy**: Most models are trained on standard resolutions (like 1280x720) and may not benefit from ultra-high resolution.
+
+## Usage Example
+
+Here is how to configure a provider with custom settings and pass it to an agent:
+
+```python
+import asyncio
+from oagi import AsyncScreenshotMaker, ImageConfig, TaskerAgent
+
+async def main():
+    # 1. Configure for higher quality (e.g., for text-heavy apps)
+    config = ImageConfig(
+        format="PNG",
+        width=1920,
+        height=1080,
+        optimize=True
+    )
+    
+    # 2. Initialize the provider
+    provider = AsyncScreenshotMaker(config=config)
+    
+    # 3. Use it in your agent
+    agent = TaskerAgent()
+    await agent.execute(
+        instruction="Analyze the spreadsheet",
+        action_handler=..., 
+        image_provider=provider  # <--- Passed here
+    )
+
+asyncio.run(main())
+```
+
+## Best Practices
+
+<Check>
+**Use Async**: Always use `AsyncScreenshotMaker` when running agents to keep your application responsive.
+</Check>
+
+<Tip>
+**Tune Resolution**: Start with the default (1260x700). Only increase it if the agent struggles to read small text or identify fine details.
+</Tip>
+
+<Warning>
+**Multi-Monitor Setups**: The default provider typically captures the primary display. Ensure your target application is on the primary screen or configure the underlying capture tool to select the correct region.
+</Warning>

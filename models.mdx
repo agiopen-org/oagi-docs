@@ -29,22 +29,43 @@ OpenAGI provides two specialized foundation models for computer use, each optimi
 **Best for:**
 - Fast, responsive UI control
 - High-throughput automation
-- Short-horizon tasks
+- Short-horizon tasks (tasks completed in < 10 steps without complex reasoning)
 - Real-time UX (CLI/desktop control loops)
 - Direct "observe → decide → act" loops
 
-**Typical usage (via TaskerAgent):**
+### Prompting Guide
+
+To get the best results from `lux-actor-1`, provide clear, step-by-step instructions. Avoid vague or high-level goals.
+
+<CodeGroup>
+```text Good (Step-by-step)
+1. Open the "Settings" menu
+2. Click on "Profile"
+3. Type "John Doe" into the "Name" field
+4. Click "Save"
+```
+
+```text Bad (Vague)
+Update my profile name to John Doe
+```
+</CodeGroup>
+
+**Typical usage (via DefaultAgent):**
+The `DefaultAgent` provides a simple loop for executing direct instructions with the actor model.
+
 ```python
 import asyncio
 
-from oagi import TaskerAgent
+from oagi.agent.default import AsyncDefaultAgent
 from oagi import AsyncPyautoguiActionHandler, AsyncScreenshotMaker
 
 async def run_actor_agent():
-    agent = TaskerAgent(model="lux-actor-1")
-    agent.set_task(task="Submit the form", todos=["Open form", "Fill fields", "Click submit"])
+    # Initialize the default agent with the actor model
+    agent = AsyncDefaultAgent(model="lux-actor-1")
+    
+    # Execute a direct instruction
     await agent.execute(
-        instruction="Complete the submission",
+        instruction="Open Safari/Chrome/Browser and navigate to google.com",
         action_handler=AsyncPyautoguiActionHandler(),
         image_provider=AsyncScreenshotMaker(),
     )
@@ -59,33 +80,21 @@ asyncio.run(run_actor_agent())
 - Non-obvious action sequences
 - Brittle or complex workflows
 - Scenarios where errors are costly
+- **Complex Examples:**
+    - "Research the top 3 coffee shops in Tokyo and save their addresses to a text file"
+    - "Compare flight prices on three different websites and book the cheapest one"
+    - "Debug the failing test case by analyzing the logs and checking the UI state"
 
 **Trade-offs:**
 - Higher latency per decision
 - Increased cost per action
 - Not ideal for tight control loops
 
-**Typical usage (hybrid via TaskerAgent):**
-```python
-import asyncio
+<Warning>
+**Avoid using Thinker with TaskerAgent for simple execution loops.**
+The `TaskerAgent` adds its own layer of reflection and planning. Combining this with `lux-thinker-1` (which also plans) can result in extremely slow execution times and redundant reasoning. Use `lux-thinker-1` primarily for the initial planning phase or for very difficult steps where the actor fails.
+</Warning>
 
-from oagi import TaskerAgent
-from oagi import AsyncPyautoguiActionHandler, AsyncScreenshotMaker
-
-async def run_thinker_plan():
-    agent = TaskerAgent(model="lux-thinker-1", max_steps=60)
-    agent.set_task(
-        task="Compare hotels and book wisely",
-        todos=["Open booking site", "Research three hotels", "Pick cheapest option", "Complete checkout"],
-    )
-    await agent.execute(
-        instruction="Finish the research and booking flow",
-        action_handler=AsyncPyautoguiActionHandler(),
-        image_provider=AsyncScreenshotMaker(),
-    )
-
-asyncio.run(run_thinker_plan())
-```
 
 ## Performance Characteristics
 
@@ -99,28 +108,45 @@ asyncio.run(run_thinker_plan())
 ## Integration with Agents
 
 ### Tasker Agent
-The built-in Tasker Agent uses **lux-actor-1** by default for executing To-Do steps, with lightweight reflection between actions to verify progress.
+The built-in `TaskerAgent` is designed for multi-step workflows. You must define the task and sub-tasks (todos) before execution.
 
 ```python
-from oagi import TaskerAgent
+import asyncio
+from oagi import TaskerAgent, AsyncPyautoguiActionHandler, AsyncScreenshotMaker
 
-agent = TaskerAgent()
-result = agent.execute("Book a flight to Tokyo")
-# Uses lux-actor-1 internally for fast execution
+async def run_tasker():
+    agent = TaskerAgent(model="lux-actor-1")
+    
+    # 1. Define the high-level task and breakdown
+    agent.set_task(
+        task="Book a flight to Tokyo",
+        todos=["Open travel site", "Search for flights", "Select flight", "Checkout"]
+    )
+    
+    # 2. Execute the workflow
+    await agent.execute(
+        instruction="Book the flight", # Context for the agent
+        action_handler=AsyncPyautoguiActionHandler(),
+        image_provider=AsyncScreenshotMaker(),
+    )
+
+asyncio.run(run_tasker())
 ```
 
 ### Custom Agents
-You can build custom agents that strategically combine both models:
+You can build and register your own custom agents using the `async_agent_register` decorator. This allows you to integrate them into the OAGI system.
 
 ```python
-# Hybrid approach: thinker for planning, actor for execution
-def hybrid_agent(complex_task):
-    # Use thinker for initial planning
-    plan = call_model("lux-thinker-1", f"Create a plan for: {complex_task}")
-    
-    # Use actor for fast execution of each step
-    for step in plan.steps:
-        result = call_model("lux-actor-1", step)
+from oagi.agent.registry import async_agent_register
+from oagi import AsyncAgent
+
+@async_agent_register("my-custom-agent")
+def create_my_agent(api_key: str, **kwargs) -> AsyncAgent:
+    # Initialize and return your custom agent instance
+    return MyCustomAgent(api_key=api_key, **kwargs)
+
+# Usage
+# agent = create_agent("my-custom-agent", api_key="...")
 ```
 
 ## Best Practices
@@ -172,26 +198,14 @@ async def guarded_checkout():
 asyncio.run(guarded_checkout())
 ```
 
-## Pricing & Quotas
+## Pricing
 
 <Note>
   Models have different pricing tiers. Check the latest pricing information in your dashboard or contact support for enterprise pricing.
 </Note>
 
 - **lux-actor-1**: Optimized for cost-effective, high-volume automation
-- **lux-thinker-1**: Premium pricing for complex reasoning tasks
-
-## Migration Between Models
-
-### Moving from Actor to Thinker
-- Expect higher latency - consider using thinker for planning only
-- Re-run acceptance tests and tune timeouts
-- Adjust step budgets for longer reasoning time
-
-### Moving from Thinker to Actor  
-- Add verification checkpoints to maintain reliability
-- Test with faster decision cycles
-- Monitor for any accuracy regressions
+- **lux-thinker-1**: Higher pricing for complex reasoning tasks
 
 ## Next Steps
 
