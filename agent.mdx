@@ -36,20 +36,24 @@ async def main():
     agent = TaskerAgent(api_key="YOUR_KEY", model="lux-actor-1")
 
     agent.set_task(
-        task="Find out when Python was created", 
+        task="Use chase to calculate IRS",
         todos=[
-            "Open Safari",
-            "Go to google.com", 
-            "Search for 'Python programming language creation date'",
-            "Take a screenshot of the answer"
+            "Go to chase.com",
+            "Click on the 'by' of 'Investing by J.P. Morgan' on the header, then select 'Retirement and IRAs'",
+            "In the header of 'Tools and resources' select 'investment calculators'",
+            "Scroll down to find the 'IRA calculator' and use it",
+            "Drag the monthly contribution slider to the right until it hits the maximum",
+            "Drag the right side of the Age Range slider to the right until it hits the maximum",
+            "After doing the steps above, scroll down to reveal the figure calculated by chase"
+
         ],
         deliverables=[
-            "Screenshot of the creation date"
+            "Chase page showing the number of IRA calculation"
         ]
     )
 
     await agent.execute(
-        instruction="Research the creation date of Python",
+        instruction="Use chase to calculate IRA",
         action_handler=AsyncPyautoguiActionHandler(),
         image_provider=AsyncScreenshotMaker(),
     )

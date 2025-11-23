@@ -53,6 +53,10 @@ Update my profile name to John Doe
 **Typical usage (via DefaultAgent):**
 The `DefaultAgent` provides a simple loop for executing direct instructions with the actor model.
 
+<Note>
+**Before running**: Ensure your desktop is set up properly. Open a single Google Chrome window with minimal tabs, close other applications to avoid overlapping windows, and keep the desktop uncluttered. The agent "sees" your screen just like you do—a clean environment improves accuracy.
+</Note>
+
 ```python
 import asyncio
 
@@ -65,7 +69,7 @@ async def run_actor_agent():
     
     # Execute a direct instruction
     await agent.execute(
-        instruction="Open Safari/Chrome/Browser and navigate to google.com",
+        instruction="Go to google.com",
         action_handler=AsyncPyautoguiActionHandler(),
         image_provider=AsyncScreenshotMaker(),
     )

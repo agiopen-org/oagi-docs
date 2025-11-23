@@ -54,12 +54,14 @@ You can customize the behavior of the local action handler using `PyautoguiConfi
 ```python
 from oagi import AsyncPyautoguiActionHandler, PyautoguiConfig
 
-config = PyautoguiConfig(
-    action_pause=0.5,       # Slower execution for better visibility
-    drag_duration=1.0,      # Smoother drags
-    macos_ctrl_to_cmd=True  # Mac-friendly hotkeys
-)
+# Minimal - all parameters are optional with sensible defaults
+action_handler = AsyncPyautoguiActionHandler()
 
+# Or customize with optional configuration
+config = PyautoguiConfig(
+    action_pause=0.5,  # Slower execution for better visibility
+    drag_duration=1.0  # Smoother drags
+)
 action_handler = AsyncPyautoguiActionHandler(config=config)
 ```
 

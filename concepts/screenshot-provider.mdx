@@ -34,54 +34,107 @@ image_provider = ScreenshotMaker()
 image = image_provider()
 ```
 
-## Configuration
-
-You can customize how screenshots are captured using `ImageConfig`. This is crucial for balancing **performance** (speed/latency) and **quality** (model accuracy).
-
-### ImageConfig Options
-
-| Option | Description | Default |
-|--------|-------------|---------|
-| `format` | Image format (JPEG, PNG) | `JPEG` |
-| `width` | Target width to resize to | `1260` |
-| `height` | Target height to resize to | `700` |
-| `quality` | JPEG quality (1-100) | `85` |
-
-### Why Resize?
-Sending full-resolution screenshots (e.g., 4K or Retina) to VLM (Vision Language Models) can be slow and expensive.
-- **Latency**: Larger images take longer to encode and upload.
-- **Cost**: More pixels often mean higher token usage.
-- **Accuracy**: Most models are trained on standard resolutions (like 1280x720) and may not benefit from ultra-high resolution.
-
 ## Usage Example
 
-Here is how to configure a provider with custom settings and pass it to an agent:
+Here is how to use a screenshot provider with an agent:
 
 ```python
 import asyncio
-from oagi import AsyncScreenshotMaker, ImageConfig, TaskerAgent
+from oagi import AsyncScreenshotMaker, TaskerAgent
 
 async def main():
-    # 1. Configure for higher quality (e.g., for text-heavy apps)
-    config = ImageConfig(
-        format="PNG",
-        width=1920,
-        height=1080,
-        optimize=True
-    )
+    # Initialize the provider with default settings
+    provider = AsyncScreenshotMaker()
     
-    # 2. Initialize the provider
-    provider = AsyncScreenshotMaker(config=config)
-    
-    # 3. Use it in your agent
+    # Use it in your agent
     agent = TaskerAgent()
     await agent.execute(
         instruction="Analyze the spreadsheet",
         action_handler=..., 
-        image_provider=provider  # <--- Passed here
+        image_provider=provider
     )
 
 asyncio.run(main())
+```
+
+## Protocol Requirements
+
+When creating a custom screenshot provider, you must implement the appropriate protocol depending on whether you're using sync or async execution.
+
+### AsyncImageProvider Protocol
+
+For asynchronous agents (recommended), implement the `AsyncImageProvider` protocol:
+
+```python
+from oagi.types import AsyncImageProvider, Image
+
+class MyCustomProvider:
+    async def __call__(self) -> Image:
+        """
+        Capture or retrieve a new screenshot.
+        
+        Returns:
+            Image: An object that implements the Image protocol (must have a read() method)
+        """
+        # Your implementation here
+        pass
+    
+    async def last_image(self) -> Image:
+        """
+        Return the most recently captured image without taking a new screenshot.
+        If no image has been captured yet, this should capture a new one.
+        
+        Returns:
+            Image: The last captured image
+        """
+        # Your implementation here
+        pass
+```
+
+### ImageProvider Protocol
+
+For synchronous execution, implement the `ImageProvider` protocol:
+
+```python
+from oagi.types import ImageProvider, Image
+
+class MyCustomProvider:
+    def __call__(self) -> Image:
+        """
+        Capture or retrieve a new screenshot.
+        
+        Returns:
+            Image: An object that implements the Image protocol (must have a read() method)
+        """
+        # Your implementation here
+        pass
+    
+    def last_image(self) -> Image:
+        """
+        Return the most recently captured image without taking a new screenshot.
+        
+        Returns:
+            Image: The last captured image
+        """
+        # Your implementation here
+        pass
+```
+
+### Image Protocol
+
+The returned `Image` object must implement a single method:
+
+```python
+class MyImageWrapper:
+    def read(self) -> bytes:
+        """
+        Read the image data as bytes.
+        
+        Returns:
+            bytes: The raw image data (typically JPEG or PNG format)
+        """
+        # Your implementation here
+        pass
 ```
 
 ## Remote & Custom Implementations
@@ -99,12 +152,19 @@ class SocketIOImageProvider:
     def __init__(self, socket_namespace, session_id):
         self.socket = socket_namespace
         self.session_id = session_id
+        self._last_screenshot = None
 
     async def __call__(self):
         # Request screenshot from the client
         # We use .call() to wait for the response
         result = await self.socket.call('get_screenshot', room=self.session_id)
-        return result['image_data']
+        self._last_screenshot = result['image_data']
+        return self._last_screenshot
+    
+    async def last_image(self):
+        if self._last_screenshot is None:
+            return await self()
+        return self._last_screenshot
 ```
 
 ## Best Practices
@@ -114,7 +174,7 @@ class SocketIOImageProvider:
 </Check>
 
 <Tip>
-**Tune Resolution**: Start with the default (1260x700). Only increase it if the agent struggles to read small text or identify fine details.
+**Adjust Quality**: If the agent struggles to read small text or identify fine details, try increasing the font size on screen.
 </Tip>
 
 <Warning>
