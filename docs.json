@@ -11,7 +11,7 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
         "groups": [
           {
             "group": "Getting started",
@@ -48,17 +48,35 @@
             ]
           },
           {
-            "group": "Guides",
-            "pages": [
-              "Deploying to Production"
-            ]
-          },
-          {
             "group": "AI tools",
             "pages": [
               "ai-tools/cursor",
               "ai-tools/claude-code",
               "ai-tools/windsurf"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/introduction",
+              "guides/deploying-to-production"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Tutorials",
+        "groups": [
+          {
+            "group": "Tutorials",
+            "pages": [
+              "tutorials/introduction",
+              "tutorials/deploying-to-production"
             ]
           }
         ]
