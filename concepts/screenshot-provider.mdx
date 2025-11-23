@@ -84,6 +84,29 @@ async def main():
 asyncio.run(main())
 ```
 
+## Remote & Custom Implementations
+
+In many production scenarios, the agent runs on a server (Backend) but needs to capture screenshots from a remote computer (Client).
+
+Instead, you need a custom Screenshot Provider that requests image data from the client.
+
+### Example: SocketIOImageProvider
+
+Here is how you might implement a provider that requests screenshots via Socket.IO:
+
+```python
+class SocketIOImageProvider:
+    def __init__(self, socket_namespace, session_id):
+        self.socket = socket_namespace
+        self.session_id = session_id
+
+    async def __call__(self):
+        # Request screenshot from the client
+        # We use .call() to wait for the response
+        result = await self.socket.call('get_screenshot', room=self.session_id)
+        return result['image_data']
+```
+
 ## Best Practices
 
 <Check>

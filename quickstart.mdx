@@ -40,21 +40,24 @@ export OAGI_BASE_URL="http://api.agiopen.org"
 
 For the best results, your desktop environment needs to be clean and simple. The agent "sees" your screen just like you do.
 
-<img className="block dark:hidden" src="/images/good-setup.png" alt="Good desktop setup" />
-<img className="hidden dark:block" src="/images/good-setup.png" alt="Good desktop setup" />
-
-**Good Setup:**
-- Single, large Chrome window
-- Clean desktop background
-- Minimal distractions
-
-<img className="block dark:hidden" src="/images/bad-setup.png" alt="Bad desktop setup" />
-<img className="hidden dark:block" src="/images/bad-setup.png" alt="Bad desktop setup" />
-
-**Bad Setup (Avoid this):**
-- **Too many tabs:** 20+ tabs make it hard to find the right one.
-- **Small window:** The agent needs to see page content clearly.
-- **Messy desktop:** Multiple overlapping apps confuse the visual analysis.
+<CardGroup cols={2}>
+  <Card title="Good Setup" icon="check">
+    <img className="block dark:hidden" src="/images/good-setup.png" alt="Good desktop setup" />
+    <img className="hidden dark:block" src="/images/good-setup.png" alt="Good desktop setup" />
+    
+    - Single, large Chrome window
+    - Clean desktop background
+    - Minimal distractions
+  </Card>
+  <Card title="Bad Setup (Avoid this)" icon="xmark">
+    <img className="block dark:hidden" src="/images/bad-setup.png" alt="Bad desktop setup" />
+    <img className="hidden dark:block" src="/images/bad-setup.png" alt="Bad desktop setup" />
+    
+    - **Too many tabs:** 20+ tabs make it hard to find the right one.
+    - **Small window:** The agent needs to see page content clearly.
+    - **Messy desktop:** Multiple overlapping apps confuse the visual analysis.
+  </Card>
+</CardGroup>
 
 ### Step 3: Run your first agent
 

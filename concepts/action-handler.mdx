@@ -1,0 +1,110 @@
+---
+title: 'Action Handler'
+description: 'Executing agent decisions on the computer'
+icon: 'mouse-pointer'
+---
+
+# Action Handler
+
+The Action Handler is the component responsible for executing the actions decided by the agent. While the [Screenshot Provider](/concepts/screenshot-provider) gives the agent "eyes", the Action Handler gives it "hands" to interact with the environment (clicking, typing, scrolling, etc.).
+
+## Available Implementations
+
+OpenAGI provides two standard implementations for controlling the local computer:
+
+### 1. AsyncPyautoguiActionHandler (Recommended)
+The `AsyncPyautoguiActionHandler` is the standard choice for most agent applications. It wraps the underlying `pyautogui` operations in a thread pool to ensure that blocking GUI actions do not freeze your agent's async event loop.
+
+```python
+from oagi import AsyncPyautoguiActionHandler
+
+# Non-blocking execution
+action_handler = AsyncPyautoguiActionHandler()
+# The agent will call this handler to execute actions
+```
+
+### 2. PyautoguiActionHandler (Synchronous)
+The `PyautoguiActionHandler` is the synchronous version, suitable for simple scripts where async execution isn't required.
+
+```python
+from oagi import PyautoguiActionHandler
+
+# Blocking execution
+action_handler = PyautoguiActionHandler()
+```
+
+## Configuration
+
+You can customize the behavior of the local action handler using `PyautoguiConfig`.
+
+### PyautoguiConfig Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `drag_duration` | Duration for drag operations (seconds) | `0.5` |
+| `scroll_amount` | Pixels to scroll per step | `30` |
+| `wait_duration` | Duration for wait actions (seconds) | `1.0` |
+| `action_pause` | Pause between actions (seconds) | `0.1` |
+| `hotkey_interval` | Interval between key presses | `0.1` |
+| `capslock_mode` | 'session' (internal state) or 'system' (OS-level) | `'session'` |
+| `macos_ctrl_to_cmd` | Auto-replace 'ctrl' with 'command' on macOS | `True` |
+
+## Usage Example
+
+```python
+from oagi import AsyncPyautoguiActionHandler, PyautoguiConfig
+
+config = PyautoguiConfig(
+    action_pause=0.5,       # Slower execution for better visibility
+    drag_duration=1.0,      # Smoother drags
+    macos_ctrl_to_cmd=True  # Mac-friendly hotkeys
+)
+
+action_handler = AsyncPyautoguiActionHandler(config=config)
+```
+
+## Remote & Custom Implementations
+
+In many production scenarios, the agent runs on a server (Backend) but needs to control a remote computer (Client).
+
+Instead, you need a custom Action Handler that sends instructions to the client.
+
+### Architecture Example: Client-Server Control
+
+1.  **Client**: Runs on the user's computer. Captures screenshots and executes actions locally.
+2.  **Server**: Runs the OpenAGI agent. Receives screenshots and sends action commands.
+
+### Example: SocketIOActionHandler
+
+Here is how you might implement a handler that sends actions via Socket.IO (as seen in the `oagi` server implementation):
+
+```python
+class SocketIOActionHandler:
+    def __init__(self, socket_namespace, session_id):
+        self.socket = socket_namespace
+        self.session_id = session_id
+
+    async def __call__(self, actions: list[Action]) -> None:
+        # Instead of executing locally, we emit events to the client
+        for action in actions:
+            await self.socket.emit('perform_action', {
+                'type': action.type,
+                'params': action.argument
+            }, room=self.session_id)
+```
+
+On the client side, you would have a listener that receives these events and uses `pyautogui` (or another library) to actually perform the click or keypress.
+
+## Best Practices
+
+<Check>
+**Use Async**: Always use `AsyncPyautoguiActionHandler` when running agents to keep your application responsive.
+</Check>
+
+<Tip>
+**Coordinate Normalization**: The default handler automatically converts the agent's normalized coordinates (0-1000 range) to your actual screen resolution. If building a custom handler, remember to handle this conversion!
+</Tip>
+
+<Warning>
+**Safety**: Automated mouse and keyboard control can be dangerous. Always keep a way to terminate the script (e.g., moving the mouse to a corner if fail-safe is enabled) and test in a safe environment.
+</Warning>
