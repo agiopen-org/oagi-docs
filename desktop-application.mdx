@@ -1,332 +1,64 @@
 ---
 title: 'Desktop Application'
-description: 'Control remote desktops through OAGI Server using our desktop application'
+description: 'A ready-to-use client for testing and visualizing OpenAGI agents'
 icon: 'window-maximize'
 ---
 
 # Desktop Application
 
-Control remote desktops through OAGI Server using our desktop application.
+The OpenAGI Desktop Application is a developer tool that lets you instantly test and visualize your agents without building a client from scratch.
 
-## Overview
+It serves two main purposes:
+1.  **Visual Playground:** A zero-setup way to see what the model sees and watch it control your computer.
+2.  **Reference Implementation:** A concrete example of how a client should interact with the [OpenAGI Server](/concepts/server-architecture).
 
-The OAGI Desktop Application enables remote task automation by connecting your desktop to the OAGI Server via Socket.IO. The server acts as a bridge between AI agents and your desktop, allowing agents to see your screen and execute actions.
+![Desktop Application](/images/desktop-application.png)
 
-## Installation
 
-### Download Desktop Application
+## Why use it?
 
-Download the appropriate version for your operating system:
+*   **Instant Feedback:** Watch the agent's thought process, screenshot captures, and mouse movements in real-time.
+*   **Debug Capabilities:** View raw logs and segment data to understand why an agent succeeded or failed.
+*   **Cross-Platform:** Available for both macOS and Windows.
 
-```bash
-# macOS
-[Download URL to be provided]
+## Getting Started
 
-# Windows
-[Download URL to be provided]
-```
-
-### Start OAGI Server
-
-Start the server that will coordinate between the agent and desktop:
-
-```bash
-# Basic start
-oagi server start
-
-# With configuration
-oagi server start --port 8000 --api-key your-key
-
-# With environment variables
-export OAGI_API_KEY="your-key"
-export OAGI_SERVER_PORT=8000
-oagi server start
-```
-
-Or programmatically with Python:
-
-```python
-import uvicorn
-from oagi.server import create_app
-
-app = create_app()
-
-if __name__ == "__main__":
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=8000,
-        log_level="info"
-    )
-```
-
-### Connect Desktop Application
-
-1. Launch the desktop application
-2. Enter server URL: `http://localhost:8000`
-3. Connect and start automation
-
-## Architecture
-
-The system uses a three-layer architecture with Socket.IO communication:
-
-<img src="/images/desktop-application-architecture.png" alt="Desktop Application Architecture" />
-
-<img src="/images/socket.io-server-workflow.svg" alt="Socket.IO Server Workflow" />
-
-## How It Works
-
-### 1. Desktop Application
-
-The desktop application runs on the target computer and:
-
-- Captures screenshots when requested
-- Executes actions (click, type, scroll, etc.)
-- Maintains persistent connection to server
-- Handles S3 upload for screenshots
-
-### 2. OAGI Server
-
-The server orchestrates communication:
-
-```python
-# Server automatically creates wrappers for each session
-class SessionNamespace:
-    async def on_init(self, data):
-        # Create wrapped handlers
-        action_handler = SocketIOActionHandler(
-            session=self.session,
-            emit=self.emit,
-            call=self.call
-        )
-
-        image_provider = SocketIOImageProvider(
-            session=self.session,
-            call=self.call,
-            client=self.session.client
-        )
-
-        # Create and execute agent
-        agent = AsyncDefaultAgent(
-            api_key=self.session.api_key,
-            model=data.get("model", "lux-v1")
-        )
-
-        # Agent uses handlers naturally
-        success = await agent.execute(
-            instruction=data["instruction"],
-            action_handler=action_handler,
-            image_provider=image_provider
-        )
-```
-
-### 3. Connection Wrappers
-
-The wrappers implement standard protocols:
-
-```python
-# SocketIOActionHandler implements AsyncActionHandler protocol
-class SocketIOActionHandler:
-    async def __call__(self, actions: list[Action]):
-        for action in actions:
-            # Convert action to Socket.IO event
-            if action.type == ActionType.CLICK:
-                await self.emit("click", {
-                    "x": x,
-                    "y": y
-                })
-            elif action.type == ActionType.TYPE:
-                await self.emit("type", {
-                    "text": action.argument
-                })
-            # ... other action types
-
-# SocketIOImageProvider implements AsyncImageProvider protocol
-class SocketIOImageProvider:
-    async def __call__(self) -> Image:
-        # Get S3 presigned URL
-        upload_response = await self.client.get_s3_presigned_url()
-
-        # Request screenshot from desktop
-        await self.call("request_screenshot", {
-            "presigned_url": upload_response.url
-        })
-
-        # Return URL for API to download
-        return URLImage(upload_response.download_url)
-```
-
-### 4. Agent Usage
-
-Any agent can use the remote desktop without modification:
-
-```python
-# Agent doesn't know it's using remote desktop
-agent = AsyncDefaultAgent(api_key="key")
-
-# These handlers connect to remote desktop via Socket.IO
-success = await agent.execute(
-    instruction="Open browser and search",
-    action_handler=socket_action_handler,  # Executes remotely
-    image_provider=socket_image_provider   # Captures remotely
-)
-```
-
-## Event Reference
-
-### Client → Server Events
-
-| Event | Description | Payload |
-|-------|-------------|---------|
-| `init` | Start task execution | `{instruction, mode, model, temperature}` |
-
-### Server → Client Events
-
-| Event | Description | Payload |
-|-------|-------------|---------|
-| `session_status` | Session state update | `{status, session_id}` |
-| `click` | Click action | `{x, y}` |
-| `type` | Type text | `{text}` |
-| `drag` | Drag action | `{start_x, start_y, end_x, end_y}` |
-| `hotkey` | Keyboard shortcut | `{keys}` |
-| `scroll` | Scroll action | `{x, y}` |
-| `wait` | Wait action | `{duration}` |
-| `request_screenshot` | Screenshot request | `{presigned_url}` |
-| `finish` | Task complete | `{actions_executed}` |
-| `error` | Error occurred | `{message, code}` |
-
-## Event Flow
-
-### Screenshot Request Flow
-
-```
-Agent → ImageProvider.call()
-  ↓
-Server → emit("request_screenshot", {presigned_url})
-  ↓
-Desktop → Capture screenshot
-  ↓
-Desktop → Upload to S3
-  ↓
-Desktop → ack({success: true})
-  ↓
-Server → Return URLImage to Agent
-  ↓
-Agent → Send to OAGI API
-```
-
-### Action Execution Flow
-
-```
-Agent → ActionHandler(actions)
-  ↓
-Server → emit("click", {x, y})
-  ↓
-Desktop → Execute click
-  ↓
-Desktop → ack({success: true})
-  ↓
-Server → Continue to next action
-  ↓
-Agent → Task continues
-```
-
-## Configuration
-
-### Environment Variables
-
-```bash
-# API Configuration
-export OAGI_API_KEY="your-key"
-export OAGI_BASE_URL="https://api.agiopen.org"
-
-# Server Settings
-export OAGI_SERVER_HOST="0.0.0.0"
-export OAGI_SERVER_PORT="8000"
-export OAGI_CORS_ALLOWED_ORIGINS="http://localhost:3000,http://localhost:5173"
-
-# Session Configuration
-export OAGI_SESSION_TIMEOUT_SECONDS="30"
-
-# Model Settings
-export OAGI_DEFAULT_MODEL="lux-v1"
-export OAGI_DEFAULT_TEMPERATURE="0.7"
-export OAGI_MAX_STEPS="30"
-
-oagi server start
-```
-
-### Python Configuration
-
-```python
-from oagi.server import ServerConfig, create_socketio_server
-
-config = ServerConfig(
-    oagi_api_key="your-key",
-    oagi_base_url="https://api.agiopen.org",
-    server_host="0.0.0.0",
-    server_port=8000,
-    session_timeout_seconds=30.0,
-    default_model="lux-v1",
-    default_temperature=0.7,
-    max_steps=30,
-    cors_allowed_origins=["http://localhost:3000"]
-)
-
-sio_server = create_socketio_server(config)
-app = sio_server.create_app()
-```
-
-## Use Cases
-
-### Remote Automation
-
-- **Cross-platform testing** - Control Windows from macOS
-- **Cloud automation** - Run agents on cloud desktops
-- **Secure environments** - Automate air-gapped systems
-
-### Development & Testing
-
-- **Browser automation** - Test web applications remotely
-- **Desktop application testing** - Automated UI testing
-- **Integration testing** - End-to-end workflow validation
-
-### Production Deployment
-
-- **Scalable automation** - Multiple desktop workers
-- **Centralized control** - Manage automation from single server
-- **Monitoring & logging** - Track all automation activities
-
-## Best Practices
-
-### Security
-
-- Use HTTPS in production environments
-- Implement proper authentication for server access
-- Restrict CORS origins to trusted domains
-- Monitor session activity and timeouts
-
-### Performance
-
-- Optimize screenshot quality vs size trade-offs
-- Use appropriate session timeouts
-- Monitor S3 upload/download performance
-- Implement connection retry logic
-
-### Reliability
-
-- Handle network disconnections gracefully
-- Implement proper error handling and recovery
-- Use health checks for desktop applications
-- Log all events for debugging
-
-## Next Steps
+### 1. Download the App
 
 <CardGroup cols={2}>
-  <Card title="CLI Commands" icon="terminal" href="/python-sdk/cli">
-    Learn server management commands
+  <Card title="Download for macOS" icon="apple" href="#">
+    Universal Binary (Intel & Apple Silicon)
   </Card>
-  <Card title="Handlers" icon="hand" href="/python-sdk/handlers">
-    Understand action and image handlers
+  <Card title="Download for Windows" icon="windows" href="#">
+    Windows 10/11 (x64)
   </Card>
 </CardGroup>
+
+
+### 2. Start Your Server
+
+The desktop app needs a "brain" to talk to. Start your local OpenAGI server:
+
+> You must set your `OAGI_API_KEY` and `OAGI_BASE_URL` environment variables before starting the server.
+
+```bash
+export OAGI_API_KEY="your-api-key"
+export OAGI_BASE_URL="https://api.agiopen.org"
+oagi server start
+```
+
+### 3. Connect
+
+Open the desktop application and enter your server URL (default: `http://0.0.0.0:8000`). Once connected, the app acts as the bridge, allowing the agent running on your server to control your desktop.
+
+![Set Server URL](/images/set_server_url.png)
+
+
+
+## Building Your Own
+
+The Desktop Application is just one example of a client. If you want to build a custom computer-use product (like a headless background worker or a specialized browser agent), you can build your own client that speaks the same protocol.
+
+<Card title="Build a Custom Client" icon="code" href="/concepts/custom-clients">
+  Learn the Socket.IO protocol to build your own client implementation.
+</Card>
