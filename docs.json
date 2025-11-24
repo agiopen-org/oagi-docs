@@ -20,7 +20,8 @@
               "quickstart",
               "agent",
               "models",
-              "authentication"
+              "authentication",
+              "desktop-application"
             ]
           },
           {
@@ -39,7 +40,8 @@
               "concepts/actor",
               "concepts/screenshot-provider",
               "concepts/action-handler",
-              "concepts/server-architecture"
+              "concepts/server-architecture",
+              "concepts/custom-clients"
             ]
           },
           {
@@ -51,8 +53,7 @@
               "python-sdk/tasker",
               "python-sdk/thinker",
               "python-sdk/handlers",
-              "python-sdk/cli",
-              "python-sdk/desktop-application"
+              "python-sdk/cli"
             ]
           },
           {
@@ -66,13 +67,12 @@
         ]
       },
       {
-        "tab": "Guides",
+        "tab": "Prompting Lux",
         "groups": [
           {
             "group": "Guides",
             "pages": [
-              "guides/introduction",
-              "guides/deploying-to-production"
+              "guides/prompting-lux"
             ]
           }
         ]

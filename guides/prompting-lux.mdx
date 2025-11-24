@@ -1,0 +1,79 @@
+---
+title: Prompting Lux
+description: Build your mental model of Lux's capabilities through progressive examples
+---
+
+# Prompting Lux
+
+Lux is a multimodal model designed to use computers like a human does. To get the most out of it, it helps to build a strong mental model of what it sees, how it thinks, and where it might stumble.
+
+This guide takes you through a progression of prompts—from simple to complex—to help you calibrate your expectations and learn how to steer the model effectively.
+
+## The Mental Model
+
+Think of Lux as a **smart intern** who is looking at your screen over your shoulder.
+- **It sees what you see:** It relies on screenshots. If a button is covered by a popup, Lux can't click it.
+- **It knows standard UIs:** It intuitively understands buttons, forms, and navigation bars.
+- **It needs clear goals:** "Fix the computer" is too vague. "Update the system settings to dark mode" is actionable.
+
+## Level 1: Basic Observation
+*Goal: Verify Lux can "see" and identify elements.*
+
+Start by asking Lux to describe what is on the screen. This confirms that the screenshot pipeline is working and gives you a sense of its visual acuity.
+
+**Prompt:**
+> "What is the primary button color on this page? Also, read the text of the error message in the top right corner."
+
+**What to look for:**
+- Does it correctly identify the color?
+- Is the text transcription accurate?
+- **Tip:** If Lux hallucinates text, check your screenshot resolution/compression settings.
+
+## Level 2: Simple Interaction
+*Goal: Test basic action execution (clicking and typing).*
+
+Now, give it a single, concrete task.
+
+**Prompt:**
+> "Click the 'Search' bar and type 'OpenAGI documentation', then press Enter."
+
+**What to look for:**
+- Does it find the search bar even if it doesn't have a clear label?
+- Does it chain the actions (Click -> Type -> KeyPress) correctly?
+
+## Level 3: Multi-step Logic
+*Goal: Test planning and context retention.*
+
+Ask for a task that requires multiple steps and maintaining state (remembering what it just did).
+
+**Prompt:**
+> "Go to the settings page, find the 'Notifications' section, and turn off 'Email Marketing'. If it's already off, leave it alone."
+
+**What to look for:**
+- **Conditional Logic:** Did it check the state of the toggle before clicking?
+- **Navigation:** Did it figure out how to get to "Settings" if it wasn't immediately visible?
+
+## Level 4: Dynamic Adaptation
+*Goal: Test resilience to unexpected UI states.*
+
+This is where the "Agent" behavior shines. Give it a goal where the path isn't perfectly linear.
+
+**Prompt:**
+> "Find the cheapest flight to Tokyo for next Tuesday on Expedia. Add it to the cart but do not checkout."
+
+**What to look for:**
+- **Handling Popups:** Did it close the "Sign up for newsletter" modal?
+- **Sorting/Filtering:** Did it use the UI tools to sort by price, or did it try to read every single result?
+- **Ambiguity:** Did it ask for clarification (e.g., "Which airport?") or make a reasonable default choice?
+
+## Best Practices
+
+1.  **Be Explicit about "Done":** Tell Lux how to know when it has succeeded.
+    *   *Bad:* "Book a meeting."
+    *   *Good:* "Book a meeting for 2pm. Stop when you see the 'Meeting Confirmed' banner."
+
+2.  **Give Context, Not Just Commands:**
+    *   *Better:* "I need to debug this layout. Open the dev tools and inspect the header element." (Tells it *why*, helping it infer the right actions if the dev tools move).
+
+3.  **Iterate:** If Lux fails, don't just retry the same prompt. Add a hint about *what* it missed.
+    *   *Correction:* "You missed the 'Next' button because it's at the very bottom. Scroll down first."

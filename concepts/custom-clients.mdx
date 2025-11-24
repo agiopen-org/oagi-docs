@@ -1,0 +1,81 @@
+---
+title: 'Building Custom Clients'
+description: 'How to build your own computer use product using OpenAGI'
+icon: 'desktop'
+---
+
+# Building Custom Clients
+
+To ship your own computer use product, you need to build a **Client** that connects to a **Server**. The server acts as the "brain" (running the agent), while your client acts as the "body" (executing actions and seeing the screen). The OpenAGI Server holds all credentials for your applications and communicates with OpenAGI's models, such as the Actor or the Thinker.
+
+## Architecture Overview
+
+1.  **Your Server**: Manages sessions and runs the AI agent (or custom Agent). It calls the Lux models via API and communicates to your client via WebSocket. 
+2.  **Your Client**: A desktop application (can be Python, Node.js, Electron, etc.) that connects to the server via Socket.IO.
+
+## The Protocol
+
+Your client needs to implement a Socket.IO connection and handle two main types of events: **Actions** and **Screenshots**.
+
+### 1. Connection
+
+Connect to the server's Socket.IO endpoint (default: `http://localhost:8000`).
+
+```javascript
+// Example in JavaScript/Node.js
+const socket = io('http://localhost:8000/session/YOUR_SESSION_ID');
+```
+
+### 2. Handling Actions
+
+The server will emit events corresponding to actions the agent wants to perform. Your client must listen for these events and execute them using local OS APIs (like `pyautogui`, `robotjs`, or native calls).
+
+| Event Name | Data Payload | Expected Behavior |
+| :--- | :--- | :--- |
+| `click` | `{ x, y }` | Move mouse to (x, y) and click left button. |
+| `right_single` | `{ x, y }` | Move mouse to (x, y) and click right button. |
+| `left_double` | `{ x, y }` | Double-click left button at (x, y). |
+| `type` | `{ text }` | Type the specified text. |
+| `hotkey` | `{ combo }` | Press a key combination (e.g., "ctrl+c"). |
+| `scroll` | `{ x, y, direction }` | Scroll the screen/element. |
+| `drag` | `{ x1, y1, x2, y2 }` | Click and hold at (x1, y1), move to (x2, y2), release. |
+| `wait` | `{ duration_ms }` | Wait for the specified duration. |
+
+**Example Handler (Pseudo-code):**
+
+```javascript
+socket.on('click', async (data) => {
+  await system.mouse.move(data.x, data.y);
+  await system.mouse.click();
+  return { success: true }; // Acknowledge execution
+});
+```
+
+### 3. Handling Screenshots
+
+The server needs to "see" what's happening. It will request a screenshot via the `request_screenshot` event.
+
+**Payload:**
+- `presigned_url`: A secure S3 URL to upload the image to.
+- `uuid`: Unique ID for the screenshot.
+
+**Your Responsibility:**
+1.  Capture the current screen.
+2.  Upload the image (PNG/JPEG) to the `presigned_url` using a standard HTTP PUT request.
+3.  Return a success acknowledgement to the server.
+
+```javascript
+socket.on('request_screenshot', async (data) => {
+  const screenshot = await system.screen.capture();
+  await http.put(data.presigned_url, screenshot);
+  return { success: true };
+});
+```
+
+## Summary Checklist
+
+To ship your product:
+
+1.  [ ] **Deploy the OAGI Server**: Run it locally or in the cloud.
+2.  [ ] **Build the Client**: Create an app that implements the Socket.IO protocol above.
+3.  [ ] **Handle OS Permissions**: Ensure your app has permission to control the mouse/keyboard and record the screen (especially on macOS).
