@@ -1,6 +1,7 @@
 ---
 title: 'OpenAGI Models'
 description: 'Choose the right model for your computer-use tasks'
+icon: 'brain'
 ---
 
 # Lux Foundation Models
@@ -38,15 +39,12 @@ OpenAGI provides two specialized foundation models for computer use, each optimi
 To get the best results from `lux-actor-1`, provide clear, step-by-step instructions. Avoid vague or high-level goals.
 
 <CodeGroup>
-```text Good (Step-by-step)
-1. Open the "Settings" menu
-2. Click on "Profile"
-3. Type "John Doe" into the "Name" field
-4. Click "Save"
+```text Good (Concise)
+Click "Settings" > "Profile". Type "John Doe" in "Name". Click "Save".
 ```
 
 ```text Bad (Vague)
-Update my profile name to John Doe
+Fix my profile info
 ```
 </CodeGroup>
 
@@ -121,11 +119,6 @@ asyncio.run(run_tasker())
     - "Compare flight prices on three different websites and book the cheapest one"
     - "Debug the failing test case by analyzing the logs and checking the UI state"
 
-**Trade-offs:**
-- Higher latency per decision
-- Increased cost per action
-- Not ideal for tight control loops
-
 <Warning>
 **Avoid using Thinker with TaskerAgent for simple execution loops.**
 The `TaskerAgent` adds its own layer of reflection and planning. Combining this with `lux-thinker-1` (which also plans) can result in extremely slow execution times and redundant reasoning. Use `lux-thinker-1` primarily for the initial planning phase or for very difficult steps where the actor fails.
@@ -133,7 +126,7 @@ The `TaskerAgent` adds its own layer of reflection and planning. Combining this 
 
 ### Usage in CLI and Custom Apps
 
-Due to its high latency and cost, `lux-thinker-1` is best suited for asynchronous workflows where a human is not waiting for immediate feedback, such as:
+`lux-thinker-1` is best suited for asynchronous workflows where a human is not waiting for immediate feedback, such as:
 1.  **CLI Tools:** Running complex analysis or setup tasks via the command line.
 
     ```bash

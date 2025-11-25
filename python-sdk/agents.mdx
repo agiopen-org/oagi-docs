@@ -151,22 +151,6 @@ Choose the right abstraction for your use case:
 
 ## Best Practices
 
-### Error Handling
-```python
-try:
-    success = await agent.execute(
-        instruction="Complete checkout process",
-        action_handler=handler,
-        image_provider=provider
-    )
-    
-    if not success:
-        print("Task failed to complete")
-        
-except Exception as e:
-    print(f"Agent execution error: {e}")
-```
-
 ### Step Observation
 Monitor agent execution with observers:
 

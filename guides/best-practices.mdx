@@ -1,0 +1,65 @@
+---
+title: 'Best Practices'
+description: 'Essential guidelines for reliable computer use automation'
+icon: 'shield-check'
+---
+
+# Best Practices
+
+This guide consolidates the most important strategies for building reliable, production-grade computer use agents with Lux.
+
+## 1. Environment Setup
+
+The "physical" environment of the computer is the foundation of reliability.
+
+-   **Clean Browser State:** Close unnecessary tabs. 30+ open tabs can interfere with clicking accuracy and distract the model.
+-   **Screen Resolution:** Use standard 1080p scaling. High-resolution screens (Retina/4K) can make icons too small for the model to detect accurately.
+-   **Pre-opened Applications:** Have your browser or target application ready at the starting page. This saves steps and reduces the chance of navigation errors.
+-   **Stable UI:** Avoid dynamic layouts or popups that appear randomly if possible.
+
+## 2. Prompting Strategy
+
+How you ask matters as much as what you ask.
+
+### Be Specific and Action-Oriented
+Computer use models thrive on concrete instructions.
+
+-   ❌ **Vague:** "Fix the computer"
+-   ✅ **Specific:** "Update the system settings to dark mode"
+
+### Break Down Complex Tasks
+If a task involves multiple logical steps, break it down.
+
+-   ❌ **Too Complex:** "Manage my Shopify store"
+-   ✅ **Broken Down:** "Add 3 products to inventory, then update their descriptions"
+
+### Specify Success Criteria
+Tell the model how to know it's done.
+
+-   **Example:** "Book a meeting for 2pm. Stop when you see the 'Meeting Confirmed' banner."
+
+## 3. Model Selection
+
+Choose the right tool for the job to balance speed, cost, and accuracy.
+
+| Model | Best For | Avoid When |
+| :--- | :--- | :--- |
+| **Lux Actor** (`lux-actor-1`) | Fast execution (1s/step), simple linear tasks (10-20 steps). | You need complex reasoning, comparison, or handling ambiguous instructions. |
+| **Lux Thinker** (`lux-thinker-1`) | Complex planning, comparison tasks ("find cheapest"), handling ambiguity. | You need low latency or are running a simple click-path. |
+| **Tasker Agent** | Structured workflows requiring some planning but mostly execution. | You need raw speed or have a very simple task. |
+
+## 4. Handling Failure
+
+Build resilience into your prompts and workflows.
+
+-   **Handle UI Variations:** "If the 'Login' button isn't visible, scroll down or look for a 'Sign In' link in the menu."
+-   **Iterate with Hints:** If Lux fails, don't just retry. Add a hint: "You missed the 'Next' button because it's at the very bottom. Scroll down first."
+
+## 5. What to Avoid
+
+The **Actor model** specifically struggles with:
+-   **Comparison tasks** (e.g., "find the cheapest flight").
+-   **Complex dropdown menus and filtering**.
+-   **Vague commands** requiring interpretation.
+
+For these scenarios, upgrade to the **Thinker model** or use the **Tasker Agent**.

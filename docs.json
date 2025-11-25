@@ -72,7 +72,8 @@
           {
             "group": "Guides",
             "pages": [
-              "guides/prompting-lux"
+              "guides/prompting-lux",
+              "guides/best-practices"
             ]
           }
         ]

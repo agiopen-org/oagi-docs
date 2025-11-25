@@ -187,27 +187,6 @@ with Actor(api_key="key") as actor:
         handler(step.actions)
 ```
 
-## Error Handling
-
-Handle API and network errors gracefully:
-
-```python
-from oagi import APIError, NetworkError
-
-try:
-    with Actor(api_key="key") as actor:
-        actor.init_task("task")
-        step = actor.step(screenshot)
-
-except APIError as e:
-    print(f"API error: {e.message}")
-    print(f"Status: {e.status_code}")
-
-except NetworkError as e:
-    print(f"Network issue: {e.message}")
-    # Implement retry logic
-```
-
 ## When to Use Actors
 
 **Use Actors when you need:**
@@ -216,11 +195,6 @@ except NetworkError as e:
 - Detailed logging and debugging
 - Integration with existing automation frameworks
 - Custom retry or error handling logic
-
-**Use ShortTask when you need:**
-- Simple, automated task execution
-- Quick prototyping
-- Standard automation workflows
 
 ## Best Practices
 
