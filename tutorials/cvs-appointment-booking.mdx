@@ -81,6 +81,7 @@ if __name__ == "__main__":
 ```
 
 This skeleton ensures macOS accessibility prompts happen once when `AsyncPyautoguiActionHandler` first loads.
+It also establishes an async context up front so later sections can drop in awaitable calls (observer exports, agent execution).
 
 ### Step 2 — Collect run arguments
 
@@ -92,11 +93,11 @@ Parameterize the run so you can swap contact details or models without editing t
     )
 
     # CVS contact info
-    parser.add_argument("--first_name", default="Ziqi")
-    parser.add_argument("--last_name", default="Pang")
-    parser.add_argument("--email", default="ziqi.pang@gmail.com")
-    parser.add_argument("--birthday", default="09-13-1997")
-    parser.add_argument("--zip_code", default="61801")
+    parser.add_argument("--first_name", default="First")
+    parser.add_argument("--last_name", default="Last")
+    parser.add_argument("--email", default="user@example.com")
+    parser.add_argument("--birthday", default="MM-DD-YYYY")
+    parser.add_argument("--zip_code", default="00000")
 
     # run config
     parser.add_argument("--exp_name", default="cvs")
@@ -111,8 +112,6 @@ Parameterize the run so you can swap contact details or models without editing t
     save_dir = os.path.join(args.save_dir, args.exp_name)
     os.makedirs(save_dir, exist_ok=True)
 ```
-
-Now any teammate can rerun the workflow with their own profile by passing flags.
 
 ### Step 3 — Initialize the automation toolkit
 
@@ -162,6 +161,7 @@ Break the appointment journey into todos so failures surface at the right granul
 ```
 
 Tip: Keep instructions declarative (“click X”) so the model knows when to wait for UI updates.
+Modeling steps as todos/deliverables mirrors Tasker’s internal memory model, giving you granular success/failure signals instead of a monolithic “pass/fail.”
 
 ### Step 5 — Execute and inspect memory
 
@@ -191,7 +191,7 @@ Kick off the agent, then summarize the replay directly from `PlannerMemory`.
         traceback.print_exc()
 ```
 
-`TaskerAgent` will emit split events to any registered observer so you can stream state to dashboards or logs. @oagi-python/src/oagi/cli/agent.py#127-177
+`TaskerAgent` will emit split events to any registered observer so you can stream state to dashboards or logs.
 
 ### Step 6 — Export the run transcript
 
@@ -204,6 +204,7 @@ Store an HTML artifact for reviews or compliance checks.
 ```
 
 At this point you have a working automation assembled from reusable building blocks.
+Exporting directly from the observer keeps presentation logic decoupled from the Tasker, so you can later swap in Markdown/JSON exports without touching the execution core.
 
 ## Run the Workflow
 
@@ -211,11 +212,11 @@ Launch the automation (make sure CVS is reachable and the browser window is visi
 
 ```bash
 python cvs_tasker.py \
-  --first_name="Ada" \
-  --last_name="Lovelace" \
-  --email="ada@example.com" \
-  --birthday="12-10-1815" \
-  --zip_code="10001" \
+  --first_name="First" \
+  --last_name="Last" \
+  --email="user@example.com" \
+  --birthday="MM-DD-YYYY" \
+  --zip_code="00000" \
   --model_name="lux-actor-1" \
   --max_steps=30
 ```
@@ -258,11 +259,11 @@ async def main():
     )
 
     # CVS contact info
-    parser.add_argument("--first_name", default="Ziqi")
-    parser.add_argument("--last_name", default="Pang")
-    parser.add_argument("--email", default="ziqi.pang@gmail.com")
-    parser.add_argument("--birthday", default="09-13-1997")
-    parser.add_argument("--zip_code", default="61801")
+    parser.add_argument("--first_name", default="First")
+    parser.add_argument("--last_name", default="Last")
+    parser.add_argument("--email", default="user@example.com")
+    parser.add_argument("--birthday", default="MM-DD-YYYY")
+    parser.add_argument("--zip_code", default="00000")
 
     # run config
     parser.add_argument("--exp_name", default="cvs")
@@ -355,7 +356,7 @@ python cvs_tasker.py \
   --first_name="Ada" \
   --last_name="Lovelace" \
   --email="ada@example.com" \
-  --birthday="12-10-1815" \
+  --birthday="MM-DD-YYYY" \
   --zip_code="10001" \
   --model_name="lux-actor-1" \
   --max_steps=30
