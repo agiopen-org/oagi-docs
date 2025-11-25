@@ -76,32 +76,6 @@ To get the best results from TaskerAgent, it helps to understand how it plans an
 
 Here are two examples of how to structure your tasks:
 
-### Example 1: Data Entry
-```python
-agent.set_task(
-    task="Transfer leads from spreadsheet to CRM",
-    todos=[
-        "Open the 'Leads' Google Sheet",
-        "Copy the first row of data",
-        "Open Salesforce in a new tab",
-        "Create a new lead and paste the data",
-        "Save the lead"
-    ]
-)
-```
-
-### Example 2: Market Research
-```python
-agent.set_task(
-    task="Research pricing for 'Project X'",
-    todos=[
-        "Go to amazon.com",
-        "Search for 'Project X'",
-        "Find the top 3 rated products",
-        "Record their prices in a text file"
-    ]
-)
-```
 
 <CardGroup cols={2}>
   <Card title="Customized Agent Examples" icon="robot" href="/python-sdk/agents#custom-agents">

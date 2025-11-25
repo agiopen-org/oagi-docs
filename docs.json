@@ -36,9 +36,6 @@
             "group": "Concepts",
             "pages": [
               "concepts/screenshot-action-loop",
-              "concepts/action",
-              "concepts/step",
-              "concepts/actor",
               "concepts/screenshot-provider",
               "concepts/action-handler",
               "concepts/server-architecture",
@@ -86,6 +83,7 @@
             "group": "Tutorials",
             "pages": [
               "tutorials/introduction",
+              "tutorials/cvs-appointment-booking",
               "tutorials/deploying-to-production"
             ]
           }

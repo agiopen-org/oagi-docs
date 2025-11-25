@@ -1,0 +1,386 @@
+---
+title: "CVS Appointment Booking"
+description: "Use the OAGI Python SDK's TaskerAgent to schedule a CVS vaccination appointment end-to-end."
+---
+
+# CVS Appointment Booking Tutorial
+
+Automate a multi-step CVS vaccination appointment with the OAGI Python SDK. We'll assemble the workflow piece by piece—starting with environment setup, then layering agents, todos, and observability—before revealing the full script at the end.
+
+## What You'll Build
+
+- Launch cvs.com, search for the vaccinations flow, and open the scheduling experience
+- Populate contact and birthday fields without relying on browser autofill
+- Select vaccines, provide a ZIP code, and submit a search for nearby appointments
+- Export a full HTML run history for auditing or support tickets
+
+## Prerequisites
+
+1. **OAGI credentials** – Generate an API key at [developer.openagi.org](https://developer.openagi.org/) and export it in your shell:
+   ```bash
+   export OAGI_API_KEY="sk-your-key"
+   export OAGI_BASE_URL="https://api.agiopen.org"  # optional override
+   ```
+2. **Python ≥ 3.10 with desktop extras** – Install the metapackage (pulls in PyAutoGUI + Pillow) or target extras explicitly:
+   ```bash
+   pip install "oagi>=0.10.0"
+   # or: pip install "oagi-core[desktop]"
+   ```
+3. **macOS permissions** – Grant accessibility/screen recording access so PyAutoGUI and screenshot capture can control the OS.
+4. **Chrome/Edge/Firefox** open and authenticated as needed for CVS bookings.
+
+## Project Layout
+
+Create a `tutorials/cvs` folder with:
+
+- `cvs_tasker.py` – main script
+- `results/` – destination for exported HTML transcripts
+
+```
+tutorials/cvs/
+├── cvs_tasker.py
+└── results/
+```
+
+## Tutorial Roadmap
+
+We'll assemble the script in six small steps:
+
+1. Bootstrap the project and async entry point
+2. Accept personalization input through `argparse`
+3. Initialize the automation toolkit (observer, screenshot maker, action handler)
+4. Describe the CVS workflow as todos + deliverables
+5. Execute the agent while streaming telemetry
+6. Export the run transcript for auditing
+
+Only after these steps will we reveal the consolidated source.
+
+### Step 1 — Bootstrap the project
+
+Start with an async entry point and the imports you'll need later:
+
+```python
+import argparse
+import asyncio
+import os
+import traceback
+from datetime import datetime
+
+from oagi import AsyncScreenshotMaker
+from oagi.agent.observer import AsyncAgentObserver
+from oagi.agent.tasker import TaskerAgent
+from oagi.handler import AsyncPyautoguiActionHandler
+
+
+async def main():
+    print("Bootstrapping CVS Tasker…")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+This skeleton ensures macOS accessibility prompts happen once when `AsyncPyautoguiActionHandler` first loads.
+
+### Step 2 — Collect run arguments
+
+Parameterize the run so you can swap contact details or models without editing the file:
+
+```python
+    parser = argparse.ArgumentParser(
+        description="Run TaskerAgent to schedule a CVS appointment"
+    )
+
+    # CVS contact info
+    parser.add_argument("--first_name", default="Ziqi")
+    parser.add_argument("--last_name", default="Pang")
+    parser.add_argument("--email", default="ziqi.pang@gmail.com")
+    parser.add_argument("--birthday", default="09-13-1997")
+    parser.add_argument("--zip_code", default="61801")
+
+    # run config
+    parser.add_argument("--exp_name", default="cvs")
+    parser.add_argument("--save_dir", default="results")
+
+    # agent config
+    parser.add_argument("--model_name", default="lux-actor-1")
+    parser.add_argument("--max_steps", type=int, default=24)
+    parser.add_argument("--temperature", type=float, default=0.0)
+
+    args = parser.parse_args()
+    save_dir = os.path.join(args.save_dir, args.exp_name)
+    os.makedirs(save_dir, exist_ok=True)
+```
+
+Now any teammate can rerun the workflow with their own profile by passing flags.
+
+### Step 3 — Initialize the automation toolkit
+
+Wire up the observation stack (`AsyncAgentObserver`) plus the desktop automation primitives. These pull in optional dependencies defined in the `desktop` extra. @oagi-python/src/oagi/__init__.py#35-93
+
+```python
+    observer = AsyncAgentObserver()
+    image_provider = AsyncScreenshotMaker()
+    action_handler = AsyncPyautoguiActionHandler()
+
+    tasker = TaskerAgent(
+        api_key=os.getenv("OAGI_API_KEY"),
+        base_url=os.getenv("OAGI_BASE_URL", "https://api.agiopen.org"),
+        model=args.model_name,
+        max_steps=args.max_steps,
+        temperature=args.temperature,
+        step_observer=observer,
+    )
+```
+
+`TaskerAgent` layers planning, memory, and observers on top of the core actor loop. @oagi-python/src/oagi/agent/tasker/tasker_agent.py#23-166
+
+### Step 4 — Describe the CVS workflow
+
+Break the appointment journey into todos so failures surface at the right granularity. Deliverables let you assert final outcomes.
+
+```python
+    month, day, year = args.birthday.split("-")
+    instruction = (
+        f"Schedule an appointment at CVS for {args.first_name} {args.last_name} "
+        f"with email {args.email} and birthday {args.birthday}"
+    )
+    deliverables = [instruction]
+    todos = [
+        "Open a new tab, go to www.cvs.com, search 'flu shot', then select Schedule vaccinations",
+        f"Enter first name '{args.first_name}', last name '{args.last_name}', email '{args.email}'",
+        f"Scroll to Date of Birth and enter Month '{month}', Day '{day}', Year '{year}'",
+        "Continue as guest, add vaccines, choose Flu, then confirm",
+        f"Advance to ZIP entry, input '{args.zip_code}', pick the first suggestion, and search",
+    ]
+
+    tasker.set_task(
+        task=instruction,
+        todos=todos,
+        deliverables=deliverables,
+    )
+```
+
+Tip: Keep instructions declarative (“click X”) so the model knows when to wait for UI updates.
+
+### Step 5 — Execute and inspect memory
+
+Kick off the agent, then summarize the replay directly from `PlannerMemory`.
+
+```python
+    print(f"Starting task execution at {datetime.now()}")
+    print("=" * 60)
+
+    try:
+        success = await tasker.execute(
+            instruction="",
+            action_handler=action_handler,
+            image_provider=image_provider,
+        )
+
+        memory = tasker.get_memory()
+        print("\n" + "=" * 60)
+        print("EXECUTION SUMMARY")
+        print(f"Overall success: {success}")
+        print(memory.task_execution_summary)
+
+        status_summary = memory.get_todo_status_summary()
+        print(f"Completed: {status_summary.get('completed', 0)}")
+    except Exception as exc:
+        print(f"Error during execution: {exc}")
+        traceback.print_exc()
+```
+
+`TaskerAgent` will emit split events to any registered observer so you can stream state to dashboards or logs. @oagi-python/src/oagi/cli/agent.py#127-177
+
+### Step 6 — Export the run transcript
+
+Store an HTML artifact for reviews or compliance checks.
+
+```python
+    output_file = os.path.join(save_dir, "cvs_execution_history.html")
+    observer.export("html", output_file)
+    print(f"Exported execution history to {output_file}")
+```
+
+At this point you have a working automation assembled from reusable building blocks.
+
+## Run the Workflow
+
+Launch the automation (make sure CVS is reachable and the browser window is visible):
+
+```bash
+python cvs_tasker.py \
+  --first_name="Ada" \
+  --last_name="Lovelace" \
+  --email="ada@example.com" \
+  --birthday="12-10-1815" \
+  --zip_code="10001" \
+  --model_name="lux-actor-1" \
+  --max_steps=30
+```
+
+> Tip: Run inside a dedicated desktop Space to avoid accidental mouse/keyboard interruptions.
+
+## Understanding the Output
+
+- **Console summary** – Displays per-todo success, deliverables, and aggregated stats pulled from the agent's memory object.
+- **HTML export** – Stored under `results/<exp_name>/cvs_execution_history.html` with screenshot thumbnails, tool calls, and timestamps for every step (ideal proof for compliance or debugging).
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| `ImportError: AsyncPyautoguiActionHandler requires desktop dependencies` | Desktop extras not installed | `pip install oagi-core[desktop]` @oagi-python/src/oagi/__init__.py#35-93 |
+| `ConfigurationError: OAGI API key must be provided` | Missing `OAGI_API_KEY` | Export env var or pass `api_key` directly. @oagi-python/src/oagi/client/base.py#42-58 |
+| Agent stalls on a todo | UI element not visible yet | Increase `--max_steps`, add `wait` language inside the todo, or lower `--temperature` for deterministic retries. |
+
+## Full Source Listing
+
+Here is the complete script assembled from the steps above:
+
+```python
+import argparse
+import asyncio
+import os
+import traceback
+from datetime import datetime
+
+from oagi import AsyncScreenshotMaker
+from oagi.agent.observer import AsyncAgentObserver
+from oagi.agent.tasker import TaskerAgent
+from oagi.handler import AsyncPyautoguiActionHandler
+
+
+async def main():
+    parser = argparse.ArgumentParser(
+        description="Run TaskerAgent to schedule a CVS appointment"
+    )
+
+    # CVS contact info
+    parser.add_argument("--first_name", default="Ziqi")
+    parser.add_argument("--last_name", default="Pang")
+    parser.add_argument("--email", default="ziqi.pang@gmail.com")
+    parser.add_argument("--birthday", default="09-13-1997")
+    parser.add_argument("--zip_code", default="61801")
+
+    # run config
+    parser.add_argument("--exp_name", default="cvs")
+    parser.add_argument("--save_dir", default="results")
+
+    # agent config
+    parser.add_argument("--model_name", default="lux-actor-1")
+    parser.add_argument("--max_steps", type=int, default=24)
+    parser.add_argument("--temperature", type=float, default=0.0)
+
+    args = parser.parse_args()
+
+    save_dir = os.path.join(args.save_dir, args.exp_name)
+    os.makedirs(save_dir, exist_ok=True)
+
+    observer = AsyncAgentObserver()
+    image_provider = AsyncScreenshotMaker()
+    action_handler = AsyncPyautoguiActionHandler()
+
+    tasker = TaskerAgent(
+        api_key=os.getenv("OAGI_API_KEY"),
+        base_url=os.getenv("OAGI_BASE_URL", "https://api.agiopen.org"),
+        model=args.model_name,
+        max_steps=args.max_steps,
+        temperature=args.temperature,
+        step_observer=observer,
+    )
+
+    month, day, year = args.birthday.split("-")
+    instruction = (
+        f"Schedule an appointment at CVS for {args.first_name} {args.last_name} "
+        f"with email {args.email} and birthday {args.birthday}"
+    )
+    deliverables = [instruction]
+    todos = [
+        "Open a new tab, go to www.cvs.com, search 'flu shot', then select Schedule vaccinations",
+        f"Enter first name '{args.first_name}', last name '{args.last_name}', email '{args.email}'",
+        f"Scroll to Date of Birth and enter Month '{month}', Day '{day}', Year '{year}'",
+        "Continue as guest, add vaccines, choose Flu, then confirm",
+        f"Advance to ZIP entry, input '{args.zip_code}', pick the first suggestion, and search",
+    ]
+
+    tasker.set_task(instruction, todos, deliverables)
+
+    print(f"Starting task execution at {datetime.now()}")
+    print("=" * 60)
+
+    try:
+        success = await tasker.execute(
+            instruction="",
+            action_handler=action_handler,
+            image_provider=image_provider,
+        )
+
+        memory = tasker.get_memory()
+        print("\n" + "=" * 60)
+        print("EXECUTION SUMMARY")
+        print(f"Overall success: {success}")
+        print(memory.task_execution_summary)
+
+        status_summary = memory.get_todo_status_summary()
+        print(f"Completed: {status_summary.get('completed', 0)}")
+    except Exception as exc:
+        print(f"Error during execution: {exc}")
+        traceback.print_exc()
+
+    output_file = os.path.join(save_dir, "cvs_execution_history.html")
+    observer.export("html", output_file)
+    print(f"Exported execution history to {output_file}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+## Next Steps
+
+1. Run multiple appointments in a batch by looping over CSV rows.
+2. Trigger the script from the `oagi` CLI (`oagi agent run`) for the same account to compare UX.
+3. Switch to `TaskerAgent` reflection mode by adjusting `reflection_interval` if you need periodic summaries between todos.
+
+With this workflow you now have a reproducible CVS booking assistant powered by OAGI's desktop automation stack, complete with observability artifacts for every run.
+
+## Run the Workflow
+
+Launch the automation (make sure CVS is reachable and the browser window is visible):
+
+```bash
+python cvs_tasker.py \
+  --first_name="Ada" \
+  --last_name="Lovelace" \
+  --email="ada@example.com" \
+  --birthday="12-10-1815" \
+  --zip_code="10001" \
+  --model_name="lux-actor-1" \
+  --max_steps=30
+```
+
+> Tip: Run inside a dedicated desktop Space to avoid accidental mouse/keyboard interruptions.
+
+## Understanding the Output
+
+- **Console summary** – Displays per-todo success, deliverables, and aggregated stats pulled from the agent's memory object.
+- **HTML export** – Stored under `results/<exp_name>/cvs_execution_history.html` with screenshot thumbnails, tool calls, and timestamps for every step (ideal proof for compliance or debugging).
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| `ImportError: AsyncPyautoguiActionHandler requires desktop dependencies` | Desktop extras not installed | `pip install oagi-core[desktop]` @oagi-python/src/oagi/__init__.py#35-93 |
+| `ConfigurationError: OAGI API key must be provided` | Missing `OAGI_API_KEY` | Export env var or pass `api_key` directly. @oagi-python/src/oagi/client/base.py#42-58 |
+| Agent stalls on a todo | UI element not visible yet | Increase `--max_steps`, add `wait` language inside the todo, or lower `--temperature` for deterministic retries. |
+
+## Next Steps
+
+1. Run multiple appointments in a batch by looping over CSV rows.
+2. Trigger the script from the `oagi` CLI (`oagi agent run`) for the same account to compare UX.
+3. Switch to `TaskerAgent` reflection mode by adjusting `reflection_interval` if you need periodic summaries between todos.
+
+With this workflow you now have a reproducible CVS booking assistant powered by OAGI's desktop automation stack, complete with observability artifacts for every run.
+
