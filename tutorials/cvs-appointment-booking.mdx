@@ -339,14 +339,6 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-## Next Steps
-
-1. Run multiple appointments in a batch by looping over CSV rows.
-2. Trigger the script from the `oagi` CLI (`oagi agent run`) for the same account to compare UX.
-3. Switch to `TaskerAgent` reflection mode by adjusting `reflection_interval` if you need periodic summaries between todos.
-
-With this workflow you now have a reproducible CVS booking assistant powered by OAGI's desktop automation stack, complete with observability artifacts for every run.
-
 ## Run the Workflow
 
 Launch the automation (make sure CVS is reachable and the browser window is visible):
@@ -376,12 +368,6 @@ python cvs_tasker.py \
 | `ImportError: AsyncPyautoguiActionHandler requires desktop dependencies` | Desktop extras not installed | `pip install oagi-core[desktop]` @oagi-python/src/oagi/__init__.py#35-93 |
 | `ConfigurationError: OAGI API key must be provided` | Missing `OAGI_API_KEY` | Export env var or pass `api_key` directly. @oagi-python/src/oagi/client/base.py#42-58 |
 | Agent stalls on a todo | UI element not visible yet | Increase `--max_steps`, add `wait` language inside the todo, or lower `--temperature` for deterministic retries. |
-
-## Next Steps
-
-1. Run multiple appointments in a batch by looping over CSV rows.
-2. Trigger the script from the `oagi` CLI (`oagi agent run`) for the same account to compare UX.
-3. Switch to `TaskerAgent` reflection mode by adjusting `reflection_interval` if you need periodic summaries between todos.
 
 With this workflow you now have a reproducible CVS booking assistant powered by OAGI's desktop automation stack, complete with observability artifacts for every run.
 
