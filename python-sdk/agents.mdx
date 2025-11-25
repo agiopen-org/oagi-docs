@@ -170,37 +170,6 @@ agent = AsyncDefaultAgent(
 - Use **lux-thinker-1** for complex, multi-step workflows
 - Adjust **temperature** for creativity vs consistency
 
-## Advanced Patterns
-
-### Retry Logic
-```python
-class RetryAgent(CustomAgent):
-    async def execute_with_retry(self, instruction, handler, provider, max_retries=3):
-        for attempt in range(max_retries):
-            try:
-                success = await self.execute(instruction, handler, provider)
-                if success:
-                    return True
-                    
-                print(f"Attempt {attempt + 1} failed, retrying...")
-                
-            except Exception as e:
-                print(f"Attempt {attempt + 1} error: {e}")
-                
-        return False
-```
-
-### Conditional Execution
-```python
-class ConditionalAgent(CustomAgent):
-    def _should_continue(self, step, step_num):
-        # Custom logic to determine if execution should continue
-        if "login required" in step.reason.lower():
-            return False  # Stop if login is needed
-            
-        return step_num < self.max_steps
-```
-
 ## Next Steps
 
 <CardGroup cols={2}>

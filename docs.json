@@ -27,14 +27,15 @@
           {
             "group": "Examples",
             "pages": [
-              "Software QA",
-              "Amazon Data Crawling",
-              "CVS Appointment Booking"
+              "examples/software-qa",
+              "examples/amazon-data-crawling",
+              "examples/cvs-appointment-booking"
             ]
           },
           {
             "group": "Concepts",
             "pages": [
+              "concepts/screenshot-actionhandler-loop",
               "concepts/action",
               "concepts/step",
               "concepts/actor",

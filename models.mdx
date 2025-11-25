@@ -30,7 +30,7 @@ OpenAGI provides two specialized foundation models for computer use, each optimi
 **Best for:**
 - Fast, responsive UI control
 - High-throughput automation
-- Short-horizon tasks (tasks completed in < 10 steps without complex reasoning)
+- Short-horizon tasks (tasks completed in < 20 steps without complex reasoning)
 - Real-time UX (CLI/desktop control loops)
 - Direct "observe → decide → act" loops
 
@@ -40,7 +40,9 @@ To get the best results from `lux-actor-1`, provide clear, step-by-step instruct
 
 <CodeGroup>
 ```text Good (Concise)
-Click "Settings" > "Profile". Type "John Doe" in "Name". Click "Save".
+"Click 'Settings' then click 'Profile'",
+"Type 'John Doe' in 'Name'",
+"Click 'Save'"
 ```
 
 ```text Bad (Vague)
@@ -175,17 +177,14 @@ If you are building a custom application, you can implement your own client to h
 
 ## Next Steps
 
-<CardGroup cols={2}>
-  <Card title="Quick Start" icon="rocket" href="/quickstart">
-    Try both models with a simple example
+<CardGroup cols={3}>
+  <Card title="Software QA" icon="bug" href="/examples/software-qa">
+    Automate testing workflows
   </Card>
-  <Card title="Python SDK" icon="code" href="/python-sdk/installation">
-    Learn how to specify models in your code
+  <Card title="Data Crawling" icon="spider" href="/examples/amazon-data-crawling">
+    Extract data from complex sites
   </Card>
-  <Card title="Best Practices" icon="shield" href="/safety/introduction">
-    Guidelines for production deployment
-  </Card>
-  <Card title="API Reference" icon="book" href="/api/reference">
-    Complete API documentation
+  <Card title="Appointment Booking" icon="calendar" href="/examples/cvs-appointment-booking">
+    Handle multi-step booking flows
   </Card>
 </CardGroup>

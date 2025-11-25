@@ -7,7 +7,7 @@ description: Use the TaskerAgent to orchestrate multi-step computer-use workflow
 
 The fastest way to ship an end-to-end automation experience with OpenAGI is to start from the **TaskerAgent** (`oagi.agent.tasker.TaskerAgent`). It is an async, hierarchical agent that:
 
-- Breaks work into todos and deliverables using an internal Planner/Memory system
+- Breaks work into todos using an internal Planner/Memory system
 - Delegates each todo to a TaskeeAgent that talks to the Lux models (defaults to `lux-actor-1` per @models.mdx#109-118)
 - Streams actions via any `AsyncActionHandler` (e.g., your Socket.IO desktop bridge) and requests screenshots through an `AsyncImageProvider`
 
@@ -42,8 +42,7 @@ async def main():
             "Search for flights",
             "Fill traveler details",
             "Confirm booking"
-        ],
-        deliverables=["Confirmation screenshot"],
+        ]
     )
 
     success = await agent.execute(
@@ -59,8 +58,8 @@ asyncio.run(main())
 
 ### How it works
 
-1. **PlannerMemory** stores the overall task, todos, deliverables, and execution history.
-2. `TaskerAgent.set_task()` seeds that memory; you can also append todos/deliverables later.
+1. **PlannerMemory** stores the overall task, todos, and execution history.
+2. `TaskerAgent.set_task()` seeds that memory; you can also append todos later.
 3. `TaskerAgent.execute()` loops through todos. For each one it spawns a `TaskeeAgent`, which:
    - Sends screenshots to the Lux model via the SDK’s `AsyncDefaultAgent` pipeline
    - Receives actions and passes them to your handler (often a Socket.IO bridge)
