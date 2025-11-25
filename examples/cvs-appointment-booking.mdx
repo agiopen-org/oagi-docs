@@ -1,3 +1,28 @@
+---
 title: 'CSV Appointment Booking Example'
 description: 'Automate CVS appointment booking tasks'
 icon: 'calendar'
+---
+
+# Overview
+
+This example distills the [full tutorial](../tutorials/cvs-appointment-booking) into the essentials:
+
+1. **Setup** – Install `oagi` with desktop extras, export `OAGI_API_KEY`, and create a `cvs_tasker.py` script beside a `results/` directory for HTML exports.
+2. **Inputs** – Use `argparse` to accept participant info (`--first_name`, `--email`, `--birthday`, `--zip_code`) and agent tuning knobs (`--model_name`, `--max_steps`, `--temperature`).
+3. **Automation stack** – Instantiate `AsyncPyautoguiActionHandler`, `AsyncScreenshotMaker`, and `AsyncAgentObserver`, then pass them into `TaskerAgent`.
+4. **Workflow definition** – Describe the CVS journey as a set of todos (navigate cvs.com, fill contact details, add vaccines, search by ZIP) plus a deliverable summarizing the appointment goal.
+5. **Execution + export** – Run `await tasker.execute(...)`, inspect `tasker.get_memory()` for statuses, and export the observer history to `results/<exp>/cvs_execution_history.html`.
+
+Run it with:
+
+```bash
+python cvs_tasker.py \
+  --first_name="First" \
+  --last_name="Last" \
+  --email="user@example.com" \
+  --birthday="MM-DD-YYYY" \
+  --zip_code="00000"
+```
+
+Use this summary when you need the gist quickly; jump to the tutorial for step-by-step explanations and rationale.
