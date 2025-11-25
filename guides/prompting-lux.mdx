@@ -12,6 +12,22 @@ This guide takes you through a progression of prompts—from simple to complex�
 > [!NOTE]
 > Computer use models are not like standard language models. They will not perform well with vague inputs; they require concise, action-oriented controls to operate the computer effectively.
 
+## Model Modes Overview
+
+Before diving in, it's important to choose the right tool for the job:
+
+- **Actor Mode (`lux-actor-1`)**: Fast execution (~1 second per step). Best for 10-20 clear, linear steps.
+- **Thinker Mode (`lux-thinker-1`)**: Slower but handles complex reasoning and comparisons.
+- **Tasker Agent**: Uses the Actor internally plus a reflection loop. A good middle ground for structured workflows.
+
+## Environment Setup
+
+To give Lux the best chance of success:
+
+- **Clean browser state**: 30+ open tabs can interfere with clicking accuracy and distract the model.
+- **Screen resolution**: High-resolution screens (like Retina displays) can make icons too small. Use standard 1080p scaling if possible.
+- **Pre-opened applications**: Have your browser or app ready at the starting page to save setup steps.
+
 ## The Mental Model
 
 Think of Lux as a **smart intern** who is looking at your screen over your shoulder.
@@ -19,23 +35,21 @@ Think of Lux as a **smart intern** who is looking at your screen over your shoul
 - **It knows standard UIs:** It intuitively understands buttons, forms, and navigation bars.
 - **It needs clear goals:** "Fix the computer" is too vague. "Update the system settings to dark mode" is actionable.
 
-## Level 1: Basic Observation
-*Goal: Verify Lux can "see" and identify elements.*
+## Building Your Mental Model
 
-Start by asking Lux to describe what is on the screen. This confirms that the screenshot pipeline is working and gives you a sense of its visual acuity.
+**Start Simple, Then Scale:**
 
-**Prompt:**
-> "What is the primary button color on this page? Also, read the text of the error message in the top right corner."
+1.  **Single actions** → "Click the login button"
+2.  **Short sequences** → "Login with username 'test' and password '123'"
+3.  **Conditional logic** → "If login fails, try the 'Forgot Password' link"
+4.  **Complex workflows** → "Research competitors' pricing and create a summary document"
 
-**What to look for:**
-- Does it correctly identify the color?
-- Is the text transcription accurate?
-- **Tip:** If Lux hallucinates text, check your screenshot resolution/compression settings.
+Each level teaches you more about Lux's capabilities and boundaries.
 
-## Level 2: Simple Interaction
+## Level 1: Basic Interaction
 *Goal: Test basic action execution (clicking and typing).*
 
-Now, give it a single, concrete task.
+Start by giving Lux a single, concrete task to verify it can control the mouse and keyboard.
 
 **Prompt:**
 > "Click the 'Search' bar and type 'OpenAGI documentation', then press Enter."
@@ -44,25 +58,28 @@ Now, give it a single, concrete task.
 - Does it find the search bar even if it doesn't have a clear label?
 - Does it chain the actions (Click -> Type -> KeyPress) correctly?
 
-## Level 3: Multi-step Logic
+## Level 2: Multi-step Tasks
 *Goal: Test planning and context retention.*
 
-Ask for a task that requires multiple steps and maintaining state (remembering what it just did).
+Ask for a task that requires multiple steps. This tests if the model can maintain state and follow a sequence.
 
 **Prompt:**
-> "Go to the settings page, find the 'Notifications' section, and turn off 'Email Marketing'. If it's already off, leave it alone."
+> "Go to Shopify admin, find the inventory section, and update the price of the first product to $29.99"
 
 **What to look for:**
 - **Conditional Logic:** Did it check the state of the toggle before clicking?
 - **Navigation:** Did it figure out how to get to "Settings" if it wasn't immediately visible?
 
-## Level 4: Dynamic Adaptation
-*Goal: Test resilience to unexpected UI states.*
+## Level 3: Dynamic Adaptation (Thinker Model)
+*Goal: Test resilience to unexpected UI states and complex planning.*
 
 This is where the "Agent" behavior shines. Give it a goal where the path isn't perfectly linear.
 
-**Prompt:**
-> "Find the cheapest flight to Tokyo for next Tuesday on Expedia. Add it to the cart but do not checkout."
+> [!TIP]
+> **Model Selection:** For complex tasks involving comparison, filtering, or ambiguity (like the example below), the standard **Actor** model may struggle. Use the **Thinker** model (`lux-thinker-1`) or the **Tasker Agent** for these scenarios.
+
+**Prompt (using `lux-thinker-1`):**
+> "Perform software QA testing: open the Nuclear music app, play a song, then check if the volume slider responds correctly"
 
 **What to look for:**
 - **Handling Popups:** Did it close the "Sign up for newsletter" modal?
@@ -80,3 +97,26 @@ This is where the "Agent" behavior shines. Give it a goal where the path isn't p
 
 3.  **Iterate:** If Lux fails, don't just retry the same prompt. Add a hint about *what* it missed.
     *   *Correction:* "You missed the 'Next' button because it's at the very bottom. Scroll down first."
+
+## Advanced Best Practices
+
+4.  **Handle UI Variations**: "If the button isn't visible, scroll down or look for a menu"
+5.  **Break Down Complex Tasks**: Instead of "manage my Shopify store," try "add 3 products to inventory, then update their descriptions"
+6.  **Specify Success Criteria**: "Stop when you see 'Task completed' or similar confirmation"
+
+## When Actor Mode Struggles
+
+The Actor model specifically cannot handle:
+
+-   **Comparison tasks** ("find cheapest option")
+-   **Complex dropdown menus and filtering**
+-   **Vague commands** requiring interpretation
+
+**Instead, use step-by-step instructions:**
+
+-   ❌ "Find the best flight to Tokyo"
+-   ✅ "Go to Expedia, search Tokyo, sort by price, click the first result"
+
+## Why This Matters
+
+We believe computer use should be accessible, not hidden behind brittle scripts or undocumented APIs. By building a mental model of Lux as a "smart intern," you can write prompts that are resilient to UI changes and capable of handling complex workflows. This approach bridges the gap between rigid automation and flexible, human-like computer interaction.
