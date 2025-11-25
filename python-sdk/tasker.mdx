@@ -46,7 +46,6 @@ memory = tasker.get_memory()
 # Access execution state
 print(memory.task)              # Task description
 print(memory.todos)             # List of todos with status
-print(memory.deliverables)      # Expected outcomes
 print(memory.history)           # Execution history
 ```
 
@@ -90,24 +89,6 @@ bad_todos = [
 ]
 ```
 
-### Writing Deliverables
-
-```python
-# Good: Observable outcomes
-deliverables = [
-    "Item added to shopping cart",
-    "Cart shows 1 item",
-    "Item price is under $50"
-]
-
-# Bad: Internal states or vague goals
-bad_deliverables = [
-    "User is happy",  # Not observable
-    "Good deal found",  # Subjective
-    "Task complete"  # Too generic
-]
-```
-
 ## Complete Example
 
 ### E-commerce Workflow
@@ -143,10 +124,6 @@ async def shop_for_laptop():
 
             # Add to cart
             "Click on first laptop in results and add it to cart",
-        ],
-
-        deliverables=[
-            "Laptop under 800 and 4 starts up added to cart",
         ]
     )
 
@@ -170,11 +147,6 @@ async def shop_for_laptop():
         }.get(todo.status.value, "[ ]")
         print(f"{status_icon} {i+1}. {todo.description}")
 
-    print("\nDeliverables:")
-    for deliverable in memory.deliverables:
-        status = "[✓]" if deliverable.achieved else "[✗]"
-        print(f"{status} {deliverable.description}")
-
     print(f"\nTotal Actions: {sum(len(h.actions) for h in memory.history)}")
 
     return success
@@ -187,13 +159,12 @@ asyncio.run(shop_for_laptop())
 
 The TaskerAgent follows a sophisticated execution pattern:
 
-1. **Set Task** - Define task, todos, and deliverables
+1. **Set Task** - Define task and todos
 2. **Initialize Memory** - Create shared PlannerMemory
 3. **Process Todos** - Execute each todo with TaskeeAgent
 4. **Plan & Execute** - Convert todo to instructions and execute
 5. **Reflect** - Assess progress and adjust strategy
 6. **Update Memory** - Track completion and history
-7. **Check Deliverables** - Verify expected outcomes
 
 ### Reflection Logic
 
@@ -239,10 +210,9 @@ execution_tasker = TaskerAgent(
 ## Best Practices
 
 1. **Write atomic todos** - Each todo should be a single, clear action
-2. **Define observable deliverables** - Use measurable outcomes
-3. **Set appropriate reflection intervals** - More frequent for complex tasks
-4. **Use descriptive task descriptions** - Help the planner understand context
-5. **Monitor memory state** - Check todo status and execution history
+2. **Set appropriate reflection intervals** - More frequent for complex tasks
+3. **Use descriptive task descriptions** - Help the planner understand context
+4. **Monitor memory state** - Check todo status and execution history
 
 ## Next Steps
 

@@ -49,7 +49,7 @@ We'll assemble the script in six small steps:
 1. Bootstrap the project and async entry point
 2. Accept personalization input through `argparse`
 3. Initialize the automation toolkit (observer, screenshot maker, action handler)
-4. Describe the CVS workflow as todos + deliverables
+4. Describe the CVS workflow as todos
 5. Execute the agent while streaming telemetry
 6. Export the run transcript for auditing
 
@@ -136,7 +136,7 @@ Wire up the observation stack (`AsyncAgentObserver`) plus the desktop automation
 
 ### Step 4 — Describe the CVS workflow
 
-Break the appointment journey into todos so failures surface at the right granularity. Deliverables let you assert final outcomes.
+Break the appointment journey into todos so failures surface at the right granularity.
 
 ```python
     month, day, year = args.birthday.split("-")
@@ -144,7 +144,6 @@ Break the appointment journey into todos so failures surface at the right granul
         f"Schedule an appointment at CVS for {args.first_name} {args.last_name} "
         f"with email {args.email} and birthday {args.birthday}"
     )
-    deliverables = [instruction]
     todos = [
         "Open a new tab, go to www.cvs.com, search 'flu shot', then select Schedule vaccinations",
         f"Enter first name '{args.first_name}', last name '{args.last_name}', email '{args.email}'",
@@ -155,13 +154,12 @@ Break the appointment journey into todos so failures surface at the right granul
 
     tasker.set_task(
         task=instruction,
-        todos=todos,
-        deliverables=deliverables,
+        todos=todos
     )
 ```
 
 Tip: Keep instructions declarative (“click X”) so the model knows when to wait for UI updates.
-Modeling steps as todos/deliverables mirrors Tasker’s internal memory model, giving you granular success/failure signals instead of a monolithic “pass/fail.”
+Modeling steps as todos mirrors Tasker’s internal memory model, giving you granular success/failure signals instead of a monolithic “pass/fail.”
 
 ### Step 5 — Execute and inspect memory
 
@@ -225,7 +223,7 @@ python cvs_tasker.py \
 
 ## Understanding the Output
 
-- **Console summary** – Displays per-todo success, deliverables, and aggregated stats pulled from the agent's memory object.
+- **Console summary** – Displays per-todo success, and aggregated stats pulled from the agent's memory object.
 - **HTML export** – Stored under `results/<exp_name>/cvs_execution_history.html` with screenshot thumbnails, tool calls, and timestamps for every step (ideal proof for compliance or debugging).
 
 ## Troubleshooting
@@ -297,7 +295,6 @@ async def main():
         f"Schedule an appointment at CVS for {args.first_name} {args.last_name} "
         f"with email {args.email} and birthday {args.birthday}"
     )
-    deliverables = [instruction]
     todos = [
         "Open a new tab, go to www.cvs.com, search 'flu shot', then select Schedule vaccinations",
         f"Enter first name '{args.first_name}', last name '{args.last_name}', email '{args.email}'",
@@ -306,7 +303,7 @@ async def main():
         f"Advance to ZIP entry, input '{args.zip_code}', pick the first suggestion, and search",
     ]
 
-    tasker.set_task(instruction, todos, deliverables)
+    tasker.set_task(instruction, todos)
 
     print(f"Starting task execution at {datetime.now()}")
     print("=" * 60)
@@ -358,7 +355,7 @@ python cvs_tasker.py \
 
 ## Understanding the Output
 
-- **Console summary** – Displays per-todo success, deliverables, and aggregated stats pulled from the agent's memory object.
+- **Console summary** – Displays per-todo success, and aggregated stats pulled from the agent's memory object.
 - **HTML export** – Stored under `results/<exp_name>/cvs_execution_history.html` with screenshot thumbnails, tool calls, and timestamps for every step (ideal proof for compliance or debugging).
 
 ## Troubleshooting
