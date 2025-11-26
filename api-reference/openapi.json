@@ -5,16 +5,6 @@
     "description": "API Gateway for Large Language Model requests",
     "version": "1.0.0"
   },
-  "servers": [
-    {
-      "url": "https://api.agiopen.org"
-    }
-  ],
-  "security": [
-    {
-      "apiKeyAuth": []
-    }
-  ],
   "paths": {
     "/v1/generate": {
       "post": {
@@ -27,7 +17,14 @@
             "in": "header",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "X-Api-Key"
             }
           },
@@ -36,7 +33,14 @@
             "in": "header",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "X-Api-Version"
             }
           }
@@ -66,7 +70,9 @@
             "description": "Bad Request",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -74,7 +80,9 @@
             "description": "Unauthorized",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -82,7 +90,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -90,7 +100,9 @@
             "description": "Rate Limit Exceeded",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -98,7 +110,9 @@
             "description": "Internal Server Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -106,7 +120,9 @@
             "description": "Service Unavailable",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -124,7 +140,14 @@
             "in": "header",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "X-Api-Version"
             }
           },
@@ -133,7 +156,14 @@
             "in": "header",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "X-Api-Key"
             }
           }
@@ -153,7 +183,9 @@
             "description": "Bad Request",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -161,7 +193,9 @@
             "description": "Unauthorized",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -169,7 +203,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -177,7 +213,9 @@
             "description": "Rate Limit Exceeded",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -185,7 +223,9 @@
             "description": "Internal Server Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -193,7 +233,9 @@
             "description": "Service Unavailable",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -202,7 +244,7 @@
     },
     "/v2/message": {
       "post": {
-        "summary": "Analyze chat messages",
+        "summary": "Analyze the chat messages to get possible actions",
         "description": "Analyze the openai-compatible messages with screenshot url to return possible actions that can accomplish the task",
         "operationId": "create_message_v2_v2_message_post",
         "parameters": [
@@ -211,7 +253,14 @@
             "in": "header",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "X-Api-Key"
             }
           },
@@ -220,7 +269,14 @@
             "in": "header",
             "required": false,
             "schema": {
-              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "X-Api-Version"
             }
           }
@@ -250,7 +306,9 @@
             "description": "Bad Request",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -258,7 +316,9 @@
             "description": "Unauthorized",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -266,7 +326,9 @@
             "description": "Task Not Found",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -274,7 +336,9 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -282,7 +346,9 @@
             "description": "Rate Limit Exceeded",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -290,7 +356,9 @@
             "description": "Internal Server Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -298,7 +366,9 @@
             "description": "Service Unavailable",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -309,9 +379,6 @@
   "components": {
     "schemas": {
       "Action": {
-        "type": "object",
-        "required": ["type", "argument", "description"],
-        "title": "Action",
         "properties": {
           "type": {
             "$ref": "#/components/schemas/ActionType",
@@ -323,7 +390,15 @@
             "description": "Action argument in the specified format"
           },
           "count": {
-            "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Count",
             "description": "Number of times to repeat the action",
             "default": 1
@@ -334,6 +409,13 @@
             "description": "Human-readable description of the action"
           }
         },
+        "type": "object",
+        "required": [
+          "type",
+          "argument",
+          "description"
+        ],
+        "title": "Action",
         "example": {
           "argument": "500,300",
           "count": 1,
@@ -358,9 +440,6 @@
         "title": "ActionType"
       },
       "Content": {
-        "type": "object",
-        "required": ["type"],
-        "title": "Content",
         "properties": {
           "type": {
             "$ref": "#/components/schemas/ContentType",
@@ -375,18 +454,22 @@
             "title": "Text",
             "description": "The text content"
           }
-        }
+        },
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "title": "Content"
       },
       "ContentType": {
         "type": "string",
-        "enum": ["text", "image_url"],
+        "enum": [
+          "text",
+          "image_url"
+        ],
         "title": "ContentType"
       },
       "ErrorDetail": {
-        "type": "object",
-        "required": ["code", "message"],
-        "title": "ErrorDetail",
-        "description": "Detailed error information.",
         "properties": {
           "code": {
             "type": "string",
@@ -399,40 +482,51 @@
             "description": "Human-readable error message"
           }
         },
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorDetail",
+        "description": "Detailed error information.",
         "example": {
           "code": "invalid_api_key",
-          "message": "Incorrect API key provided. Visit https://developer.agiopen.org to create one."
+          "message": "Incorrect API key provided. Visit https://platform.example.com/api-keys to create one."
         }
       },
       "ErrorResponse": {
-        "type": "object",
-        "title": "ErrorResponse",
-        "description": "Standard error response format.",
         "properties": {
           "error": {
             "anyOf": [
-              { "$ref": "#/components/schemas/ErrorDetail" },
-              { "type": "null" }
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
             ],
             "description": "Error details, null if request succeeded"
           }
         },
+        "type": "object",
+        "title": "ErrorResponse",
+        "description": "Standard error response format.",
         "example": {
           "error": {
             "code": "invalid_api_key",
-            "message": "Incorrect API key provided. Visit https://developer.agiopen.org to create one."
+            "message": "Incorrect API key provided. Visit https://platform.example.com/api-keys to create one."
           }
         }
       },
       "ExternalLLMRequest": {
-        "type": "object",
-        "required": ["external_worker_id", "task_description", "todos", "overall_todo"],
-        "title": "ExternalLLMRequest",
-        "description": "Request for external LLM generation with structured memory context.",
         "properties": {
           "external_worker_id": {
             "type": "string",
-            "enum": ["oagi_first", "oagi_follow", "oagi_task_summary"],
+            "enum": [
+              "oagi_first",
+              "oagi_follow",
+              "oagi_task_summary"
+            ],
             "title": "External Worker Id",
             "description": "The desired OAGI worker type"
           },
@@ -442,24 +536,42 @@
             "description": "Overall task description"
           },
           "todos": {
+            "items": {
+              "$ref": "#/components/schemas/TodoItem"
+            },
             "type": "array",
-            "items": { "$ref": "#/components/schemas/TodoItem" },
             "title": "Todos",
             "description": "List of all todos in the workflow"
           },
           "history": {
+            "items": {
+              "$ref": "#/components/schemas/HistoryItem"
+            },
             "type": "array",
-            "items": { "$ref": "#/components/schemas/HistoryItem" },
             "title": "History",
             "description": "Execution history of completed todos"
           },
           "current_todo_index": {
-            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Current Todo Index",
             "description": "Index of the current todo being executed"
           },
           "task_execution_summary": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Task Execution Summary",
             "description": "Summary of overall task execution"
           },
@@ -469,55 +581,108 @@
             "description": "The current user todo to plan for"
           },
           "current_screenshot": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Current Screenshot",
             "description": "S3 URL or UUID for current screenshot"
           },
           "result_screenshot": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Result Screenshot",
             "description": "Final screenshot S3 URL for oagi_follow"
           },
           "window_screenshots": {
             "anyOf": [
-              { "type": "array", "items": { "type": "string" } },
-              { "type": "null" }
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
             ],
             "title": "Window Screenshots",
             "description": "List of screenshot S3 URLs for oagi_follow"
           },
           "current_subtask_instruction": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Current Subtask Instruction",
             "description": "Current subtask being executed (None for first call, str for follow)"
           },
           "window_steps": {
             "anyOf": [
               {
-                "type": "array",
-                "items": { "type": "object", "additionalProperties": true }
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
               },
-              { "type": "null" }
+              {
+                "type": "null"
+              }
             ],
             "title": "Window Steps",
             "description": "List of action steps for oagi_follow"
           },
           "prior_notes": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Prior Notes",
             "description": "Execution history notes for oagi_follow"
           },
           "latest_todo_summary": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Latest Todo Summary",
             "description": "Latest execution summary for oagi_task_summary"
           }
-        }
+        },
+        "type": "object",
+        "required": [
+          "external_worker_id",
+          "task_description",
+          "todos",
+          "overall_todo"
+        ],
+        "title": "ExternalLLMRequest",
+        "description": "Request for external LLM generation with structured memory context."
       },
       "ExternalLLMResponse": {
-        "type": "object",
-        "required": ["response", "prompt_tokens", "completion_tokens"],
-        "title": "ExternalLLMResponse",
         "properties": {
           "response": {
             "type": "string",
@@ -535,7 +700,14 @@
             "description": "Completion tokens count"
           },
           "cost": {
-            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Cost",
             "description": "API cost in US dollar (None if not available)",
             "deprecated": true
@@ -546,13 +718,16 @@
             "description": "Cached prompt tokens count",
             "default": 0
           }
-        }
+        },
+        "type": "object",
+        "required": [
+          "response",
+          "prompt_tokens",
+          "completion_tokens"
+        ],
+        "title": "ExternalLLMResponse"
       },
       "HistoryItem": {
-        "type": "object",
-        "required": ["todo_index", "todo_description", "action_count", "completed"],
-        "title": "HistoryItem",
-        "description": "A record of todo execution history.",
         "properties": {
           "todo_index": {
             "type": "integer",
@@ -570,7 +745,14 @@
             "description": "Number of actions taken"
           },
           "summary": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Summary",
             "description": "Execution summary"
           },
@@ -579,34 +761,32 @@
             "title": "Completed",
             "description": "Whether the todo was completed"
           }
-        }
+        },
+        "type": "object",
+        "required": [
+          "todo_index",
+          "todo_description",
+          "action_count",
+          "completed"
+        ],
+        "title": "HistoryItem",
+        "description": "A record of todo execution history."
       },
       "ImageContent": {
-        "type": "object",
-        "required": ["url"],
-        "title": "ImageContent",
         "properties": {
           "url": {
             "type": "string",
             "title": "Url",
             "description": "URL of the image"
           }
-        }
-      },
-      "LLMResponse": {
+        },
         "type": "object",
         "required": [
-          "id",
-          "task_id",
-          "created",
-          "model",
-          "task_description",
-          "current_step",
-          "is_complete",
-          "actions",
-          "usage"
+          "url"
         ],
-        "title": "LLMResponse",
+        "title": "ImageContent"
+      },
+      "LLMResponse": {
         "properties": {
           "id": {
             "type": "string",
@@ -650,13 +830,22 @@
             "description": "Whether the task is complete"
           },
           "actions": {
+            "items": {
+              "$ref": "#/components/schemas/Action"
+            },
             "type": "array",
-            "items": { "$ref": "#/components/schemas/Action" },
             "title": "Actions",
             "description": "List of possible actions to accomplish the task"
           },
           "reason": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Reason",
             "description": "Reason for the current step (if applicable)"
           },
@@ -666,58 +855,83 @@
           },
           "error": {
             "anyOf": [
-              { "$ref": "#/components/schemas/ErrorDetail" },
-              { "type": "null" }
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
             ],
             "description": "Error details if request failed, null if successful"
           },
           "raw_output": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Raw Output",
             "description": "Raw output from the LLM (if enabled)"
           },
           "log_data": {
             "anyOf": [
-              { "$ref": "#/components/schemas/RequestLogData" },
-              { "type": "null" }
+              {
+                "$ref": "#/components/schemas/RequestLogData"
+              },
+              {
+                "type": "null"
+              }
             ],
-            "description": "Log data for LLM inference or request processing"
+            "description": "log data for LLM inference or request processing"
           }
         },
+        "type": "object",
+        "required": [
+          "id",
+          "task_id",
+          "created",
+          "model",
+          "task_description",
+          "current_step",
+          "is_complete",
+          "actions",
+          "usage"
+        ],
+        "title": "LLMResponse",
         "example": {
-          "id": "task-123abc",
-          "task_id": "task_abc123def456",
-          "object": "task.completion",
-          "created": 1677652288,
-          "model": "vision-model-v1",
-          "task_description": "Log into the website using my credentials",
-          "current_step": 1,
-          "is_complete": false,
           "actions": [
             {
-              "type": "click",
               "argument": "300, 150",
               "count": 1,
-              "description": "Click on the username input field to focus it"
+              "description": "Click on the username input field to focus it",
+              "type": "click"
             },
             {
-              "type": "type",
               "argument": "username@example.com",
               "count": 1,
-              "description": "Type the username into the input field"
+              "description": "Type the username into the input field",
+              "type": "type"
             }
           ],
+          "created": 1677652288,
+          "current_step": 1,
+          "id": "task-123abc",
+          "is_complete": false,
+          "model": "vision-model-v1",
+          "object": "task.completion",
+          "task_description": "Log into the website using my credentials",
+          "task_id": "task_abc123def456",
           "usage": {
-            "prompt_tokens": 450,
             "completion_tokens": 120,
+            "prompt_tokens": 450,
             "total_tokens": 570
           }
         }
       },
       "Message": {
-        "type": "object",
-        "required": ["role"],
-        "title": "Message",
         "properties": {
           "role": {
             "$ref": "#/components/schemas/Role",
@@ -725,19 +939,27 @@
           },
           "content": {
             "anyOf": [
-              { "type": "string" },
-              { "type": "array", "items": { "$ref": "#/components/schemas/Content" } }
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Content"
+                },
+                "type": "array"
+              }
             ],
             "title": "Content",
             "description": "Text content of the message or a list of content items"
           }
-        }
+        },
+        "type": "object",
+        "required": [
+          "role"
+        ],
+        "title": "Message"
       },
       "OpenAIChatRequest": {
-        "type": "object",
-        "required": ["model", "messages", "task_description", "task_id"],
-        "title": "OpenAIChatRequest",
-        "description": "OpenAI-compatible chat completion request",
         "properties": {
           "model": {
             "type": "string",
@@ -745,8 +967,10 @@
             "description": "Model name to use"
           },
           "messages": {
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
             "type": "array",
-            "items": { "$ref": "#/components/schemas/Message" },
             "title": "Messages",
             "description": "Messages in chronological order"
           },
@@ -762,15 +986,15 @@
           },
           "temperature": {
             "type": "number",
-            "minimum": 0,
             "maximum": 2,
+            "minimum": 0,
             "title": "Temperature",
             "description": "Sampling temperature between 0 and 2"
           },
           "top_p": {
             "type": "number",
-            "minimum": 0,
             "maximum": 1,
+            "minimum": 0,
             "title": "Top P",
             "description": "Nucleus sampling parameter"
           },
@@ -785,39 +1009,70 @@
             "title": "User",
             "description": "End-user identifier for abuse/fraud detection"
           }
-        }
+        },
+        "type": "object",
+        "required": [
+          "model",
+          "messages",
+          "task_description",
+          "task_id"
+        ],
+        "title": "OpenAIChatRequest",
+        "description": "OpenAI-compatible chat completion request"
       },
       "RequestLogData": {
-        "type": "object",
-        "title": "RequestLogData",
         "properties": {
           "llm_latency": {
-            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Llm Latency",
-            "description": "The latency of LLM inference"
+            "description": "the latency of llm infererce"
           },
           "llm_target": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Llm Target",
-            "description": "The path of target LLM server"
+            "description": "the path of target LLM server"
           },
           "request_latency": {
-            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Request Latency",
-            "description": "The time cost of processing the whole request"
+            "description": "the time cost of processing the whole request"
           }
-        }
+        },
+        "type": "object",
+        "title": "RequestLogData"
       },
       "Role": {
         "type": "string",
-        "enum": ["system", "user", "assistant", "function"],
+        "enum": [
+          "system",
+          "user",
+          "assistant",
+          "function"
+        ],
         "title": "Role"
       },
       "TodoItem": {
-        "type": "object",
-        "required": ["index", "description", "status"],
-        "title": "TodoItem",
-        "description": "A single todo item in the task workflow.",
         "properties": {
           "index": {
             "type": "integer",
@@ -831,21 +1086,38 @@
           },
           "status": {
             "type": "string",
-            "enum": ["pending", "in_progress", "completed", "skipped"],
+            "enum": [
+              "pending",
+              "in_progress",
+              "completed",
+              "skipped"
+            ],
             "title": "Status",
             "description": "Current status of the todo"
           },
           "execution_summary": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Execution Summary",
             "description": "Summary of execution for this todo"
           }
-        }
+        },
+        "type": "object",
+        "required": [
+          "index",
+          "description",
+          "status"
+        ],
+        "title": "TodoItem",
+        "description": "A single todo item in the task workflow."
       },
       "UploadFileResponse": {
-        "type": "object",
-        "required": ["url", "uuid", "expires_at", "file_expires_at", "download_url"],
-        "title": "UploadFileResponse",
         "properties": {
           "url": {
             "type": "string",
@@ -872,12 +1144,18 @@
             "title": "Download Url",
             "description": "Presigned download file url"
           }
-        }
+        },
+        "type": "object",
+        "required": [
+          "url",
+          "uuid",
+          "expires_at",
+          "file_expires_at",
+          "download_url"
+        ],
+        "title": "UploadFileResponse"
       },
       "Usage": {
-        "type": "object",
-        "required": ["prompt_tokens", "completion_tokens", "total_tokens"],
-        "title": "Usage",
         "properties": {
           "prompt_tokens": {
             "type": "integer",
@@ -894,14 +1172,14 @@
             "title": "Total Tokens",
             "description": "Total number of tokens used"
           }
-        }
-      }
-    },
-    "securitySchemes": {
-      "apiKeyAuth": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "x-api-key"
+        },
+        "type": "object",
+        "required": [
+          "prompt_tokens",
+          "completion_tokens",
+          "total_tokens"
+        ],
+        "title": "Usage"
       }
     }
   }
