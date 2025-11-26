@@ -37,26 +37,39 @@ async def main():
     agent = TaskerAgent(api_key="YOUR_KEY", model="lux-actor-1")
 
     agent.set_task(
-        task="Use chase to calculate IRS",
+        task="Use chase to calculate mortgage payments",
         todos=[
-            "Go to chase.com",
-            "Click on the 'by' of 'Investing by J.P. Morgan' on the header, then select 'Retirement and IRAs'",
-            "In the header of 'Tools and resources' select 'investment calculators'",
-            "Scroll down to find the 'IRA calculator' and use it",
-            "Drag the monthly contribution slider to the right until it hits the maximum",
-            "Drag the right side of the Age Range slider to the right until it hits the maximum",
-            "After doing the steps above, scroll down to reveal the figure calculated by chase"
+            "Go to google.com and search for 'Chase mortgage calculator'",
+            "Scroll down to 'Customize your info' and change the Credit score to 'Very good (700-739)'",
+            "Set the 'Property use' to 'Investment property' and set 'Property type' to 'Condo' ",
+            "For the County type 'San Francisco' and select CA, San Francisco from the autocomplete dropdotn",
+            "Set the property price to 2000000, the down payment to '400000', and click 'Loan Options'",
         ]
     )
 
     await agent.execute(
-        instruction="Use chase to calculate IRA",
+        instruction="Use chase to calculate mortgage payments",
         action_handler=AsyncPyautoguiActionHandler(),
         image_provider=AsyncScreenshotMaker(),
     )
 
 asyncio.run(main())
 ```
+
+This is the expected behavior if you run the above with the correct desktop setup.
+
+<div style={{ padding: "62.62% 0 0 0", position: "relative" }}>
+  <iframe
+    src="https://player.vimeo.com/video/1140801936?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
+    frameBorder="0"
+    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+    referrerPolicy="strict-origin-when-cross-origin"
+    style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+    title="OpenAGI - Chase Mortgage Calculator Example"
+  />
+</div>
+
+
 
 That’s it: behind the scenes, TaskerAgent talks to lux-actor-1 for you, keeps a PlannerMemory of todos, and routes every action to your client-side handler.
 
@@ -68,8 +81,8 @@ To get the best results from TaskerAgent, it helps to understand how it plans an
 - **Todos**: A sequential list of steps the agent should follow. Think of this as a checklist you would give to a human intern.
 
 ### Best Practices for Todos
-- **Be specific**: Instead of "Research", say "Search for 3 competitor pricing models".
-- **Start with verbs**: "Open", "Click", "Type", "Verify".
+- **Be specific**: Instead of "Research", say something to the effect of "Search X on Google, click on the first result, and find this page, and fill in the form with these specific details".
+- **Start with verbs**: "Open", "Click", "Type".
 - **Keep it linear**: Break complex workflows into simple, logical steps.
 
 ## Next steps

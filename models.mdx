@@ -40,9 +40,7 @@ To get the best results from `lux-actor-1`, provide clear, step-by-step instruct
 
 <CodeGroup>
 ```text Good (Concise)
-"Click 'Settings' then click 'Profile'",
-"Type 'John Doe' in 'Name'",
-"Click 'Save'"
+"Click 'Settings' then click 'Profile', and Type 'John Doe' in 'Name', and then click 'Save'"
 ```
 
 ```text Bad (Vague)
@@ -54,7 +52,7 @@ Fix my profile info
 The `DefaultAgent` provides a simple loop for executing direct instructions with the actor model.
 
 <Note>
-**Before running**: Ensure your desktop is set up properly. Open a browser to Google.com with minimal tabs, close other applications to avoid overlapping windows, and keep the desktop uncluttered. The agent "sees" your screen just like you do—a clean environment improves accuracy.
+**Before running**: Ensure your desktop is set up properly. Open a browser to a blank page with minimal tabs, close other applications to avoid overlapping windows, and keep the desktop uncluttered. The agent "sees" your screen just like you do—a clean environment improves accuracy.
 </Note>
 
 ```python
@@ -69,7 +67,7 @@ async def run_actor_agent():
     
     # Execute a direct instruction
     await agent.execute(
-        instruction="Go to google.com",
+        instruction="Go to Google.com, search timer, add 1 minute by clicking on the '+1:00', and start the timer",
         action_handler=AsyncPyautoguiActionHandler(),
         image_provider=AsyncScreenshotMaker(),
     )
@@ -77,8 +75,22 @@ async def run_actor_agent():
 asyncio.run(run_actor_agent())
 ```
 
+Here's the expected behavior of the code snippet above when run with the correct desktop environment.
+
+<div style={{ padding: "62.5% 0 0 0", position: "relative" }}>
+  <iframe
+    src="https://player.vimeo.com/video/1140808440?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
+    frameBorder="0"
+    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+    referrerPolicy="strict-origin-when-cross-origin"
+    style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+    title="OpenAGI - Timer Example with DefaultAgent"
+  />
+</div>
+
+
 ### Tasker Agent
-The built-in `TaskerAgent` is designed for multi-step workflows. You must define the task and sub-tasks (todos) before execution.
+The built-in `TaskerAgent` is designed for multi-step workflows, and it happily runs on top of `lux-actor-1`, which gives you fast, deterministic execution while the TaskerAgent handles planning, memory, and retries. You must define the task and sub-tasks (todos) before execution.
 
 ```python
 import asyncio
@@ -89,25 +101,38 @@ async def run_tasker():
     
     # 1. Define the high-level task and breakdown
     agent.set_task(
-        task="Find a flight from San Francisco to Tokyo",
+        task="Find a flight from Fukuoka to San Francisco",
         todos=[
-          "Open a browser", 
-          "Navigate to flights.google.com and set the departure date to today",
-          "Set the return date two weeks from today",
-          "Set the departure location to San Francisco and set the arrival location to Tokyo",
-          "Click on the first flight and select the first return flight"
+          "Navigate to flights.google.com, set the arrival city to 'San Francisco' and click the first one from the dropdown",
+          "Set the departure date to today, then set the return date two weeks from today, and click 'Search'",
+          "Click on the first flight of the 'Top departing flights' and click the first of the 'Top returning flights'"
         ]
     )
     
     # 2. Execute the workflow
     await agent.execute(
-        instruction="Book the flight", # Context for the agent
+        instruction="Find a flight", # Context for the agent
         action_handler=AsyncPyautoguiActionHandler(),
         image_provider=AsyncScreenshotMaker(),
     )
 
 asyncio.run(run_tasker())
 ```
+
+Here's what the run will look like with the correct desktop setup.
+
+<div style={{ padding: "75% 0 0 0", position: "relative" }}>
+  <iframe
+    src="https://player.vimeo.com/video/1140830837?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
+    frameBorder="0"
+    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+    referrerPolicy="strict-origin-when-cross-origin"
+    style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+    title="OpenAGI - Google Flights Example with TaskerAgent"
+  />
+</div>
+
+
 
 ### lux-thinker-1: Careful Planning
 
@@ -123,7 +148,7 @@ asyncio.run(run_tasker())
 
 <Warning>
 **Avoid using Thinker with TaskerAgent for simple execution loops.**
-The `TaskerAgent` adds its own layer of reflection and planning. Combining this with `lux-thinker-1` (which also plans) can result in extremely slow execution times and redundant reasoning. Use `lux-thinker-1` primarily for the initial planning phase or for very difficult steps where the actor fails.
+The `TaskerAgent` adds its own layer of reflection and planning. Combining this with `lux-thinker-1` (which also plans) can result in extremely slow execution times and redundant reasoning. Use `lux-thinker-1` for vague, complex goals, requiring hour-long executions.
 </Warning>
 
 ### Usage in CLI and Custom Apps
@@ -149,7 +174,6 @@ If you are building a custom application, you can implement your own client to h
 | Feature | lux-actor-1 | lux-thinker-1 |
 |---------|-------------|---------------|
 | **Latency** | Lower | Higher |
-| **Cost** | Lower | Higher |
 | **Accuracy** | High for simple tasks | Higher for complex tasks |
 | **Best Use** | Real-time control | Strategic planning |
 
@@ -158,8 +182,7 @@ If you are building a custom application, you can implement your own client to h
 
 ### Model Selection
 - **Start with lux-actor-1** unless you have evidence the task needs deeper reasoning
-- **Use lux-thinker-1 selectively** for planning, brittle flows, or where retries are expensive
-- **Consider hybrid approaches** for long tasks: thinker for planning, actor for execution
+- **Use lux-thinker-1** for planning, long running, and more complex tasks
 
 ### Environment Setup
 - Maintain stable initial UI state (limit open tabs, avoid obstructive modals)
@@ -172,8 +195,8 @@ If you are building a custom application, you can implement your own client to h
   Models have different pricing tiers. Check the latest pricing information in your dashboard or contact support for enterprise pricing.
 </Note>
 
-- **lux-actor-1**: Optimized for cost-effective, high-volume automation
-- **lux-thinker-1**: Higher pricing for complex reasoning tasks
+- **lux-actor-1**: Ideal for immediate tasks, completing actions at near-instant speed
+- **lux-thinker-1**: Understands vague, complex goals, performing hour-long executions
 
 ## Next Steps
 

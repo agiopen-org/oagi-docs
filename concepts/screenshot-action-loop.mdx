@@ -10,12 +10,7 @@ At the heart of every OpenAGI agent is a continuous cycle of perceiving the UI, 
 
 ## How it Works
 
-```mermaid
-graph LR
-    A[Screenshot Provider] -->|Image| B[Agent / Model]
-    B -->|Action| C[Action Handler]
-    C -->|Updates UI| A
-```
+![Screenshot-action loop diagram](/images/screenshot-action-loop.png)
 
 In code, this loop is conceptually very simple:
 

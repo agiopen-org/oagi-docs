@@ -27,9 +27,32 @@
           {
             "group": "Examples",
             "pages": [
-              "examples/software-qa",
-              "examples/amazon-data-crawling",
-              "examples/cvs-appointment-booking"
+              {
+                "group": "TaskerAgent",
+                "icon": "robot",
+                "pages": [
+                  "examples/cvs-appointment-booking",
+                  "examples/software-qa",
+                  "examples/amazon-data-crawling"
+                ]
+              },
+              {
+                "group": "Actor Agent",
+                "icon": "mouse",
+                "pages": [
+                  "examples/test1",
+                  "examples/test2"
+
+                ]
+              },
+              {
+                "group": "Thinker",
+                "icon": "lightbulb",
+                "pages": [
+                  "examples/test3",
+                  "examples/test4"
+                ]
+              }
             ]
           },
           {
@@ -38,8 +61,7 @@
               "concepts/screenshot-action-loop",
               "concepts/screenshot-provider",
               "concepts/action-handler",
-              "concepts/server-architecture",
-              "concepts/custom-clients"
+              "concepts/server-architecture"
             ]
           },
           {

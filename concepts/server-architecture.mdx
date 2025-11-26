@@ -50,9 +50,22 @@ if __name__ == "__main__":
 
 Once the server is running, desktop clients (the "bridge") can connect to it via Socket.IO.
 
-1. **Desktop Client Connects**: The client connects to the server URL (e.g., `http://localhost:8000`).
-2. **Session Created**: The server creates a unique session for that connection.
-3. **Agent Loop**: The server spins up an agent (like `TaskerAgent`) to handle the automation logic, sending commands to the desktop client and receiving screenshots back.
+<Info>
+**Using the Desktop Application**
+
+The fastest way to try this loop is with the [Desktop Application](/desktop-application). It provides a ready-made bridge that:
+
+- Shows you what the model sees (screenshot stream) and how it moves the mouse/keyboard
+- Streams logs, tool calls, and errors so you can debug agent behavior
+- Works on macOS and Windows without building your own client
+
+**Steps**
+1. Start your local server (e.g., `oagi server start`) with `OAGI_API_KEY` / `OAGI_BASE_URL` set.
+2. Launch the desktop app and point it at the server URL (default `http://0.0.0.0:8000`).
+3. Send commands into the Desktop Application
+</Info>
+
+If you are building your own client, implement the same handshake: connect over Socket.IO, request a session, send screenshots, and execute incoming actions.
 
 ## Deployment Tips
 
