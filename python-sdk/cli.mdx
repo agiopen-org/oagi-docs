@@ -65,7 +65,7 @@ oagi agent run "Open calculator"
 
 # With options
 oagi agent run "Search for weather" \
-    --model lux-v1 \
+    --model lux-actor-1 \
     --max-steps 30 \
     --temperature 0.7
 ```
@@ -97,7 +97,7 @@ oagi agent run "Fill out the registration form" \
     --temperature 0.5
 
 # Using TaskerAgent mode
-oagi agent run "Research and compare laptops" \
+oagi agent run "Go to google.com and search for weather" \
     --mode tasker \
     --max-steps 100
 

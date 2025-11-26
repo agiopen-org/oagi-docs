@@ -1,0 +1,29 @@
+---
+title: "Tutorials Overview"
+description: "How to navigate the end-to-end guides in the Tutorials section."
+---
+
+# Welcome to the Tutorials
+
+This section curates opinionated, end-to-end walkthroughs that show how to ship real automations with the OAGI platform. Each tutorial pairs narrative guidance with runnable code so you can see how API primitives, desktop handlers, and observers come together in production-style workflows.
+
+## What to Expect
+
+- **Progressive builds** – Every tutorial starts from a minimal scaffold, then layers features (CLI arguments, observers, Tasker configuration, exports) so you can follow along even if you are new to the SDK.
+- **Copy-paste ready code** – Use the snippets verbatim or adapt them into your own repositories. When a tutorial needs environment variables or permissions, it calls those out explicitly.
+- **Context + rationale** – We highlight why each component is wired a certain way (e.g., why TaskerAgent is used over lower-level actors, or why observers export HTML logs) so you can generalize the patterns.
+
+## How to Use These Tutorials
+
+1. **Skim the summary** to confirm the workflow matches your use case (e.g., desktop RPA, browser scheduling, QA automation).
+2. **Work through the numbered steps** in order—later sections assume you completed the earlier setup.
+3. **Compare with the example counterpart** (under `/examples`) when you just need a refresher or a trimmed-down version.
+4. **Adapt the todos/instructions** to your own app by editing the provided lists before running the agent.
+
+## Featured Tutorials
+
+- **CVS Appointment Booking** – Shows how to orchestrate a multi-step, form-heavy workflow with `TaskerAgent`, PyAutoGUI handlers, and HTML exports.
+- **Desktop Agent Basics (coming soon)** – Teaches the fundamentals of wiring AsyncActor/AsyncPyautoguiActionHandler for ad-hoc tasks.
+- **Browser QA Smoke Test (coming soon)** – Demonstrates screenshot diffing and observer exports for verification runs.
+
+Use these guides as a launch pad: replicate the patterns, then expand them into your domain-specific automations.

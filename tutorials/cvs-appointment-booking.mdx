@@ -23,7 +23,7 @@ Automate a multi-step CVS vaccination appointment with the OAGI Python SDK. We'l
    ```
 2. **Python ≥ 3.10 with desktop extras** – Install the metapackage (pulls in PyAutoGUI + Pillow) or target extras explicitly:
    ```bash
-   pip install "oagi>=0.10.0"
+   pip install "oagi>=0.10.1"
    # or: pip install "oagi-core[desktop]"
    ```
 3. **macOS permissions** – Grant accessibility/screen recording access so PyAutoGUI and screenshot capture can control the OS.
@@ -136,7 +136,7 @@ Wire up the observation stack (`AsyncAgentObserver`) plus the desktop automation
 
 ### Step 4 — Describe the CVS workflow
 
-Break the appointment journey into todos so failures surface at the right granularity.
+Break the appointment journey into todos so each successful step is clearly defined for the agent.
 
 ```python
     month, day, year = args.birthday.split("-")
@@ -145,11 +145,11 @@ Break the appointment journey into todos so failures surface at the right granul
         f"with email {args.email} and birthday {args.birthday}"
     )
     todos = [
-        "Open a new tab, go to www.cvs.com, search 'flu shot', then select Schedule vaccinations",
-        f"Enter first name '{args.first_name}', last name '{args.last_name}', email '{args.email}'",
-        f"Scroll to Date of Birth and enter Month '{month}', Day '{day}', Year '{year}'",
-        "Continue as guest, add vaccines, choose Flu, then confirm",
-        f"Advance to ZIP entry, input '{args.zip_code}', pick the first suggestion, and search",
+        "Open a new tab, go to www.cvs.com, type 'flu shot' in the search bar and press enter, wait for the page to load, then click on the button of Schedule vaccinations on the top of the page",
+        f"Enter the first name '{args.first_name}', last name '{args.last_name}', and email '{args.email}' in the form. Do not use any suggested autofills. Make sure the mobile phone number is empty.",
+        f"Slightly scroll down to see the date of birth, enter Month '{month}', Day '{day}', and Year '{year}' in the form",
+        "Click on 'Continue as guest' button, wait for the page to load with wait, click on 'Add vaccines' button, select 'Flu' and click on 'Add vaccines'",
+        f"Click on 'next' to enter the page with recommendation vaccines, then click on 'next' again, until on the page of entering zip code, enter '{args.zip_code}', select the first option from the dropdown menu, and click on 'Search'",
     ]
 
     tasker.set_task(
@@ -159,7 +159,7 @@ Break the appointment journey into todos so failures surface at the right granul
 ```
 
 Tip: Keep instructions declarative (“click X”) so the model knows when to wait for UI updates.
-Modeling steps as todos mirrors Tasker’s internal memory model, giving you granular success/failure signals instead of a monolithic “pass/fail.”
+Modeling steps as todos mirrors Tasker’s internal memory model, giving you clear success checkpoints instead of one monolithic “done” signal.
 
 ### Step 5 — Execute and inspect memory
 
@@ -296,11 +296,11 @@ async def main():
         f"with email {args.email} and birthday {args.birthday}"
     )
     todos = [
-        "Open a new tab, go to www.cvs.com, search 'flu shot', then select Schedule vaccinations",
-        f"Enter first name '{args.first_name}', last name '{args.last_name}', email '{args.email}'",
-        f"Scroll to Date of Birth and enter Month '{month}', Day '{day}', Year '{year}'",
-        "Continue as guest, add vaccines, choose Flu, then confirm",
-        f"Advance to ZIP entry, input '{args.zip_code}', pick the first suggestion, and search",
+        "Open a new tab, go to www.cvs.com, type 'flu shot' in the search bar and press enter, wait for the page to load, then click on the button of Schedule vaccinations on the top of the page",
+        f"Enter the first name '{args.first_name}', last name '{args.last_name}', and email '{args.email}' in the form. Do not use any suggested autofills. Make sure the mobile phone number is empty.",
+        f"Slightly scroll down to see the date of birth, enter Month '{month}', Day '{day}', and Year '{year}' in the form",
+        "Click on 'Continue as guest' button, wait for the page to load with wait, click on 'Add vaccines' button, select 'Flu' and click on 'Add vaccines'",
+        f"Click on 'next' to enter the page with recommendation vaccines, then click on 'next' again, until on the page of entering zip code, enter '{args.zip_code}', select the first option from the dropdown menu, and click on 'Search'",
     ]
 
     tasker.set_task(instruction, todos)
