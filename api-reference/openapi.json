@@ -1,152 +1,306 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
+    "title": "OAGI API Gateway",
+    "description": "API Gateway for Large Language Model requests",
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://api.agiopen.org"
     }
   ],
   "security": [
     {
-      "bearerAuth": []
+      "apiKeyAuth": []
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
+    "/v1/generate": {
+      "post": {
+        "summary": "OAGI worker generate",
+        "description": "Generate response for OAGI workers (oagi_first, oagi_follow, oagi_task_summary)",
+        "operationId": "generate_v1_generate_post",
         "parameters": [
           {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "name": "x-api-version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "X-Api-Version"
             }
           }
         ],
-        "responses": {
-          "200": {
-            "description": "Plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
         "requestBody": {
-          "description": "Plant to add to the store",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/ExternalLLMRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
-            "description": "plant response",
+            "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/ExternalLLMResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "unexpected error",
+            "description": "Bad Request",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate Limit Exceeded",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
               }
             }
           }
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/v1/file/upload": {
+      "get": {
+        "summary": "Request file upload",
+        "description": "Get presigned file upload URL, file uuid used for generation API, and file expiration time",
+        "operationId": "upload_file_v1_file_upload_get",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
+            "name": "x-api-version",
+            "in": "header",
+            "required": false,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "X-Api-Version"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "X-Api-Key"
             }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
+          "200": {
+            "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/UploadFileResponse"
                 }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate Limit Exceeded",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
               }
             }
           }
         }
       }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
+    },
+    "/v2/message": {
       "post": {
-        "description": "Information about a new plant added to the store",
+        "summary": "Analyze chat messages",
+        "description": "Analyze the openai-compatible messages with screenshot url to return possible actions that can accomplish the task",
+        "operationId": "create_message_v2_v2_message_post",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "name": "x-api-version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
+              "title": "X-Api-Version"
+            }
+          }
+        ],
         "requestBody": {
-          "description": "Plant added to the store",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/OpenAIChatRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LLMResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Task Not Found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate Limit Exceeded",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
           }
         }
       }
@@ -154,63 +308,600 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "Action": {
         "type": "object",
+        "required": ["type", "argument", "description"],
+        "title": "Action",
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
+          "type": {
+            "$ref": "#/components/schemas/ActionType",
+            "description": "Type of action to perform"
           },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "argument": {
+            "type": "string",
+            "title": "Argument",
+            "description": "Action argument in the specified format"
+          },
+          "count": {
+            "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }],
+            "title": "Count",
+            "description": "Number of times to repeat the action",
+            "default": 1
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Human-readable description of the action"
+          }
+        },
+        "example": {
+          "argument": "500,300",
+          "count": 1,
+          "description": "Click the login button to proceed with authentication",
+          "type": "click"
+        }
+      },
+      "ActionType": {
+        "type": "string",
+        "enum": [
+          "click",
+          "left_double",
+          "left_triple",
+          "right_single",
+          "drag",
+          "hotkey",
+          "type",
+          "scroll",
+          "wait",
+          "finish"
+        ],
+        "title": "ActionType"
+      },
+      "Content": {
+        "type": "object",
+        "required": ["type"],
+        "title": "Content",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ContentType",
+            "description": "The type of the content"
+          },
+          "image_url": {
+            "$ref": "#/components/schemas/ImageContent",
+            "description": "The metadata for image content"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text",
+            "description": "The text content"
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
+      "ContentType": {
+        "type": "string",
+        "enum": ["text", "image_url"],
+        "title": "ContentType"
       },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+      "ErrorDetail": {
         "type": "object",
+        "required": ["code", "message"],
+        "title": "ErrorDetail",
+        "description": "Detailed error information.",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "description": "Error code for programmatic handling"
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "title": "Message",
+            "description": "Human-readable error message"
+          }
+        },
+        "example": {
+          "code": "invalid_api_key",
+          "message": "Incorrect API key provided. Visit https://developer.agiopen.org to create one."
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "title": "ErrorResponse",
+        "description": "Standard error response format.",
+        "properties": {
+          "error": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/ErrorDetail" },
+              { "type": "null" }
+            ],
+            "description": "Error details, null if request succeeded"
+          }
+        },
+        "example": {
+          "error": {
+            "code": "invalid_api_key",
+            "message": "Incorrect API key provided. Visit https://developer.agiopen.org to create one."
+          }
+        }
+      },
+      "ExternalLLMRequest": {
+        "type": "object",
+        "required": ["external_worker_id", "task_description", "todos", "overall_todo"],
+        "title": "ExternalLLMRequest",
+        "description": "Request for external LLM generation with structured memory context.",
+        "properties": {
+          "external_worker_id": {
+            "type": "string",
+            "enum": ["oagi_first", "oagi_follow", "oagi_task_summary"],
+            "title": "External Worker Id",
+            "description": "The desired OAGI worker type"
+          },
+          "task_description": {
+            "type": "string",
+            "title": "Task Description",
+            "description": "Overall task description"
+          },
+          "todos": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/TodoItem" },
+            "title": "Todos",
+            "description": "List of all todos in the workflow"
+          },
+          "history": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/HistoryItem" },
+            "title": "History",
+            "description": "Execution history of completed todos"
+          },
+          "current_todo_index": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Current Todo Index",
+            "description": "Index of the current todo being executed"
+          },
+          "task_execution_summary": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Task Execution Summary",
+            "description": "Summary of overall task execution"
+          },
+          "overall_todo": {
+            "type": "string",
+            "title": "Overall Todo",
+            "description": "The current user todo to plan for"
+          },
+          "current_screenshot": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Current Screenshot",
+            "description": "S3 URL or UUID for current screenshot"
+          },
+          "result_screenshot": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Result Screenshot",
+            "description": "Final screenshot S3 URL for oagi_follow"
+          },
+          "window_screenshots": {
+            "anyOf": [
+              { "type": "array", "items": { "type": "string" } },
+              { "type": "null" }
+            ],
+            "title": "Window Screenshots",
+            "description": "List of screenshot S3 URLs for oagi_follow"
+          },
+          "current_subtask_instruction": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Current Subtask Instruction",
+            "description": "Current subtask being executed (None for first call, str for follow)"
+          },
+          "window_steps": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": { "type": "object", "additionalProperties": true }
+              },
+              { "type": "null" }
+            ],
+            "title": "Window Steps",
+            "description": "List of action steps for oagi_follow"
+          },
+          "prior_notes": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Prior Notes",
+            "description": "Execution history notes for oagi_follow"
+          },
+          "latest_todo_summary": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Latest Todo Summary",
+            "description": "Latest execution summary for oagi_task_summary"
+          }
+        }
+      },
+      "ExternalLLMResponse": {
+        "type": "object",
+        "required": ["response", "prompt_tokens", "completion_tokens"],
+        "title": "ExternalLLMResponse",
+        "properties": {
+          "response": {
+            "type": "string",
+            "title": "Response",
+            "description": "Response text from external LLM API"
+          },
+          "prompt_tokens": {
+            "type": "integer",
+            "title": "Prompt Tokens",
+            "description": "Prompt tokens count"
+          },
+          "completion_tokens": {
+            "type": "integer",
+            "title": "Completion Tokens",
+            "description": "Completion tokens count"
+          },
+          "cost": {
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "title": "Cost",
+            "description": "API cost in US dollar (None if not available)",
+            "deprecated": true
+          },
+          "cached_tokens": {
+            "type": "integer",
+            "title": "Cached Tokens",
+            "description": "Cached prompt tokens count",
+            "default": 0
+          }
+        }
+      },
+      "HistoryItem": {
+        "type": "object",
+        "required": ["todo_index", "todo_description", "action_count", "completed"],
+        "title": "HistoryItem",
+        "description": "A record of todo execution history.",
+        "properties": {
+          "todo_index": {
+            "type": "integer",
+            "title": "Todo Index",
+            "description": "Index of the todo that was executed"
+          },
+          "todo_description": {
+            "type": "string",
+            "title": "Todo Description",
+            "description": "Description of the todo"
+          },
+          "action_count": {
+            "type": "integer",
+            "title": "Action Count",
+            "description": "Number of actions taken"
+          },
+          "summary": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Summary",
+            "description": "Execution summary"
+          },
+          "completed": {
+            "type": "boolean",
+            "title": "Completed",
+            "description": "Whether the todo was completed"
+          }
+        }
+      },
+      "ImageContent": {
+        "type": "object",
+        "required": ["url"],
+        "title": "ImageContent",
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url",
+            "description": "URL of the image"
+          }
+        }
+      },
+      "LLMResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "task_id",
+          "created",
+          "model",
+          "task_description",
+          "current_step",
+          "is_complete",
+          "actions",
+          "usage"
+        ],
+        "title": "LLMResponse",
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Unique identifier for the response"
+          },
+          "task_id": {
+            "type": "string",
+            "title": "Task Id",
+            "description": "Task ID for this task execution"
+          },
+          "object": {
+            "type": "string",
+            "title": "Object",
+            "description": "Object type",
+            "default": "task.completion"
+          },
+          "created": {
+            "type": "integer",
+            "title": "Created",
+            "description": "Unix timestamp of creation"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "description": "Model used for analysis"
+          },
+          "task_description": {
+            "type": "string",
+            "title": "Task Description",
+            "description": "The original task description"
+          },
+          "current_step": {
+            "type": "integer",
+            "title": "Current Step",
+            "description": "Current step number in the session"
+          },
+          "is_complete": {
+            "type": "boolean",
+            "title": "Is Complete",
+            "description": "Whether the task is complete"
+          },
+          "actions": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Action" },
+            "title": "Actions",
+            "description": "List of possible actions to accomplish the task"
+          },
+          "reason": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Reason",
+            "description": "Reason for the current step (if applicable)"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/Usage",
+            "description": "Token usage information"
+          },
+          "error": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/ErrorDetail" },
+              { "type": "null" }
+            ],
+            "description": "Error details if request failed, null if successful"
+          },
+          "raw_output": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Raw Output",
+            "description": "Raw output from the LLM (if enabled)"
+          },
+          "log_data": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/RequestLogData" },
+              { "type": "null" }
+            ],
+            "description": "Log data for LLM inference or request processing"
+          }
+        },
+        "example": {
+          "id": "task-123abc",
+          "task_id": "task_abc123def456",
+          "object": "task.completion",
+          "created": 1677652288,
+          "model": "vision-model-v1",
+          "task_description": "Log into the website using my credentials",
+          "current_step": 1,
+          "is_complete": false,
+          "actions": [
+            {
+              "type": "click",
+              "argument": "300, 150",
+              "count": 1,
+              "description": "Click on the username input field to focus it"
+            },
+            {
+              "type": "type",
+              "argument": "username@example.com",
+              "count": 1,
+              "description": "Type the username into the input field"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 450,
+            "completion_tokens": 120,
+            "total_tokens": 570
+          }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "required": ["role"],
+        "title": "Message",
+        "properties": {
+          "role": {
+            "$ref": "#/components/schemas/Role",
+            "description": "Role of the message sender"
+          },
+          "content": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "$ref": "#/components/schemas/Content" } }
+            ],
+            "title": "Content",
+            "description": "Text content of the message or a list of content items"
+          }
+        }
+      },
+      "OpenAIChatRequest": {
+        "type": "object",
+        "required": ["model", "messages", "task_description", "task_id"],
+        "title": "OpenAIChatRequest",
+        "description": "OpenAI-compatible chat completion request",
+        "properties": {
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "description": "Model name to use"
+          },
+          "messages": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Message" },
+            "title": "Messages",
+            "description": "Messages in chronological order"
+          },
+          "task_description": {
+            "type": "string",
+            "title": "Task Description",
+            "description": "Description of the task to accomplish"
+          },
+          "task_id": {
+            "type": "string",
+            "title": "Task Id",
+            "description": "Task ID for identifying one single task"
+          },
+          "temperature": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2,
+            "title": "Temperature",
+            "description": "Sampling temperature between 0 and 2"
+          },
+          "top_p": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "title": "Top P",
+            "description": "Nucleus sampling parameter"
+          },
+          "max_tokens": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Max Tokens",
+            "description": "Maximum number of tokens for the generated completion"
+          },
+          "user": {
+            "type": "string",
+            "title": "User",
+            "description": "End-user identifier for abuse/fraud detection"
+          }
+        }
+      },
+      "RequestLogData": {
+        "type": "object",
+        "title": "RequestLogData",
+        "properties": {
+          "llm_latency": {
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "title": "Llm Latency",
+            "description": "The latency of LLM inference"
+          },
+          "llm_target": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Llm Target",
+            "description": "The path of target LLM server"
+          },
+          "request_latency": {
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "title": "Request Latency",
+            "description": "The time cost of processing the whole request"
+          }
+        }
+      },
+      "Role": {
+        "type": "string",
+        "enum": ["system", "user", "assistant", "function"],
+        "title": "Role"
+      },
+      "TodoItem": {
+        "type": "object",
+        "required": ["index", "description", "status"],
+        "title": "TodoItem",
+        "description": "A single todo item in the task workflow.",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "title": "Index",
+            "description": "Todo index in the list"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Todo description"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "in_progress", "completed", "skipped"],
+            "title": "Status",
+            "description": "Current status of the todo"
+          },
+          "execution_summary": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Execution Summary",
+            "description": "Summary of execution for this todo"
+          }
+        }
+      },
+      "UploadFileResponse": {
+        "type": "object",
+        "required": ["url", "uuid", "expires_at", "file_expires_at", "download_url"],
+        "title": "UploadFileResponse",
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url",
+            "description": "Presigned upload file url"
+          },
+          "uuid": {
+            "type": "string",
+            "title": "Uuid",
+            "description": "UUID for the uploaded file, this can be used as image_url in worker API"
+          },
+          "expires_at": {
+            "type": "integer",
+            "title": "Expires At",
+            "description": "Expiration time of the presigned upload url"
+          },
+          "file_expires_at": {
+            "type": "integer",
+            "title": "File Expires At",
+            "description": "Expiration time of the uploaded file"
+          },
+          "download_url": {
+            "type": "string",
+            "title": "Download Url",
+            "description": "Presigned download file url"
+          }
+        }
+      },
+      "Usage": {
+        "type": "object",
+        "required": ["prompt_tokens", "completion_tokens", "total_tokens"],
+        "title": "Usage",
+        "properties": {
+          "prompt_tokens": {
+            "type": "integer",
+            "title": "Prompt Tokens",
+            "description": "Number of tokens in the prompt"
+          },
+          "completion_tokens": {
+            "type": "integer",
+            "title": "Completion Tokens",
+            "description": "Number of tokens in the completion"
+          },
+          "total_tokens": {
+            "type": "integer",
+            "title": "Total Tokens",
+            "description": "Total number of tokens used"
           }
         }
       }
     },
     "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
       }
     }
   }
