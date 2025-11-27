@@ -142,9 +142,9 @@ Here's what the run will look like with the correct desktop setup.
 - Brittle or complex workflows
 - Scenarios where errors are costly
 - **Complex Examples:**
-    - "Research the top 3 coffee shops in Tokyo and save their addresses to a text file"
-    - "Compare flight prices on three different websites and book the cheapest one"
-    - "Debug the failing test case by analyzing the logs and checking the UI state"
+    - "Research the top 3 coffee shops in Tokyo and copy their names to a text file"
+    - "Look up the store hours for the nearest Apple Store to zip code 23456"
+    - "Find the baggage policy for international flights on Delta's website"
 
 <Warning>
 **Avoid using Thinker with TaskerAgent for simple execution loops.**
@@ -154,19 +154,12 @@ The `TaskerAgent` adds its own layer of reflection and planning. Combining this 
 ### Usage in CLI and Custom Apps
 
 `lux-thinker-1` is best suited for asynchronous workflows where a human is not waiting for immediate feedback, such as:
-1.  **CLI Tools:** Running complex analysis or setup tasks via the command line.
+
+**CLI Tools:** Running complex analysis or setup tasks via the command line.
 
     ```bash
     oagi agent run "Research the top 3 coffee shops in Tokyo and save their addresses to a text file" --model "lux-thinker-1"
     ```
-
-2.  **Custom Clients:** Background workers or specialized applications built for specific business logic.
-
-If you are building a custom application, you can implement your own client to handle these long-running tasks efficiently.
-
-<Card title="Build a Custom Client" icon="code" href="/concepts/custom-clients">
-  Learn how to build custom clients for specialized use cases.
-</Card>
 
 
 ## Performance Characteristics
@@ -201,13 +194,13 @@ If you are building a custom application, you can implement your own client to h
 ## Next Steps
 
 <CardGroup cols={3}>
-  <Card title="Software QA" icon="bug" href="/examples/software-qa">
+  <Card title="Software QA" icon="bug" href="/examples/tasker/software-qa">
     Automate testing workflows
   </Card>
-  <Card title="Data Crawling" icon="spider" href="/examples/amazon-data-crawling">
+  <Card title="Data Crawling" icon="spider" href="/examples/tasker/amazon-data-crawling">
     Extract data from complex sites
   </Card>
-  <Card title="Appointment Booking" icon="calendar" href="/examples/cvs-appointment-booking">
+  <Card title="Appointment Booking" icon="calendar" href="/examples/tasker/cvs-appointment-booking">
     Handle multi-step booking flows
   </Card>
 </CardGroup>

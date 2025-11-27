@@ -1,0 +1,78 @@
+---
+title: "AAPL Insider Activity"
+description: "Use lux-actor-1 to quickly navigate to NASDAQ and find Apple's insider trading activity."
+icon: "chart-line"
+---
+
+# AAPL Insider Activity
+
+This example demonstrates how `lux-actor-1` handles direct, well-defined tasks with near-instant speed. With a single CLI command, the Actor model will navigate to NASDAQ's website and find Apple's insider activity data.
+
+<div style={{ padding: "62.5% 0 0 0", position: "relative" }}>
+  <iframe
+    src="https://player.vimeo.com/video/1141165232?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
+    frameBorder="0"
+    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+    referrerPolicy="strict-origin-when-cross-origin"
+    style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+    title="OpenAGI - AAPL Insider Activity with Actor"
+  />
+</div>
+
+## Why Actor?
+
+`lux-actor-1` is optimized for speed and responsiveness:
+
+- **Fast execution** — Completes actions at near-instant speed
+- **Direct control** — Perfect for "observe → decide → act" loops
+- **Clear instructions** — Works best when the steps are well-defined
+
+This task is ideal for Actor because the navigation path is explicit: go to a website, search, and click through to a specific page.
+
+## Run the Example
+
+All you need is a single CLI command:
+
+```bash
+oagi agent run "Go to nasdaq.com, search for AAPL. Under More, go to Insider Activity" --model lux-actor-1
+```
+
+That's it. The Actor model will:
+
+1. Open a browser and navigate to nasdaq.com
+2. Search for "AAPL" using the site's search
+3. Navigate to the "More" section
+4. Click through to the Insider Activity page
+
+## What Happens Behind the Scenes
+
+When you invoke this command, the CLI triggers a fast execution loop powered by `lux-actor-1`:
+
+1. **Screenshot capture** — The agent takes a screenshot of your current screen
+2. **Visual analysis** — Lux analyzes the interface and predicts the next action
+3. **Action execution** — The agent performs clicks, types, and scrolls to complete the goal
+4. **Repeat** — This loop continues until the task is complete
+
+Because Actor is optimized for speed, each step executes rapidly with minimal latency.
+
+## When to Use Actor
+
+Actor is ideal for:
+
+- **Immediate tasks** — When you need actions completed quickly
+- **Short-horizon workflows** — Tasks completed in under 20 steps
+- **Well-defined instructions** — Clear, step-by-step goals
+- **Real-time control** — CLI or desktop automation loops
+
+For complex, ambiguous tasks that require deeper reasoning, consider using `lux-thinker-1` instead.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Models Overview" icon="microchip" href="/models">
+    Learn when to use Actor vs Thinker vs TaskerAgent
+  </Card>
+  <Card title="Screenshot-Action Loop" icon="rotate" href="/concepts/screenshot-action-loop">
+    Understand how agents see and act on your screen
+  </Card>
+</CardGroup>

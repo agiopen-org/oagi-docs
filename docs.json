@@ -30,17 +30,17 @@
                 "group": "TaskerAgent",
                 "icon": "robot",
                 "pages": [
-                  "examples/cvs-appointment-booking",
-                  "examples/software-qa",
-                  "examples/amazon-data-crawling"
+                  "examples/tasker/cvs-appointment-booking",
+                  "examples/tasker/software-qa",
+                  "examples/tasker/amazon-data-crawling"
                 ]
               },
               {
                 "group": "Actor Agent",
                 "icon": "mouse",
                 "pages": [
-                  "examples/test1",
-                  "examples/test2"
+                  "examples/actor/aapl-insider-activity",
+                  "examples/actor/test2"
 
                 ]
               },
@@ -48,8 +48,8 @@
                 "group": "Thinker",
                 "icon": "lightbulb",
                 "pages": [
-                  "examples/test3",
-                  "examples/test4"
+                  "examples/thinker/apple-store-locator",
+                  "examples/thinker/delta-baggage-policy"
                 ]
               }
             ]
@@ -73,14 +73,6 @@
               "python-sdk/thinker",
               "python-sdk/handlers",
               "python-sdk/cli"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
             ]
           }
         ]

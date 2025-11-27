@@ -1,0 +1,76 @@
+---
+title: "Delta Baggage Policy"
+description: "Use lux-thinker-1 to find the baggage policy for international flights on Delta's website."
+icon: "suitcase"
+---
+
+# Delta Baggage Policy
+
+This example demonstrates how `lux-thinker-1` handles research tasks that require navigating complex websites and extracting specific information. With a single CLI command, the Thinker model will autonomously browse Delta's website and find the baggage policy for international flights.
+
+<div style={{ padding: "62.5% 0 0 0", position: "relative" }}>
+  <iframe
+    src="https://player.vimeo.com/video/1141162495?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
+    frameBorder="0"
+    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+    referrerPolicy="strict-origin-when-cross-origin"
+    style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+    title="OpenAGI - Delta Baggage Policy Thinker Example"
+  />
+</div>
+
+## Why Thinker?
+
+Finding baggage policies on airline websites is surprisingly complex:
+
+- **Buried information** — Policies are often nested deep within help sections or FAQs
+- **Context-dependent rules** — International vs domestic, cabin class, and route all affect the policy
+- **Dynamic content** — Airlines frequently update their policies and site structure
+
+`lux-thinker-1` excels at these research tasks where the exact navigation path isn't known upfront.
+
+## Run the Example
+
+All you need is a single CLI command:
+
+```bash
+oagi agent run "Find the baggage policy for international flights on Delta's website" --model lux-thinker-1
+```
+
+That's it. The Thinker model will:
+
+1. Open a browser and navigate to Delta's website
+2. Search for or navigate to the baggage information section
+3. Locate the international flight policies
+4. Extract and report the relevant baggage rules
+
+## What Happens Behind the Scenes
+
+When you invoke this command, the CLI triggers a workflow powered by `lux-thinker-1`:
+
+1. **Task interpretation** — The model parses your request and understands it needs to find international baggage rules specifically
+2. **Autonomous navigation** — It explores Delta's website, navigating through menus or using search to find the right page
+3. **Information extraction** — Once the policy page is found, it reads and summarizes the key details
+
+Because Thinker is designed for asynchronous, research-heavy tasks, it will take its time to ensure accuracy rather than rushing through steps.
+
+## When to Use Thinker
+
+This example is ideal for scenarios where:
+
+- The task requires **research and reasoning** rather than rote execution
+- You're not waiting for **immediate feedback** — Thinker runs asynchronously
+- The workflow is **ambiguous** and the exact steps depend on what the model discovers
+
+For faster, more deterministic tasks, consider using `lux-actor-1` with explicit step-by-step instructions instead.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Models Overview" icon="microchip" href="/models">
+    Learn when to use Thinker vs Actor vs TaskerAgent
+  </Card>
+  <Card title="Screenshot-Action Loop" icon="rotate" href="/concepts/screenshot-action-loop">
+    Understand how agents see and act on your screen
+  </Card>
+</CardGroup>
