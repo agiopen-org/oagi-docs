@@ -33,6 +33,22 @@ from oagi import PyautoguiActionHandler
 action_handler = PyautoguiActionHandler()
 ```
 
+## Configuration
+
+You can customize the behavior of the local action handler using `PyautoguiConfig`.
+
+### PyautoguiConfig Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `drag_duration` | Duration for drag operations (seconds) | `0.5` |
+| `scroll_amount` | Pixels to scroll per step | `30` |
+| `wait_duration` | Duration for wait actions (seconds) | `1.0` |
+| `action_pause` | Pause between actions (seconds) | `0.1` |
+| `hotkey_interval` | Interval between key presses | `0.1` |
+| `capslock_mode` | 'session' (internal state) or 'system' (OS-level) | `'session'` |
+| `macos_ctrl_to_cmd` | Auto-replace 'ctrl' with 'command' on macOS | `True` |
+
 ## Usage Example
 
 ```python

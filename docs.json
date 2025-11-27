@@ -20,7 +20,6 @@
               "quickstart",
               "agent",
               "models",
-              "authentication",
               "desktop-application"
             ]
           },
@@ -155,7 +154,7 @@
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://developer.agiopen.org/"
+      "href": "https://developer.agiopen.org/api-keys"
     }
   },
   "contextual": {
