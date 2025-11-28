@@ -1,0 +1,42 @@
+---
+title: "Overview"
+description: "Explore real-world examples using Actor, Thinker, and TaskerAgent."
+icon: "book-open"
+---
+
+# Examples Overview
+
+This section contains practical examples demonstrating the different ways to use Lux for computer automation. Each approach has distinct strengths depending on your use case.
+
+## When to Use Each
+
+| Approach | Best For | Trade-offs |
+|----------|----------|------------|
+| **Actor** | Fast UI control, short tasks (under 20 steps), real-time automation | Requires clear, step-by-step instructions |
+| **Thinker** | Research tasks, ambiguous goals, complex planning | Slower execution, best for async workflows |
+| **TaskerAgent** | Multi-step forms, structured workflows, repeatable processes | Requires defining todos upfront |
+
+## Actor Examples
+
+Use `lux-actor-1` when you need speed and have well-defined instructions:
+
+- [AAPL Insider Activity](/examples/actor/aapl-insider-activity) — Navigate NASDAQ to find insider trading data
+- [Healthcare.gov to Covered California](/examples/actor/healthcare-to-coveredca) — Multi-step navigation across government sites
+- [Nike Shopping](/examples/actor/nike-shopping) — E-commerce navigation with menus and product selection
+
+## Thinker Examples
+
+Use `lux-thinker-1` when the task requires research and reasoning:
+
+- [Apple Store Locator](/examples/thinker/apple-store-locator) — Find store hours for the nearest Apple Store
+- [Delta Baggage Policy](/examples/thinker/delta-baggage-policy) — Research baggage rules on complex airline sites
+- [Ibuprofen Side Effects](/examples/thinker/ibuprofen-side-effects) — Extract medical information from Drugs.com
+
+## TaskerAgent Examples
+
+Use `TaskerAgent` when you have structured, multi-step workflows:
+
+- [CVS Appointment Booking](/examples/tasker/cvs-appointment-booking) — Automate vaccine appointment scheduling
+- [Amazon Data Crawling](/examples/tasker/amazon-data-crawling) — Scrape product data with navigation and filters
+- [Software QA Workflows](/examples/tasker/software-qa) — Run automated UI testing tasks
+

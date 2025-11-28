@@ -26,6 +26,7 @@
           {
             "group": "Examples",
             "pages": [
+              "examples/overview",
               {
                 "group": "TaskerAgent",
                 "icon": "robot",
@@ -86,7 +87,6 @@
             "pages": [
               "tutorials/introduction",
               "tutorials/cvs-appointment-booking",
-              "tutorials/deploying-to-production"
             ]
           }
         ]
