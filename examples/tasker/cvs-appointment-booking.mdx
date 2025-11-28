@@ -1,20 +1,37 @@
 ---
-title: 'CSV Appointment Booking'
-description: 'Automate CVS appointment booking tasks'
-icon: 'calendar'
+title: "CVS Appointment Booking"
+description: "Use TaskerAgent to automate multi-step appointment booking on CVS.com."
+icon: "calendar"
 ---
 
-# Overview
+# CVS Appointment Booking
 
-This example distills the [full tutorial](../tutorials/cvs-appointment-booking) into the essentials:
+This example demonstrates how `TaskerAgent` handles complex, multi-step workflows that require form filling and navigation. With a Python script, the agent will autonomously navigate CVS.com, fill in patient details, and book a vaccine appointment.
 
-1. **Setup** – Install `oagi` with desktop extras, export `OAGI_API_KEY`, and create a `cvs_tasker.py` script beside a `results/` directory for HTML exports.
-2. **Inputs** – Use `argparse` to accept participant info (`--first_name`, `--email`, `--birthday`, `--zip_code`) and agent tuning knobs (`--model_name`, `--max_steps`, `--temperature`).
-3. **Automation stack** – Instantiate `AsyncPyautoguiActionHandler`, `AsyncScreenshotMaker`, and `AsyncAgentObserver`, then pass them into `TaskerAgent`.
-4. **Workflow definition** – Describe the CVS journey as a set of todos (navigate cvs.com, fill contact details, add vaccines, search by ZIP) plus a deliverable summarizing the appointment goal.
-5. **Execution + export** – Run `await tasker.execute(...)`, inspect `tasker.get_memory()` for statuses, and export the observer history to `results/<exp>/cvs_execution_history.html`.
+<div style={{ padding: "62.5% 0 0 0", position: "relative" }}>
+  <iframe
+    src="https://player.vimeo.com/video/1141277756?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
+    frameBorder="0"
+    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+    referrerPolicy="strict-origin-when-cross-origin"
+    style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+    title="OpenAGI - CVS Appointment Booking Tasker Example"
+  />
+</div>
 
-Run it with:
+## Why TaskerAgent?
+
+Booking a CVS appointment involves multiple challenges:
+
+- **Multi-step forms** — The booking flow spans several pages with different input types
+- **Dynamic validation** — Fields must be filled in the correct format and order
+- **Conditional logic** — Available appointments depend on location and vaccine type
+
+`TaskerAgent` excels at these structured workflows where you can define clear todos and deliverables.
+
+## Run the Example
+
+Create a `cvs_tasker.py` script and run it with your details:
 
 ```bash
 python cvs_tasker.py \
@@ -25,4 +42,42 @@ python cvs_tasker.py \
   --zip_code="00000"
 ```
 
-Use this summary when you need the gist quickly; jump to the tutorial for step-by-step explanations and rationale.
+The TaskerAgent will:
+
+1. Open a browser and navigate to CVS.com's vaccine scheduler
+2. Fill in contact and patient information
+3. Select the desired vaccine type
+4. Search for available appointments by ZIP code
+5. Complete the booking flow
+
+## What Happens Behind the Scenes
+
+When you run the script, the TaskerAgent orchestrates a complete workflow:
+
+1. **Workflow definition** — The agent receives a set of todos describing each step of the CVS journey
+2. **Action handling** — `AsyncPyautoguiActionHandler` translates agent decisions into mouse and keyboard actions
+3. **Visual feedback** — `AsyncScreenshotMaker` captures the screen so the agent can see what's happening
+4. **Execution tracking** — `AsyncAgentObserver` records the session for debugging and export
+
+The agent works through each todo, adapting to page changes and validation errors as needed.
+
+## When to Use TaskerAgent
+
+This example is ideal for scenarios where:
+
+- The task has **well-defined steps** that can be expressed as todos
+- You need **form automation** with multiple fields and pages
+- The workflow requires **structured deliverables** at the end
+
+For more open-ended research tasks, consider using `lux-thinker-1` instead.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Full Tutorial" icon="book" href="/tutorials/cvs-appointment-booking">
+    Step-by-step walkthrough with code explanations
+  </Card>
+  <Card title="Models Overview" icon="microchip" href="/models">
+    Learn when to use Thinker vs Actor vs TaskerAgent
+  </Card>
+</CardGroup>
