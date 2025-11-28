@@ -86,7 +86,9 @@
             "group": "Tutorials",
             "pages": [
               "tutorials/introduction",
-              "tutorials/cvs-appointment-booking"
+              "tutorials/cvs-appointment-booking",
+              "tutorials/software-qa",
+              "tutorials/amazon-data-crawling"
             ]
           }
         ]
