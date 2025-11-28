@@ -8,6 +8,15 @@ icon: 'window-maximize'
 
 The OpenAGI Desktop Application is a developer tool that lets you instantly test and visualize your agents without building a client from scratch.
 
+<CardGroup cols={2}>
+  <Card title="Source Code" icon="github" href="https://github.com/agiopen-org/desktop-application">
+    View the open-source desktop client on GitHub
+  </Card>
+  <Card title="Design System" icon="figma" href="https://figma.com/">
+    Explore the Figma design system (coming soon)
+  </Card>
+</CardGroup>
+
 It serves two main purposes:
 1.  **Visual Playground:** A zero-setup way to see what the model sees and watch it control your computer.
 2.  **Reference Implementation:** A concrete example of how a client should interact with the [OpenAGI Server](/concepts/server-architecture).
@@ -77,6 +86,10 @@ Try a simple example with the Actor model:
 Open the Calculator
 ```
 
+<Danger>
+  In this example, the Calculator app is **in the dock** and the icon is **large enough** for the agent to see. Make sure target elements are visible and reasonably sized for best results.
+</Danger>
+
 <div style={{ padding: "62.5% 0 0 0", position: "relative" }}>
   <iframe
     src="https://player.vimeo.com/video/1141313481?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
@@ -88,12 +101,12 @@ Open the Calculator
   />
 </div>
 
-## Building Your Own
+## Learn More
 
-The Desktop Application is just one example of a client. If you want to build a custom computer-use product (like a headless background worker or a specialized browser agent), you can build your own client that speaks the same protocol.
+To understand how the Desktop Application communicates with the OAGI server—and how you can configure or extend the server for your own workflows—check out the Server Architecture guide.
 
 <CardGroup cols={1}>
-  <Card title="Server Architecture" icon="server" href="/server-architecture">
-    Learn how to set up and run the OAGI server for remote automation.
+  <Card title="Server Architecture" icon="server" href="/concepts/server-architecture">
+    Learn how the OAGI server works and explore configuration options.
   </Card>
 </CardGroup>
