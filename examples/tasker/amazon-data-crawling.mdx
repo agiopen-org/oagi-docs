@@ -1,4 +1,85 @@
-title: 'Amazon Data Crawling'
-description: 'Automate software quality assurance tasks'
-icon: 'spider'
 ---
+title: "Amazon Data Crawling"
+description: "Use TaskerAgent to scrape top-selling product data from Amazon."
+icon: "spider"
+---
+
+# Scraping Data with TaskerAgent 
+
+This example demonstrates how `TaskerAgent` handles web scraping workflows that require navigation and data extraction. With a Python script, the agent will autonomously search Amazon, sort by best sellers, and collect product information.
+
+<div style={{ padding: "62.5% 0 0 0", position: "relative" }}>
+  <iframe
+    src="https://player.vimeo.com/video/1141284228?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
+    frameBorder="0"
+    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+    referrerPolicy="strict-origin-when-cross-origin"
+    style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+    title="OpenAGI - Amazon Data Crawling Tasker Example"
+  />
+</div>
+
+## Why TaskerAgent?
+
+Scraping product data from Amazon involves several challenges:
+
+- **Dynamic content** — Product listings load dynamically and change frequently
+- **Multi-step navigation** — Requires searching, sorting, and extracting data across pages
+- **UI interactions** — Dropdowns and filters need precise clicking
+
+`TaskerAgent` excels at these structured workflows where you can define clear todos and let the agent handle the execution.
+
+## Run the Example
+
+Create an `amazon_scraping.py` script and run it with your product:
+
+```bash
+python amazon_scraping.py --product_name "wireless headphones" --exp_name amazon
+```
+
+The TaskerAgent will:
+
+1. Open a new browser tab and navigate to Amazon
+2. Search for the specified product
+3. Sort results by "Best Sellers"
+4. Extract information about top-selling items
+
+## The Workflow
+
+The workflow is defined with a simple instruction and todo list:
+
+```python
+instruction = f"Find the information about the top-selling {args.product_name} on Amazon"
+todos = [
+    f"Open a new tab, go to www.amazon.com, and search for {args.product_name} in the search bar",
+    f"Click on 'Sort by' in the top right of the page and select 'Best Sellers'",
+]
+```
+
+## Prompting Tips
+
+This example highlights two important prompting techniques:
+
+- **Specify UI locations** — `"Click on 'Sort by' in the top right of the page"` helps the agent locate elements reliably
+- **Open new tabs** — `"Open a new tab"` prevents the agent from interfering with your existing browser sessions
+
+## When to Use TaskerAgent
+
+This example is ideal for scenarios where:
+
+- The task has **well-defined steps** that can be expressed as todos
+- You need **web scraping** with navigation and interaction
+- The workflow benefits from **explicit location hints** in prompts
+
+For more open-ended research tasks, consider using `lux-thinker-1` instead.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Models Overview" icon="microchip" href="/models">
+    Learn when to use Thinker vs Actor vs TaskerAgent
+  </Card>
+  <Card title="Best Practices" icon="lightbulb" href="/guides/best-practices">
+    Tips for writing effective agent prompts
+  </Card>
+</CardGroup>

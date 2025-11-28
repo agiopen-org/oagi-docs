@@ -1,0 +1,76 @@
+---
+title: "Ibuprofen Side Effects"
+description: "Use lux-thinker-1 to research side effects of ibuprofen on Drugs.com."
+icon: "user-doctor"
+---
+
+# Find Ibuprofen Side Effects with Thinker
+
+This example demonstrates how `lux-thinker-1` handles medical research tasks that require navigating complex health information websites. With a single CLI command, the Thinker model will autonomously browse Drugs.com and extract the side effects of ibuprofen.
+
+<div style={{ padding: "62.5% 0 0 0", position: "relative" }}>
+  <iframe
+    src="https://player.vimeo.com/video/1141281817?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
+    frameBorder="0"
+    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+    referrerPolicy="strict-origin-when-cross-origin"
+    style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+    title="OpenAGI - Ibuprofen Side Effects Thinker Example"
+  />
+</div>
+
+## Why Thinker?
+
+Researching drug side effects on medical websites presents unique challenges:
+
+- **Dense information** — Medical pages contain extensive lists of side effects organized by severity and frequency
+- **Complex navigation** — Information may be spread across multiple tabs or sections
+- **Context-sensitive content** — Side effects vary by dosage, age group, and medical conditions
+
+`lux-thinker-1` excels at these research tasks where careful reading and synthesis are required.
+
+## Run the Example
+
+All you need is a single CLI command:
+
+```bash
+oagi agent run "Find the side effects of ibuprofen on Drugs.com" --model lux-thinker-1
+```
+
+That's it. The Thinker model will:
+
+1. Open a browser and navigate to Drugs.com
+2. Search for ibuprofen or navigate to its drug page
+3. Locate the side effects section
+4. Extract and summarize the key side effects
+
+## What Happens Behind the Scenes
+
+When you invoke this command, the CLI triggers a workflow powered by `lux-thinker-1`:
+
+1. **Task interpretation** — The model understands it needs to find side effect information specifically from Drugs.com
+2. **Autonomous navigation** — It explores the website, using search or menus to find the ibuprofen page
+3. **Information extraction** — Once the side effects section is found, it reads and organizes the information by severity
+
+Because Thinker is designed for asynchronous, research-heavy tasks, it will take its time to ensure accuracy rather than rushing through steps.
+
+## When to Use Thinker
+
+This example is ideal for scenarios where:
+
+- The task requires **research and reasoning** rather than rote execution
+- You're not waiting for **immediate feedback** — Thinker runs asynchronously
+- The workflow is **ambiguous** and the exact steps depend on what the model discovers
+
+For faster, more deterministic tasks, consider using `lux-actor-1` with explicit step-by-step instructions instead.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Models Overview" icon="microchip" href="/models">
+    Learn when to use Thinker vs Actor vs TaskerAgent
+  </Card>
+  <Card title="Screenshot-Action Loop" icon="rotate" href="/concepts/screenshot-action-loop">
+    Understand how agents see and act on your screen
+  </Card>
+</CardGroup>

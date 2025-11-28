@@ -61,6 +61,18 @@
               "concepts/action-handler",
               "concepts/server-architecture"
             ]
+          },
+          {
+            "group": "Python SDK Usage",
+            "pages": [
+              "python-sdk/installation",
+              "python-sdk/actor",
+              "python-sdk/agents",
+              "python-sdk/tasker",
+              "python-sdk/thinker",
+              "python-sdk/handlers",
+              "python-sdk/cli"
+            ]
           }
         ]
       },
@@ -85,6 +97,25 @@
               "tutorials/introduction",
               "tutorials/cvs-appointment-booking",
               "tutorials/deploying-to-production"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/introduction"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api-reference/endpoint/generate",
+              "api-reference/endpoint/file-upload",
+              "api-reference/endpoint/message"
             ]
           }
         ]

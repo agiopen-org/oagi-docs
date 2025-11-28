@@ -1,4 +1,66 @@
-title: 'Software QA'
-description: 'Automate software quality assurance tasks'
-icon: 'bug'
-----
+---
+title: "Software QA"
+description: "Use TaskerAgent to automate software quality assurance workflows."
+icon: "bug"
+---
+
+# Running developer QA tasks with TaskerAgent
+
+This example demonstrates how `TaskerAgent` can run developer QA workflows, automating repetitive testing tasks that would otherwise require manual interaction. The agent navigates applications, performs test actions, and validates expected behaviors.
+
+<div style={{ padding: "56.25% 0 0 0", position: "relative" }}>
+  <iframe
+    src="https://player.vimeo.com/video/1141285812?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
+    frameBorder="0"
+    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+    referrerPolicy="strict-origin-when-cross-origin"
+    style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+    title="OpenAGI - Software QA Workflow Tasker Example"
+  />
+</div>
+
+## Why TaskerAgent?
+
+Software QA automation presents unique challenges:
+
+- **UI-driven testing** — Many applications require clicking through interfaces rather than API calls
+- **Multi-step workflows** — Test scenarios often span multiple screens and states
+- **Visual validation** — Some checks require seeing what's on screen, not just parsing data
+
+`TaskerAgent` excels at these workflows where you can define test steps as todos and let the agent execute them systematically.
+
+## Run the Example
+
+Create a QA script and run it against your application:
+
+```bash
+python software_qa.py --app_name "MyApp" --test_suite "smoke"
+```
+
+The TaskerAgent will:
+
+1. Launch or navigate to the target application
+2. Execute each test step defined in your todos
+3. Capture screenshots at key checkpoints
+4. Report pass/fail status for each todo
+
+## When to Use TaskerAgent
+
+This example is ideal for scenarios where:
+
+- You need **UI-level testing** that can't be done via APIs alone
+- The workflow has **well-defined test steps** that can be expressed as todos
+- You want **visual verification** of application state
+
+For exploratory testing or ambiguous scenarios, consider using `lux-thinker-1` instead.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Models Overview" icon="microchip" href="/models">
+    Learn when to use Thinker vs Actor vs TaskerAgent
+  </Card>
+  <Card title="Best Practices" icon="lightbulb" href="/guides/best-practices">
+    Tips for writing effective agent prompts
+  </Card>
+</CardGroup>
