@@ -48,6 +48,10 @@ oagi agent permissions
 3. Click **Create an API Key**, give it a descriptive name in the modal, then create it.
 4. Copy the generated value (keys start with `sk-`) and store it securely—treat it like a password.
 
+<Note>
+  **Free credits** — New users receive $10 in inference credits upon registration. This is enough to run dozens of agent sessions while you explore the platform.
+</Note>
+
 #### Configure your environment:
 
 ```bash
@@ -98,6 +102,17 @@ Launch a Lux computer-use agent with a single command:
 oagi agent run "Go to https://agiopen.org" --model "lux-actor-1"
 ```
 
+<div style={{ padding: "62.5% 0 0 0", position: "relative" }}>
+  <iframe
+    src="https://player.vimeo.com/video/1141306440?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
+    frameBorder="0"
+    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+    referrerPolicy="strict-origin-when-cross-origin"
+    style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+    title="OpenAGI - Quickstart with Actor"
+  />
+</div>
+
 **What happens next:**
 - The agent takes a screenshot of your current screen
 - Lux analyzes the visual interface and predict the keyboard and mouse actions
@@ -147,5 +162,5 @@ Now that you have your first agent running, explore these capabilities:
 </AccordionGroup>
 
 <Note>
-  **Need help?** Check our [Python SDK documentation](/python-sdk/installation) or explore [core concepts](/concepts/actors) to understand how computer-use agents work.
+  **What's next?** Explore [OpenAGI Models](/models) to learn when to use Actor, Thinker, or TaskerAgent.
 </Note>

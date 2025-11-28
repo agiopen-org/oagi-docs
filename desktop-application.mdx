@@ -4,13 +4,13 @@ description: 'A ready-to-use client for testing and visualizing OpenAGI agents'
 icon: 'window-maximize'
 ---
 
-# Desktop Application
+# Use the Desktop Application for Prototyping
 
 The OpenAGI Desktop Application is a developer tool that lets you instantly test and visualize your agents without building a client from scratch.
 
 It serves two main purposes:
 1.  **Visual Playground:** A zero-setup way to see what the model sees and watch it control your computer.
-2.  **Reference Implementation:** A concrete example of how a client should interact with the [OpenAGI Server](/server-architecture).
+2.  **Reference Implementation:** A concrete example of how a client should interact with the [OpenAGI Server](/concepts/server-architecture).
 
 ![Desktop Application](/images/desktop-application.png)
 
@@ -21,15 +21,27 @@ It serves two main purposes:
 *   **Debug Capabilities:** View raw logs and segment data to understand why an agent succeeded or failed.
 *   **Cross-Platform:** Available for both macOS and Windows.
 
+## Agent Modes
+
+The Desktop Application supports three agent modes, each optimized for different use cases:
+
+- **Actor** — Fast, responsive execution for well-defined tasks (under 20 steps)
+- **Thinker** — Deep reasoning for ambiguous research and complex planning
+- **Tasker** — Structured multi-step workflows with todo management
+
+Switch between modes using the dropdown in the application interface:
+
+![Desktop Application Modes](/images/desktop-application-modes.png)
+
 ## Getting Started
 
 ### 1. Download the App
 
 <CardGroup cols={2}>
-  <Card title="Download for macOS" icon="apple" href="#">
+  <Card title="Download for macOS" icon="apple" href="https://lux-app-release.s3.us-west-2.amazonaws.com/lux-desktop_0.1.0_universal.app.zip">
     Universal Binary (Intel & Apple Silicon)
   </Card>
-  <Card title="Download for Windows" icon="windows" href="#">
+  <Card title="Download for Windows" icon="windows" href="https://lux-app-release.s3.us-west-2.amazonaws.com/lux-desktop_0.1.0_x64-setup.exe.zip">
     Windows 10/11 (x64)
   </Card>
 </CardGroup>
@@ -55,7 +67,26 @@ Open the desktop application and enter your server URL (default: `http://0.0.0.0
 
 ![Set Server URL](/images/set_server_url.png)
 
+### 4. Send a Prompt
 
+Once connected, you can type prompts directly into the application. The agent will execute your instructions in real-time on your desktop.
+
+Try a simple example with the Actor model:
+
+```
+Open the Calculator
+```
+
+<div style={{ padding: "62.5% 0 0 0", position: "relative" }}>
+  <iframe
+    src="https://player.vimeo.com/video/1141313481?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
+    frameBorder="0"
+    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+    referrerPolicy="strict-origin-when-cross-origin"
+    style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+    title="OpenAGI - Desktop Application Demo"
+  />
+</div>
 
 ## Building Your Own
 
