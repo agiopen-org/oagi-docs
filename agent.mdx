@@ -60,7 +60,7 @@ This is the expected behavior if you run the above with the correct desktop setu
 
 <div style={{ padding: "62.62% 0 0 0", position: "relative" }}>
   <iframe
-    src="https://player.vimeo.com/video/1140801936?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
+    src="https://player.vimeo.com/video/1141444797?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
     frameBorder="0"
     allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
     referrerPolicy="strict-origin-when-cross-origin"
@@ -87,6 +87,14 @@ To get the best results from TaskerAgent, it helps to understand how it plans an
 
 ## Next steps
 
+This guide just scratches the surface. OpenAGI offers multiple models—each optimized for different use cases. Learn more on the [Models](/models) page.
+
+Beyond TaskerAgent, you can use:
+- **Actor** (`lux-actor-1`) — Fast, deterministic execution for well-defined tasks
+- **Thinker** (`lux-thinker-1`) — Autonomous reasoning for ambiguous, open-ended goals
+
+Explore more examples below:
+
 <CardGroup cols={3}>
   <Card title="CVS Appointment Booking" icon="calendar" href="/examples/tasker/cvs-appointment-booking">
     Multi-step desktop automation that books a vaccination slot with TaskerAgent
@@ -96,5 +104,16 @@ To get the best results from TaskerAgent, it helps to understand how it plans an
   </Card>
   <Card title="Software QA Smoke Test" icon="check-circle" href="/examples/tasker/software-qa">
     Run browser QA steps, capture screenshots, and export observer transcripts
+  </Card>
+</CardGroup>
+
+If you're ready to try out the Actor or Thinker directly, check out some of these examples here: 
+
+<CardGroup cols={2}>
+  <Card title="Apple Store Locator" icon="location-dot" href="/examples/thinker/apple-store-locator">
+    **Thinker** — Autonomously research store hours using open-ended reasoning
+  </Card>
+  <Card title="Nike Shopping" icon="bag-shopping" href="/examples/actor/nike-shopping">
+    **Actor** — Fast, deterministic product search and navigation
   </Card>
 </CardGroup>
