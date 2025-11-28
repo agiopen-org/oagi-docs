@@ -20,7 +20,7 @@ This example demonstrates how `TaskerAgent` can run developer QA workflows, auto
 </div>
 
 <Danger>
-  **Before you run:** To run this example correctly, you first need to set up Nuclear the open source project and ensure that it is visible to the OAGI Agent.
+  **Before you run:** To run this example correctly, **you first need to set up Nuclear**, the open source project and ensure that it is visible to the OAGI Agent.
 </Danger>
 
 <Tip>Want the full code? Check out the [step-by-step tutorial](/tutorials/software-qa) for complete implementation details, or clone the [sample repository](https://github.com/agiopen-org/oagi-lux-samples).</Tip>
@@ -37,10 +37,12 @@ Software QA automation presents unique challenges:
 
 ## Run the Example
 
-Create a QA script and run it against your application:
+Clone the sample repository and run the script:
 
 ```bash
-python software_qa.py
+git clone https://github.com/agiopen-org/oagi-lux-samples.git
+cd oagi-lux-samples
+python tasker_examples/software_qa_with_nuclear/software_qa.py
 ```
 
 The TaskerAgent will:
