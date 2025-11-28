@@ -15,6 +15,10 @@ Build a TaskerAgent that automates product research on Amazon—navigating to th
 - Execution summary with todo status tracking
 - HTML execution history for debugging
 
+<Card title="Source Code" icon="github" href="https://github.com/agiopen-org/oagi-lux-samples">
+  Clone the sample repository to get the complete source code for this tutorial.
+</Card>
+
 ## Prerequisites
 
 1. **OAGI credentials** – Generate an API key at [developer.openagi.org](https://developer.openagi.org/) and export it in your shell:
@@ -30,16 +34,20 @@ Build a TaskerAgent that automates product research on Amazon—navigating to th
 
 ## Project Layout
 
-Create a project folder with:
-
-- `amazon_crawler.py` – main script
-- `results/` – destination for HTML execution history
+If you cloned the [sample repository](https://github.com/agiopen-org/oagi-lux-samples), the source code is already available at:
 
 ```
-amazon-crawler/
-├── amazon_crawler.py
-└── results/
+tasker_examples/amazon_scraping/
+├── amazon_scraping.py
 ```
+
+Once you have a browser open, you can execute the script directly:
+
+```bash
+python tasker_examples/amazon_scraping/amazon_scraping.py
+```
+
+Or if you're following along, create your own file `amazon_scraping.py`:
 
 ## Tutorial Roadmap
 

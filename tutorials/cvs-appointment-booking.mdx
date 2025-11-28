@@ -19,6 +19,10 @@ Automate a multi-step CVS vaccination appointment with the OAGI Python SDK. We'l
 - Select vaccines, provide a ZIP code, and submit a search for nearby appointments
 - Export a full HTML run history for auditing or support tickets
 
+<Card title="Source Code" icon="github" href="https://github.com/agiopen-org/oagi-lux-samples">
+  Clone the sample repository to get the complete source code for this tutorial.
+</Card>
+
 ## Prerequisites
 
 1. **OAGI credentials** – Generate an API key at [developer.openagi.org](https://developer.openagi.org/) and export it in your shell:
@@ -36,16 +40,20 @@ Automate a multi-step CVS vaccination appointment with the OAGI Python SDK. We'l
 
 ## Project Layout
 
-Create a `tutorials/cvs` folder with:
-
-- `cvs_tasker.py` – main script
-- `results/` – destination for exported HTML transcripts
+If you cloned the [sample repository](https://github.com/agiopen-org/oagi-lux-samples), the source code is already available at:
 
 ```
-tutorials/cvs/
+tasker_examples/cvs_appointment_booking/
 ├── cvs_tasker.py
-└── results/
 ```
+
+Once you have a browser open, you can execute the script directly:
+
+```bash
+python tasker_examples/cvs_appointment_booking/cvs_tasker.py
+```
+
+Or if you're following along, create your own file `cvs_tasker.py`:
 
 ## Tutorial Roadmap
 

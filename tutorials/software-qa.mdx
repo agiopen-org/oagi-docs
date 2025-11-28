@@ -14,6 +14,10 @@ Build a TaskerAgent that automates UI testing by clicking through every sidebar 
 - Execution summary with todo status tracking
 - HTML execution history for debugging and compliance
 
+<Card title="Source Code" icon="github" href="https://github.com/agiopen-org/oagi-lux-samples">
+  Clone the sample repository to get the complete source code for this tutorial.
+</Card>
+
 ## Prerequisites
 
 1. **OAGI credentials** – Generate an API key at [developer.openagi.org](https://developer.openagi.org/) and export it in your shell:
@@ -35,18 +39,20 @@ Build a TaskerAgent that automates UI testing by clicking through every sidebar 
 
 ## Project Layout
 
-Create a project folder with:
-
-- `nuclear_qa.py` – main script
-- `results/` – destination for HTML execution history
+If you cloned the [sample repository](https://github.com/agiopen-org/oagi-lux-samples), the source code is already available at:
 
 ```
-nuclear-qa/
-├── nuclear_qa.py
-└── results/
+tasker_examples/software_qa_with_nuclear/
+├── software_qa.py
 ```
 
-## Tutorial Roadmap
+Once you have Nuclear running, you can execute the script directly:
+
+```bash
+python tasker_examples/software_qa_with_nuclear/software_qa.py
+```
+
+Or if you're following along, create your own file `nuclear_qa.py`:
 
 We'll assemble the script in five steps:
 
