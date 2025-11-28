@@ -39,7 +39,9 @@
                 "group": "Actor Agent",
                 "icon": "mouse",
                 "pages": [
-                  "examples/actor/aapl-insider-activity"
+                  "examples/actor/aapl-insider-activity",
+                  "examples/actor/healthcare-to-coveredca",
+                  "examples/actor/nike-shopping"
                 ]
               },
               {
