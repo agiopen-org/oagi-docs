@@ -6,7 +6,7 @@ icon: 'window-maximize'
 
 # Use the Desktop Application for Prototyping
 
-The OpenAGI Desktop Application is a developer tool that lets you instantly test and visualize your agents without building a client from scratch.
+The OpenAGI Desktop Application is a developer tool that lets you instantly test and visualize your agents without building a client from scratch. It's **open source** and available for both macOS and Windows. Our Design System is also available for you to build on top of!
 
 <CardGroup cols={2}>
   <Card title="Source Code" icon="github" href="https://github.com/agiopen-org/desktop-application">
@@ -36,11 +36,15 @@ The Desktop Application supports three agent modes, each optimized for different
 
 - **Actor** — Fast, responsive execution for well-defined tasks (under 20 steps)
 - **Thinker** — Deep reasoning for ambiguous research and complex planning
-- **Tasker** — Structured multi-step workflows with todo management
+- **Tasker** — Structured workflows with todo management defined on the server
 
 Switch between modes using the dropdown in the application interface:
 
 ![Desktop Application Modes](/images/desktop-application-modes.png)
+
+<Warning>
+It's not possible to define a Tasker agent workflow in the desktop application. The desktop application is a visual playground for Actors and Thinkers. You'll soon be able to add Tasker agents to the desktop application by creating your own OAGI Server.
+</Warning>
 
 ## Getting Started
 
