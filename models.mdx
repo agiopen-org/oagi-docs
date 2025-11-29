@@ -141,15 +141,10 @@ Here's what the run will look like with the correct desktop setup.
 - Non-obvious action sequences
 - Brittle or complex workflows
 - Scenarios where errors are costly
-- **Complex Examples:**
+- **Additional Examples:**
     - "Search for the top 3 coffee shops in Tokyo and save their names to a text editor"
     - "Look up the store hours for the nearest Apple Store to zip code 23456"
     - "Find the baggage policy for international flights on Delta's website"
-
-<Warning>
-**Avoid using Thinker with TaskerAgent for simple execution loops.**
-The `TaskerAgent` adds its own layer of reflection and planning. Combining this with `lux-thinker-1` (which also plans) can result in extremely slow execution times and redundant reasoning. Use `lux-thinker-1` for vague, complex goals, requiring hour-long executions.
-</Warning>
 
 ### Usage in CLI and Custom Apps
 
@@ -192,16 +187,27 @@ oagi agent run "Search for the top 3 coffee shops in Tokyo and save their names 
 - Use reasonable screen resolution and scaling so targets are visible
 - Provide explicit instructions rather than vague ones
 
-## Next Steps
+## Try out more examples with the TaskerAgent
 
 <CardGroup cols={3}>
-  <Card title="Software QA" icon="bug" href="/examples/tasker/software-qa">
-    Automate testing workflows
+  <Card title="CVS Appointment Booking" icon="calendar" href="/examples/tasker/cvs-appointment-booking">
+    Multi-step desktop automation that books a vaccination slot with TaskerAgent
   </Card>
-  <Card title="Data Crawling" icon="spider" href="/examples/tasker/amazon-data-crawling">
-    Extract data from complex sites
+  <Card title="Amazon Data Crawling" icon="shopping-cart" href="/examples/tasker/amazon-data-crawling">
+    Scrape Amazon listings into structured datasets for downstream analysis
   </Card>
-  <Card title="Appointment Booking" icon="calendar" href="/examples/tasker/cvs-appointment-booking">
-    Handle multi-step booking flows
+  <Card title="Software QA Smoke Test" icon="check-circle" href="/examples/tasker/software-qa">
+    Run browser QA steps, capture screenshots, and export observer transcripts
+  </Card>
+</CardGroup>
+
+Here are some addition examples using the Actor or Thinker directly:
+
+<CardGroup cols={2}>
+  <Card title="Apple Store Locator" icon="location-dot" href="/examples/thinker/apple-store-locator">
+    **Thinker** — Autonomously research store hours using open-ended reasoning
+  </Card>
+  <Card title="Nike Shopping" icon="bag-shopping" href="/examples/actor/nike-shopping">
+    **Actor** — Fast, deterministic product search and navigation
   </Card>
 </CardGroup>
