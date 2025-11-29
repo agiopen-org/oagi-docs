@@ -49,4 +49,4 @@ When contributing to the documentation:
 ### Resources
 - [OpenAGI Platform](https://agiopen.org)
 - [Mintlify documentation](https://mintlify.com/docs)
-- [Support](mailto:support@agiopen.org)
+- [Support](mailto:contact@agiopen.org)
