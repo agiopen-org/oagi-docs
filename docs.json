@@ -37,7 +37,7 @@
                 ]
               },
               {
-                "group": "Actor Agent",
+                "group": "Actor",
                 "icon": "mouse",
                 "pages": [
                   "examples/actor/aapl-insider-activity",
