@@ -288,7 +288,7 @@ action_handler = AsyncPyautoguiActionHandler(action_config)
 image_provider = AsyncScreenshotMaker(image_config)
 
 # Use with agent
-agent = AsyncDefaultAgent(api_key="key")
+agent = AsyncDefaultAgent()
 success = await agent.execute(
     "Complete task",
     action_handler,

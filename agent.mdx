@@ -34,7 +34,7 @@ from oagi import AsyncPyautoguiActionHandler
 from oagi import TaskerAgent
 
 async def main():
-    agent = TaskerAgent(api_key="YOUR_KEY", model="lux-actor-1")
+    agent = TaskerAgent(model="lux-actor-1")
 
     agent.set_task(
         task="Use chase to calculate mortgage payments",
