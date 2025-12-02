@@ -62,6 +62,7 @@
               "concepts/screenshot-action-loop",
               "concepts/screenshot-provider",
               "concepts/action-handler",
+              "concepts/execution-report",
               "concepts/server-architecture"
             ]
           }
