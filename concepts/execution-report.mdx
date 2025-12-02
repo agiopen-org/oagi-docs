@@ -32,6 +32,12 @@ oagi agent run "<your-task>" --model lux-actor-1 --export json
 
 This produces an `execution_report.<format>` file in your working directory.
 
+To customize the output filename, use the `--export-file` argument:
+
+```bash
+oagi agent run "<your-task>" --model lux-actor-1 --export html --export-file my-report.html
+```
+
 ## Report Structure
 
 The execution report is organized around **todos** (high-level tasks) and **steps** (individual actions within each todo).
