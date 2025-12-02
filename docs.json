@@ -98,6 +98,11 @@
     "global": {
       "anchors": [
         {
+          "anchor": "Discord",
+          "href": "https://discord.gg/PVAtX8PzxK",
+          "icon": "discord"
+        },
+        {
           "anchor": "Blog",
           "href": "https://agiopen.org/blog",
           "icon": "newspaper"
@@ -136,6 +141,7 @@
   },
   "footer": {
     "socials": {
+      "discord": "https://discord.gg/PVAtX8PzxK",
       "x": "https://x.com/openagi",
       "github": "https://github.com/agiopen-org",
       "linkedin": "https://linkedin.com/company/agiopen-org"
