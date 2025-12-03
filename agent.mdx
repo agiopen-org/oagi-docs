@@ -58,17 +58,10 @@ asyncio.run(main())
 
 This is the expected behavior if you run the above with the correct desktop setup.
 
-<div style={{ padding: "62.62% 0 0 0", position: "relative" }}>
-  <iframe
-    src="https://player.vimeo.com/video/1141444797?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
-    frameBorder="0"
-    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-    referrerPolicy="strict-origin-when-cross-origin"
-    style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
-    title="OpenAGI - Chase Mortgage Calculator Example"
-  />
-</div>
-
+<Vimeo
+  src="https://player.vimeo.com/video/1141444797?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
+  title="OpenAGI - Chase Mortgage Calculator Example"
+/>
 
 
 That’s it: behind the scenes, TaskerAgent talks to lux-actor-1 for you, keeps a PlannerMemory of todos, and routes every action to your client-side handler.
