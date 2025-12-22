@@ -1,0 +1,49 @@
+---
+title: 'Using Agents'
+description: 'High-level automation by managing the entire task execution workflow'
+icon: 'user-hat-tie'
+---
+
+# Using Agents
+
+Agents provide high-level automation by managing the entire task execution workflow. Unlike Actors, which require manual step management, Agents handle the complete automation process from start to finish.
+
+## DefaultAgent
+
+Run tasks automatically with screenshot capture and action execution:
+
+```typescript
+import { DefaultActionHandler, DefaultAgent, ScreenshotMaker } from '@oagi/oagi';
+
+async function main() {
+  const agent = new DefaultAgent();
+
+  await agent.execute(
+    'Search weather on Google',
+    new DefaultActionHandler(),
+    new ScreenshotMaker(),
+  );
+};
+
+main();
+```
+
+## Agent vs Actor
+
+| Feature | Actor | Agent |
+|---------|-------|-------|
+| **Control Level** | Fine-grained | High-level |
+| **Setup Complexity** | Manual loop | Moderate |
+| **Customization** | Full | Configurable |
+| **Best For** | Custom logic and tooling | Production workflows |
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Actors" icon="person" href="/ts-sdk/actor">
+    Learn about fine-grained control with Actors.
+  </Card>
+  <Card title="CLI" icon="terminal" href="/ts-sdk/cli">
+    Run agents directly from your terminal.
+  </Card>
+</CardGroup>

@@ -1,0 +1,63 @@
+---
+title: 'Installation'
+description: 'Install and set up the OAGI TypeScript SDK'
+icon: 'code'
+---
+
+# Installation
+
+## Install the package
+
+```bash
+# If you are using Node.js
+npm install @oagi/oagi
+yarn add @oagi/oagi
+pnpm add @oagi/oagi
+
+# If you are using Deno
+deno add npm:@oagi/oagi
+
+# If you are using Bun
+bun install @oagi/oagi
+```
+
+## Requirements
+
+- Node.js (or Bun/Deno) on macOS, Windows, or Linux
+- For local computer-use execution: Accessibility + Screen Recording permissions (macOS)
+
+## Setup
+
+### 1. Get an API key
+
+Get your API key from the OpenAGI Developer Platform.
+
+### 2. Set credentials
+
+**Environment variables (recommended):**
+
+```bash
+export OAGI_API_KEY=sk-...
+export OAGI_BASE_URL=https://api.agiopen.org
+```
+
+### 3. Verify installation
+
+```bash
+# Verify the CLI is available
+npx oagi version
+
+# Check permissions (macOS)
+npx oagi agent permission
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Agents" icon="user-hat-tie" href="/ts-sdk/agents">
+    Run a complete task with a high-level agent.
+  </Card>
+  <Card title="Actors" icon="person" href="/ts-sdk/actor">
+    Take fine-grained control over step-by-step execution.
+  </Card>
+</CardGroup>

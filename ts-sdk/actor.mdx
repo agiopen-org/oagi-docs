@@ -1,0 +1,57 @@
+---
+title: 'Working with Actors'
+description: 'Fine-grained control over task execution with manual step management'
+icon: 'person'
+---
+
+# Actors
+
+Actors provide fine-grained control over task execution, allowing you to manage each step manually. Unlike higher-level agents, Actors give you complete control over the execution loop.
+
+## Basic Actor Usage
+
+For step-by-step control over task execution:
+
+```typescript
+import { Actor, DefaultActionHandler, ScreenshotMaker } from '@oagi/oagi';
+
+async function main() {
+  const actor = new Actor();
+  await actor.initTask('Complete the form');
+
+  const imageProvider = new ScreenshotMaker();
+  const actionHandler = new DefaultActionHandler();
+
+  for (let i = 0; i < 10; ++i) {
+    const image = await imageProvider.provide();
+    const step = await actor.step(image);
+
+    if (step.stop) break;
+
+    await actionHandler.handle(step.actions);
+  }
+};
+
+main();
+```
+
+## Actor Execution Flow
+
+1. **Initialize** - Create actor and set task description
+2. **Capture** - Take a screenshot of the current state
+3. **Analyze** - Send screenshot to the model for analysis
+4. **Receive** - Get the next `step` containing reasoning and actions
+5. **Check** - Stop if the task is complete
+6. **Execute** - Run the returned actions
+7. **Repeat** - Continue until completion or `maxSteps`
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Agents" icon="user-hat-tie" href="/ts-sdk/agents">
+    Explore higher-level agent abstractions that manage the full loop for you.
+  </Card>
+  <Card title="CLI" icon="terminal" href="/ts-sdk/cli">
+    Run agents directly from your terminal.
+  </Card>
+</CardGroup>

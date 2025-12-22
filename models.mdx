@@ -55,6 +55,7 @@ The `DefaultAgent` provides a simple loop for executing direct instructions with
 **Before running**: Ensure your desktop is set up properly. Open a browser to a blank page with minimal tabs, close other applications to avoid overlapping windows, and keep the desktop uncluttered. The agent "sees" your screen just like you do—a clean environment improves accuracy.
 </Note>
 
+<CodeGroup>
 ```python
 import asyncio
 
@@ -74,6 +75,26 @@ async def run_actor_agent():
 
 asyncio.run(run_actor_agent())
 ```
+
+```typescript
+import {
+  DefaultAgent,
+  ScreenshotMaker,
+  DefaultActionHandler,
+} from '@oagi/oagi';
+
+async function main() {
+  const agent = new DefaultAgent(process.env.OAGI_API_KEY);
+  await agent.execute(
+    "Go to Google.com, search timer, add 1 minute by clicking on the '+1:00', and start the timer",
+    new DefaultActionHandler(),
+    new ScreenshotMaker()
+  );
+}
+
+main();
+```
+</CodeGroup>
 
 Here's the expected behavior of the code snippet above when run with the correct desktop environment.
 
