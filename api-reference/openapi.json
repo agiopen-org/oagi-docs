@@ -37,7 +37,7 @@
                 "$ref": "#/components/schemas/OpenAICompatRequest"
               },
               "example": {
-                "model": "lux-thinker-1",
+                "model": "lux-actor-1",
                 "messages": [
                   {
                     "role": "user",

@@ -159,6 +159,11 @@
       "vscode"
     ]
   },
+  "api": {
+    "examples": {
+      "prefill": true
+    }
+  },
   "footer": {
     "socials": {
       "discord": "https://discord.gg/PVAtX8PzxK",
