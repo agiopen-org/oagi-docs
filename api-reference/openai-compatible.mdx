@@ -148,23 +148,55 @@ See [Image Uploading](/api-reference/image-uploading) for details on uploading l
 
 ## Parsing the Response
 
-The model returns a structured response in the `content` field with thinking and action delimiters:
+The model returns a structured response in the `content` field with thinking and action delimiters. Here's how to parse it (matching the oagi SDK):
 
 ```python
 import re
+from enum import Enum
 
+class ActionType(str, Enum):
+    CLICK = "click"
+    LEFT_DOUBLE = "left_double"
+    LEFT_TRIPLE = "left_triple"
+    RIGHT_SINGLE = "right_single"
+    DRAG = "drag"
+    HOTKEY = "hotkey"
+    TYPE = "type"
+    SCROLL = "scroll"
+    FINISH = "finish"
+    WAIT = "wait"
+
+def parse_response(content: str) -> dict:
+    """Parse LLM response into structured format."""
+    # Extract thinking
+    think_match = re.search(r'<\|think_start\|>(.*?)<\|think_end\|>', content, re.DOTALL)
+    reason = think_match.group(1).strip() if think_match else ""
+
+    # Extract action block
+    action_match = re.search(r'<\|action_start\|>(.*?)<\|action_end\|>', content, re.DOTALL)
+    actions = []
+    stop = False
+
+    if action_match:
+        action_block = action_match.group(1).strip()
+        # Parse action: action_type(arguments)
+        match = re.match(r"(\w+)\((.*)\)", action_block)
+        if match:
+            action_type = match.group(1).lower()
+            argument = match.group(2).strip()
+            actions.append({"type": action_type, "argument": argument})
+            if action_type == "finish":
+                stop = True
+
+    return {"reason": reason, "actions": actions, "stop": stop}
+
+# Usage
 content = response.choices[0].message.content
+step = parse_response(content)
 
-# Extract thinking
-think_match = re.search(r'<\|think_start\|>(.*?)<\|think_end\|>', content, re.DOTALL)
-thinking = think_match.group(1).strip() if think_match else ""
-
-# Extract action
-action_match = re.search(r'<\|action_start\|>(.*?)<\|action_end\|>', content, re.DOTALL)
-action = action_match.group(1).strip() if action_match else ""
-
-print(f"Thinking: {thinking}")
-print(f"Action: {action}")
+print(f"Thinking: {step['reason']}")
+print(f"Actions: {step['actions']}")
+print(f"Task complete: {step['stop']}")
 ```
 
 Example response content:
@@ -172,6 +204,10 @@ Example response content:
 <|think_start|> I see a browser with an address bar. I need to click on it and type the URL. <|think_end|>
 <|action_start|> click(500, 50) <|action_end|>
 ```
+
+<Tip>
+The `oagi` Python SDK provides a built-in `parse_raw_output()` function that handles all parsing automatically, including multi-action responses separated by `&`.
+</Tip>
 
 ## Error Handling
 
