@@ -94,6 +94,25 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Guides",
+            "pages": [
+              "api-reference/openai-compatible",
+              "api-reference/image-uploading"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "openapi": {
+              "source": "api-reference/openapi.json",
+              "directory": "api-reference"
+            }
+          }
+        ]
       }
     ],
     "global": {

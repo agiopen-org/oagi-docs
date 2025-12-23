@@ -1,0 +1,124 @@
+---
+title: 'Image Uploading'
+description: 'Upload local screenshots for use with the chat completions API'
+icon: 'upload'
+---
+
+The Lux API requires images to be provided as URLs. For local screenshots, use the `/v1/file/upload` endpoint to get a presigned URL for uploading.
+<Card title="Try it interactively" icon="play" href="/api-reference/v1fileupload">
+  Test the /v1/file/upload endpoint directly in the API reference.
+</Card>
+
+
+
+## Request Upload URL
+
+Call the upload endpoint to get presigned URLs:
+
+```python
+import requests
+
+API_KEY = "sk-your-api-key"
+API_BASE = "https://api.agiopen.org"
+
+response = requests.get(
+    f"{API_BASE}/v1/file/upload",
+    headers={"x-api-key": API_KEY}
+)
+response.raise_for_status()
+data = response.json()
+
+print(f"Upload URL: {data['url']}")
+print(f"Download URL: {data['download_url']}")
+print(f"File UUID: {data['uuid']}")
+print(f"Expires at: {data['file_expires_at']}")
+```
+
+### Response Fields
+
+| Field | Description |
+|-------|-------------|
+| `url` | Presigned URL to upload your image (PUT request) |
+| `download_url` | URL to use in chat messages after upload |
+| `uuid` | Unique identifier for the uploaded file |
+| `expires_at` | When the upload URL expires (Unix timestamp) |
+| `file_expires_at` | When the uploaded file expires (Unix timestamp) |
+
+## Upload the Image
+
+Use a PUT request to upload your image data to the presigned URL:
+
+```python
+# Read the image file
+with open("screenshot.png", "rb") as f:
+    image_data = f.read()
+
+# Upload to presigned URL
+upload_response = requests.put(
+    data["url"],
+    data=image_data
+)
+upload_response.raise_for_status()
+
+print(f"Uploaded {len(image_data)} bytes successfully")
+```
+
+<Warning>
+The presigned upload URL expires after 1 hour (check `expires_at`). Request a new URL if the upload fails due to expiration.
+</Warning>
+
+## Use in Chat Messages
+
+After uploading, use the `download_url` in your chat messages:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=API_KEY,
+    base_url="https://api.agiopen.org/v1"
+)
+
+response = client.chat.completions.create(
+    model="lux-thinker-1",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": prompt},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": data["download_url"]}
+                }
+            ]
+        }
+    ]
+)
+```
+
+## Error Handling
+
+Common errors when uploading:
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 401 | `invalid_api_key` | Invalid or missing API key |
+| 429 | `rate_limit_exceeded` | Too many upload requests |
+| 500 | `internal_server_error` | Server error during URL generation |
+
+```python
+try:
+    response = requests.get(
+        f"{API_BASE}/v1/file/upload",
+        headers={"x-api-key": API_KEY}
+    )
+    response.raise_for_status()
+except requests.HTTPError as e:
+    error_data = e.response.json()
+    print(f"Error: {error_data['error']['code']}")
+    print(f"Message: {error_data['error']['message']}")
+```
+
+<Card title="OpenAI Compatible API" icon="plug" href="/api-reference/openai-compatible">
+  Learn about using the chat completions endpoint
+</Card>

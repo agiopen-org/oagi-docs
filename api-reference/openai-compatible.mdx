@@ -1,0 +1,242 @@
+---
+title: 'OpenAI Compatible API'
+description: 'Using the OpenAI-compatible chat completions endpoint for computer use'
+icon: 'messages'
+---
+
+You can use the OpenAI-compatible `/v1/chat/completions` endpoint to create chat completions for computer use.
+<Card title="Try it interactively" icon="play" href="/api-reference/v1chatcompletions">
+  Test the /v1/chat/completions endpoint directly in the API reference.
+</Card>
+
+## Quick Start
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-your-api-key",
+    base_url="https://api.agiopen.org/v1"
+)
+
+response = client.chat.completions.create(
+    model="lux-thinker-1",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": prompt},
+                {"type": "image_url", "image_url": {"url": image_url}}
+            ]
+        }
+    ]
+)
+```
+
+## Key Requirements
+
+### Use the Predefined Prompt Format
+
+Lux models require a specific prompt template to function correctly. The prompt instructs the model on how to interpret screenshots and generate actions.
+
+```python
+instruction_template = """You are a Desktop Agent completing computer use tasks from a user instruction.
+
+Every step, you will look at the screenshot and output the desired actions in a format as:
+
+<|think_start|> brief description of your intent and reasoning <|think_end|>
+<|action_start|> one of the allowed actions as below <|action_end|>
+
+In the action field, you have the following action formats:
+1. click(x, y) # left-click at the position (x, y), where x and y are integers normalized between 0 and 1000
+2. left_double(x, y) # left-double-click at the position (x, y)
+3. left_triple(x, y) # left-triple-click at the position (x, y)
+4. right_single(x, y) # right-click at the position (x, y)
+5. drag(x1, y1, x2, y2) # drag the mouse from (x1, y1) to (x2, y2)
+6. hotkey(key, c) # press the key for c times
+7. type(text) # type a text string on the keyboard
+8. scroll(x, y, direction, c) # scroll at (x, y) up or down for c times
+9. wait() # wait for a while
+10. finish() # indicate the task is finished
+
+Directly output the text beginning with <|think_start|>, no additional text is needed for this scenario.
+
+The user instruction is:
+{instruction}
+"""
+
+def build_prompt(task_description: str) -> str:
+    return instruction_template.format(instruction=task_description)
+```
+
+### One Image Per Turn
+
+Each user message should contain exactly **one screenshot**. The model analyzes the current screen state to determine the next action.
+
+```python
+# First turn: prompt + screenshot
+messages = [
+    {
+        "role": "user",
+        "content": [
+            {"type": "text", "text": build_prompt("Navigate to google.com")},
+            {"type": "image_url", "image_url": {"url": screenshot_url}}
+        ]
+    }
+]
+
+# Follow-up turns: just the new screenshot
+messages.append({
+    "role": "user",
+    "content": [
+        {"type": "image_url", "image_url": {"url": new_screenshot_url}}
+    ]
+})
+```
+
+Here's what a typical 3-turn conversation looks like:
+
+```python
+messages = [
+    # Turn 1: User sends prompt + screenshot
+    {
+        "role": "user",
+        "content": [
+            {"type": "text", "text": "You are a Desktop Agent..."},
+            {"type": "image_url", "image_url": {"url": "https://..."}}
+        ]
+    },
+
+    # Turn 1: Assistant responds with action
+    {
+        "role": "assistant",
+        "content": "<|think_start|> I see the browser... <|think_end|>\n<|action_start|> click(450, 52) <|action_end|>"
+    },
+
+    # Turn 2: User sends new screenshot after action
+    {
+        "role": "user",
+        "content": [
+            {"type": "image_url", "image_url": {"url": "https://..."}}
+        ]
+    },
+
+    # Turn 2: Assistant responds
+    {
+        "role": "assistant",
+        "content": "<|think_start|> The address bar is selected... <|think_end|>\n<|action_start|> type(google.com) <|action_end|>"
+    },
+
+    # Turn 3: User sends new screenshot
+    {
+        "role": "user",
+        "content": [
+            {"type": "image_url", "image_url": {"url": "https://..."}}
+        ]
+    }
+]
+```
+
+### Images Must Be URLs
+
+Images must be provided as URLs, not base64-encoded data. You have two options:
+
+1. **Direct URL**: Use a publicly accessible image URL
+2. **Upload via API**: Use the `/v1/file/upload` endpoint to get a presigned URL
+
+See [Image Uploading](/api-reference/image-uploading) for details on uploading local screenshots.
+
+## Parsing the Response
+
+The model returns a structured response in the `content` field with thinking and action delimiters:
+
+```python
+import re
+
+content = response.choices[0].message.content
+
+# Extract thinking
+think_match = re.search(r'<\|think_start\|>(.*?)<\|think_end\|>', content, re.DOTALL)
+thinking = think_match.group(1).strip() if think_match else ""
+
+# Extract action
+action_match = re.search(r'<\|action_start\|>(.*?)<\|action_end\|>', content, re.DOTALL)
+action = action_match.group(1).strip() if action_match else ""
+
+print(f"Thinking: {thinking}")
+print(f"Action: {action}")
+```
+
+Example response content:
+```
+<|think_start|> I see a browser with an address bar. I need to click on it and type the URL. <|think_end|>
+<|action_start|> click(500, 50) <|action_end|>
+```
+
+## Error Handling
+
+The API returns standard HTTP status codes with detailed error information:
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `invalid_request` | Invalid request parameters |
+| 400 | `model_not_found` | Requested model not available |
+| 401 | `invalid_api_key` | Invalid API key |
+| 401 | `expired_api_key` | API key has expired |
+| 402 | `insufficient_balance` | Insufficient account balance |
+| 429 | `rate_limit_exceeded` | Rate limit exceeded |
+| 500 | `inference_failed` | Inference processing failed |
+| 503 | `service_unavailable` | Service temporarily unavailable |
+| 503 | `engine_overloaded` | Inference engine overloaded |
+
+```python
+try:
+    response = client.chat.completions.create(...)
+except openai.APIError as e:
+    print(f"Error code: {e.code}")
+    print(f"Error message: {e.message}")
+```
+
+## Complete Example
+
+```python
+import json
+import re
+from openai import OpenAI
+
+API_KEY = "sk-your-api-key"
+BASE_URL = "https://api.agiopen.org/v1"
+IMAGE_URL = "https://lux-app-release.s3.us-west-2.amazonaws.com/api-demo.jpg"
+
+client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
+
+# Build the prompt
+prompt = build_prompt("Compare available plans for the AeroAPI on Flightaware")
+
+# First turn
+response = client.chat.completions.create(
+    model="lux-thinker-1",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": prompt},
+                {"type": "image_url", "image_url": {"url": IMAGE_URL}}
+            ]
+        }
+    ]
+)
+
+content = response.choices[0].message.content
+print(f"Response: {content}")
+
+# Parse the action
+action_match = re.search(r'<\|action_start\|>(.*?)<\|action_end\|>', content, re.DOTALL)
+if action_match:
+    action = action_match.group(1).strip()
+    print(f"Next action: {action}")
+```
+
+<Card title="Image Uploading" icon="upload" href="/api-reference/image-uploading">
+    Learn how to upload local screenshots to use with the API
+</Card>

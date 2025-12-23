@@ -5,43 +5,27 @@
     "description": "API Gateway for Large Language Model requests",
     "version": "1.0.0"
   },
+  "servers": [
+    {
+      "url": "https://api.agiopen.org",
+      "description": "Production server"
+    }
+  ],
   "paths": {
-    "/v1/generate": {
+    "/v1/chat/completions": {
       "post": {
-        "summary": "OAGI worker generate",
-        "description": "Generate response for OAGI workers (oagi_first, oagi_follow, oagi_task_summary)",
-        "operationId": "generate_v1_generate_post",
+        "summary": "/v1/chat/completions",
+        "description": "OpenAI-compatible endpoint for chat completions with UI actions",
+        "operationId": "create_chat_completion_v1_chat_completions_post",
         "parameters": [
           {
             "name": "x-api-key",
             "in": "header",
-            "required": false,
+            "required": true,
+            "description": "Your API key. Get one at https://developer.agiopen.org/api-keys",
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "type": "string",
               "title": "X-Api-Key"
-            }
-          },
-          {
-            "name": "x-api-version",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Version"
             }
           }
         ],
@@ -50,7 +34,27 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ExternalLLMRequest"
+                "$ref": "#/components/schemas/OpenAICompatRequest"
+              },
+              "example": {
+                "model": "lux-thinker-1",
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "You are a Desktop Agent completing computer use tasks from a user instruction.\n\nEvery step, you will look at the screenshot and output the desired actions in a format as:\n\n<|think_start|> brief description of your intent and reasoning <|think_end|>\n<|action_start|> one of the allowed actions as below <|action_end|>\n\nIn the action field, you have the following action formats:\n1. click(x, y) # left-click at the position (x, y), where x and y are integers normalized between 0 and 1000\n2. left_double(x, y) # left-double-click at the position (x, y), where x and y are integers normalized between 0 and 1000\n3. left_triple(x, y) # left-triple-click at the position (x, y), where x and y are integers normalized between 0 and 1000\n4. right_single(x, y) # right-click at the position (x, y), where x and y are integers normalized between 0 and 1000\n5. drag(x1, y1, x2, y2) # drag the mouse from (x1, y1) to (x2, y2) to select or move contents, where x1, y1, x2, y2 are integers normalized between 0 and 1000\n6. hotkey(key, c) # press the key for c times\n7. type(text) # type a text string on the keyboard\n8. scroll(x, y, direction, c) # scroll the mouse at position (x, y) in the direction of up or down for c times, where x and y are integers normalized between 0 and 1000\n9. wait() # wait for a while\n10. finish() # indicate the task is finished\n\nDirectly output the text beginning with <|think_start|>, no additional text is needed for this scenario.\n\nThe user instruction is:\nCompare available plans for the AeroAPI on Flightaware"
+                      },
+                      {
+                        "type": "image_url",
+                        "image_url": {
+                          "url": "https://lux-app-release.s3.us-west-2.amazonaws.com/api-demo.jpg"
+                        }
+                      }
+                    ]
+                  }
+                ]
               }
             }
           }
@@ -61,37 +65,99 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExternalLLMResponse"
+                  "$ref": "#/components/schemas/OpenAIChatCompletionResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request - Invalid request parameters or model not found",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_request": {
+                    "summary": "Invalid request",
+                    "value": {
+                      "error": {
+                        "code": "invalid_request",
+                        "message": "Invalid request parameters"
+                      }
+                    }
+                  },
+                  "model_not_found": {
+                    "summary": "Model not found",
+                    "value": {
+                      "error": {
+                        "code": "model_not_found",
+                        "message": "Model 'invalid-model' is not available. Available models: lux-actor-1, lux-thinker-1"
+                      }
+                    }
+                  }
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized",
+            "description": "Unauthorized - Invalid or expired API key",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalid_api_key": {
+                    "summary": "Invalid API key",
+                    "value": {
+                      "error": {
+                        "code": "invalid_api_key",
+                        "message": "Incorrect API key provided. Visit https://developer.agiopen.org/api-keys to create one."
+                      }
+                    }
+                  },
+                  "expired_api_key": {
+                    "summary": "Expired API key",
+                    "value": {
+                      "error": {
+                        "code": "expired_api_key",
+                        "message": "API key has expired. Visit https://developer.agiopen.org/api-keys to create a new one."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Insufficient Balance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "insufficient_balance",
+                    "message": "Insufficient balance. Please add credits at https://developer.agiopen.org"
+                  }
                 }
               }
             }
           },
           "422": {
-            "description": "Validation Error",
+            "description": "Validation Error - Request body validation failed",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "validation_error",
+                    "message": "Request validation failed"
+                  }
                 }
               }
             }
@@ -102,26 +168,58 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "rate_limit_exceeded",
+                    "message": "Rate limit exceeded. Please retry after 60 seconds."
+                  }
                 }
               }
             }
           },
           "500": {
-            "description": "Internal Server Error",
+            "description": "Internal Server Error - Inference processing failed",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "inference_failed",
+                    "message": "Failed to process inference request"
+                  }
                 }
               }
             }
           },
           "503": {
-            "description": "Service Unavailable",
+            "description": "Service Unavailable - Service temporarily unavailable or engine overloaded",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "service_unavailable": {
+                    "summary": "Service unavailable",
+                    "value": {
+                      "error": {
+                        "code": "service_unavailable",
+                        "message": "Service temporarily unavailable. Please try again later."
+                      }
+                    }
+                  },
+                  "engine_overloaded": {
+                    "summary": "Engine overloaded",
+                    "value": {
+                      "error": {
+                        "code": "engine_overloaded",
+                        "message": "Inference engine is currently overloaded. Please retry after a few seconds."
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -131,39 +229,17 @@
     },
     "/v1/file/upload": {
       "get": {
-        "summary": "Request file upload",
+        "summary": "/v1/file/upload",
         "description": "Get presigned file upload URL, file uuid used for generation API, and file expiration time",
         "operationId": "upload_file_v1_file_upload_get",
         "parameters": [
           {
-            "name": "x-api-version",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Version"
-            }
-          },
-          {
             "name": "x-api-key",
             "in": "header",
-            "required": false,
+            "required": true,
+            "description": "Your API key. Get one at https://developer.agiopen.org/api-keys",
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "type": "string",
               "title": "X-Api-Key"
             }
           }
@@ -179,32 +255,34 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "401": {
-            "description": "Unauthorized",
+            "description": "Unauthorized - Invalid or missing API key",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_api_key",
+                    "message": "Incorrect API key provided. Visit https://developer.agiopen.org/api-keys to create one."
+                  }
                 }
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
+          "402": {
+            "description": "Insufficient Balance",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "insufficient_balance",
+                    "message": "Insufficient balance. Please add credits at https://developer.agiopen.org"
+                  }
                 }
               }
             }
@@ -215,6 +293,12 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "rate_limit_exceeded",
+                    "message": "Rate limit exceeded. Please retry after 60 seconds."
+                  }
                 }
               }
             }
@@ -225,6 +309,12 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "unexpected_error",
+                    "message": "An unexpected error occurred. Please try again later."
+                  }
                 }
               }
             }
@@ -235,139 +325,12 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v2/message": {
-      "post": {
-        "summary": "Analyze the chat messages to get possible actions",
-        "description": "Analyze the openai-compatible messages with screenshot url to return possible actions that can accomplish the task",
-        "operationId": "create_message_v2_v2_message_post",
-        "parameters": [
-          {
-            "name": "x-api-key",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
                 },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          },
-          {
-            "name": "x-api-version",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Version"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OpenAIChatRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LLMResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Task Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate Limit Exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                "example": {
+                  "error": {
+                    "code": "service_unavailable",
+                    "message": "Service temporarily unavailable. Please try again later."
+                  }
                 }
               }
             }
@@ -378,67 +341,6 @@
   },
   "components": {
     "schemas": {
-      "Action": {
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/ActionType",
-            "description": "Type of action to perform"
-          },
-          "argument": {
-            "type": "string",
-            "title": "Argument",
-            "description": "Action argument in the specified format"
-          },
-          "count": {
-            "anyOf": [
-              {
-                "type": "integer",
-                "minimum": 1
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Count",
-            "description": "Number of times to repeat the action",
-            "default": 1
-          },
-          "description": {
-            "type": "string",
-            "title": "Description",
-            "description": "Human-readable description of the action"
-          }
-        },
-        "type": "object",
-        "required": [
-          "type",
-          "argument",
-          "description"
-        ],
-        "title": "Action",
-        "example": {
-          "argument": "500,300",
-          "count": 1,
-          "description": "Click the login button to proceed with authentication",
-          "type": "click"
-        }
-      },
-      "ActionType": {
-        "type": "string",
-        "enum": [
-          "click",
-          "left_double",
-          "left_triple",
-          "right_single",
-          "drag",
-          "hotkey",
-          "type",
-          "scroll",
-          "wait",
-          "finish"
-        ],
-        "title": "ActionType"
-      },
       "Content": {
         "properties": {
           "type": {
@@ -459,7 +361,13 @@
         "required": [
           "type"
         ],
-        "title": "Content"
+        "title": "Content",
+        "example": {
+          "image_url": {
+            "url": "https://example.com/image.png"
+          },
+          "type": "image_url"
+        }
       },
       "ContentType": {
         "type": "string",
@@ -491,7 +399,7 @@
         "description": "Detailed error information.",
         "example": {
           "code": "invalid_api_key",
-          "message": "Incorrect API key provided. Visit https://platform.example.com/api-keys to create one."
+          "message": "Incorrect API key provided. Visit https://developer.agiopen.org/api-keys to create one."
         }
       },
       "ErrorResponse": {
@@ -514,7 +422,7 @@
         "example": {
           "error": {
             "code": "invalid_api_key",
-            "message": "Incorrect API key provided. Visit https://platform.example.com/api-keys to create one."
+            "message": "Incorrect API key provided. Visit https://developer.agiopen.org/api-keys to create one."
           }
         }
       },
@@ -727,6 +635,19 @@
         ],
         "title": "ExternalLLMResponse"
       },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
       "HistoryItem": {
         "properties": {
           "todo_index": {
@@ -784,151 +705,9 @@
         "required": [
           "url"
         ],
-        "title": "ImageContent"
-      },
-      "LLMResponse": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id",
-            "description": "Unique identifier for the response"
-          },
-          "task_id": {
-            "type": "string",
-            "title": "Task Id",
-            "description": "Task ID for this task execution"
-          },
-          "object": {
-            "type": "string",
-            "title": "Object",
-            "description": "Object type",
-            "default": "task.completion"
-          },
-          "created": {
-            "type": "integer",
-            "title": "Created",
-            "description": "Unix timestamp of creation"
-          },
-          "model": {
-            "type": "string",
-            "title": "Model",
-            "description": "Model used for analysis"
-          },
-          "task_description": {
-            "type": "string",
-            "title": "Task Description",
-            "description": "The original task description"
-          },
-          "current_step": {
-            "type": "integer",
-            "title": "Current Step",
-            "description": "Current step number in the session"
-          },
-          "is_complete": {
-            "type": "boolean",
-            "title": "Is Complete",
-            "description": "Whether the task is complete"
-          },
-          "actions": {
-            "items": {
-              "$ref": "#/components/schemas/Action"
-            },
-            "type": "array",
-            "title": "Actions",
-            "description": "List of possible actions to accomplish the task"
-          },
-          "reason": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Reason",
-            "description": "Reason for the current step (if applicable)"
-          },
-          "usage": {
-            "$ref": "#/components/schemas/Usage",
-            "description": "Token usage information"
-          },
-          "error": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ErrorDetail"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Error details if request failed, null if successful"
-          },
-          "raw_output": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Raw Output",
-            "description": "Raw output from the LLM (if enabled)"
-          },
-          "log_data": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/RequestLogData"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "log data for LLM inference or request processing"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "task_id",
-          "created",
-          "model",
-          "task_description",
-          "current_step",
-          "is_complete",
-          "actions",
-          "usage"
-        ],
-        "title": "LLMResponse",
+        "title": "ImageContent",
         "example": {
-          "actions": [
-            {
-              "argument": "300, 150",
-              "count": 1,
-              "description": "Click on the username input field to focus it",
-              "type": "click"
-            },
-            {
-              "argument": "username@example.com",
-              "count": 1,
-              "description": "Type the username into the input field",
-              "type": "type"
-            }
-          ],
-          "created": 1677652288,
-          "current_step": 1,
-          "id": "task-123abc",
-          "is_complete": false,
-          "model": "vision-model-v1",
-          "object": "task.completion",
-          "task_description": "Log into the website using my credentials",
-          "task_id": "task_abc123def456",
-          "usage": {
-            "completion_tokens": 120,
-            "prompt_tokens": 450,
-            "total_tokens": 570
-          }
+          "url": "https://example.com/image.png"
         }
       },
       "Message": {
@@ -957,9 +736,91 @@
         "required": [
           "role"
         ],
-        "title": "Message"
+        "title": "Message",
+        "example": {
+          "content": "What's the weather today?",
+          "role": "user"
+        }
       },
-      "OpenAIChatRequest": {
+      "OpenAIChatCompletionResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Unique identifier (chatcmpl-{request_id})"
+          },
+          "task_id": {
+            "type": "string",
+            "title": "Task Id",
+            "description": "Session ID for multi-turn conversations"
+          },
+          "object": {
+            "type": "string",
+            "title": "Object",
+            "description": "Object type",
+            "default": "chat.completion"
+          },
+          "created": {
+            "type": "integer",
+            "title": "Created",
+            "description": "Unix timestamp"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "description": "Model used for completion"
+          },
+          "choices": {
+            "items": {
+              "$ref": "#/components/schemas/OpenAIChoice"
+            },
+            "type": "array",
+            "title": "Choices",
+            "description": "List of completion choices"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/OpenAIUsage",
+            "description": "Token usage information"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "task_id",
+          "model",
+          "choices",
+          "usage"
+        ],
+        "title": "OpenAIChatCompletionResponse",
+        "description": "OpenAI-compatible chat completion response."
+      },
+      "OpenAIChoice": {
+        "properties": {
+          "index": {
+            "type": "integer",
+            "title": "Index",
+            "description": "Index of the choice",
+            "default": 0
+          },
+          "message": {
+            "$ref": "#/components/schemas/OpenAIMessage",
+            "description": "The generated message"
+          },
+          "finish_reason": {
+            "type": "string",
+            "title": "Finish Reason",
+            "description": "Reason for finishing",
+            "default": "stop"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "OpenAIChoice",
+        "description": "OpenAI-compatible choice in response."
+      },
+      "OpenAICompatRequest": {
         "properties": {
           "model": {
             "type": "string",
@@ -974,67 +835,7 @@
             "title": "Messages",
             "description": "Messages in chronological order"
           },
-          "task_description": {
-            "type": "string",
-            "title": "Task Description",
-            "description": "Description of the task to accomplish"
-          },
           "task_id": {
-            "type": "string",
-            "title": "Task Id",
-            "description": "Task ID for identifying one single task"
-          },
-          "temperature": {
-            "type": "number",
-            "maximum": 2,
-            "minimum": 0,
-            "title": "Temperature",
-            "description": "Sampling temperature between 0 and 2"
-          },
-          "top_p": {
-            "type": "number",
-            "maximum": 1,
-            "minimum": 0,
-            "title": "Top P",
-            "description": "Nucleus sampling parameter"
-          },
-          "max_tokens": {
-            "type": "integer",
-            "minimum": 1,
-            "title": "Max Tokens",
-            "description": "Maximum number of tokens for the generated completion"
-          },
-          "user": {
-            "type": "string",
-            "title": "User",
-            "description": "End-user identifier for abuse/fraud detection"
-          }
-        },
-        "type": "object",
-        "required": [
-          "model",
-          "messages",
-          "task_description",
-          "task_id"
-        ],
-        "title": "OpenAIChatRequest",
-        "description": "OpenAI-compatible chat completion request"
-      },
-      "RequestLogData": {
-        "properties": {
-          "llm_latency": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Llm Latency",
-            "description": "the latency of llm infererce"
-          },
-          "llm_target": {
             "anyOf": [
               {
                 "type": "string"
@@ -1043,24 +844,174 @@
                 "type": "null"
               }
             ],
-            "title": "Llm Target",
-            "description": "the path of target LLM server"
+            "title": "Task Id",
+            "description": "Optional session ID for multi-turn conversations"
           },
-          "request_latency": {
+          "temperature": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 2.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Request Latency",
-            "description": "the time cost of processing the whole request"
+            "title": "Temperature",
+            "description": "Sampling temperature between 0 and 2"
+          },
+          "top_p": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Top P",
+            "description": "Nucleus sampling parameter"
+          },
+          "max_tokens": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Tokens",
+            "description": "Maximum number of tokens for the completion"
+          },
+          "user": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User",
+            "description": "End-user identifier for abuse/fraud detection"
           }
         },
         "type": "object",
-        "title": "RequestLogData"
+        "required": [
+          "model",
+          "messages"
+        ],
+        "title": "OpenAICompatRequest",
+        "description": "Pure OpenAI-compatible chat completion request."
+      },
+      "OpenAIMessage": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "title": "Role",
+            "description": "Role of the message sender",
+            "default": "assistant"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content",
+            "description": "JSON string with thinking and actions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "title": "OpenAIMessage",
+        "description": "OpenAI-compatible message in response."
+      },
+      "OpenAIModel": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Model identifier"
+          },
+          "object": {
+            "type": "string",
+            "title": "Object",
+            "description": "Object type",
+            "default": "model"
+          },
+          "created": {
+            "type": "integer",
+            "title": "Created",
+            "description": "Creation timestamp"
+          },
+          "owned_by": {
+            "type": "string",
+            "title": "Owned By",
+            "description": "Model owner",
+            "default": "oagi"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "OpenAIModel",
+        "description": "OpenAI-compatible model information."
+      },
+      "OpenAIModelListResponse": {
+        "properties": {
+          "object": {
+            "type": "string",
+            "title": "Object",
+            "description": "Object type",
+            "default": "list"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/OpenAIModel"
+            },
+            "type": "array",
+            "title": "Data",
+            "description": "List of available models"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "OpenAIModelListResponse",
+        "description": "OpenAI-compatible model list response."
+      },
+      "OpenAIUsage": {
+        "properties": {
+          "prompt_tokens": {
+            "type": "integer",
+            "title": "Prompt Tokens",
+            "description": "Number of tokens in the prompt"
+          },
+          "completion_tokens": {
+            "type": "integer",
+            "title": "Completion Tokens",
+            "description": "Number of tokens in the completion"
+          },
+          "total_tokens": {
+            "type": "integer",
+            "title": "Total Tokens",
+            "description": "Total number of tokens used"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prompt_tokens",
+          "completion_tokens",
+          "total_tokens"
+        ],
+        "title": "OpenAIUsage",
+        "description": "OpenAI-compatible usage information."
       },
       "Role": {
         "type": "string",
@@ -1090,7 +1041,7 @@
               "pending",
               "in_progress",
               "completed",
-              "skipped"
+              "blocked"
             ],
             "title": "Status",
             "description": "Current status of the todo"
@@ -1155,31 +1106,38 @@
         ],
         "title": "UploadFileResponse"
       },
-      "Usage": {
+      "ValidationError": {
         "properties": {
-          "prompt_tokens": {
-            "type": "integer",
-            "title": "Prompt Tokens",
-            "description": "Number of tokens in the prompt"
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
           },
-          "completion_tokens": {
-            "type": "integer",
-            "title": "Completion Tokens",
-            "description": "Number of tokens in the completion"
+          "msg": {
+            "type": "string",
+            "title": "Message"
           },
-          "total_tokens": {
-            "type": "integer",
-            "title": "Total Tokens",
-            "description": "Total number of tokens used"
+          "type": {
+            "type": "string",
+            "title": "Error Type"
           }
         },
         "type": "object",
         "required": [
-          "prompt_tokens",
-          "completion_tokens",
-          "total_tokens"
+          "loc",
+          "msg",
+          "type"
         ],
-        "title": "Usage"
+        "title": "ValidationError"
       }
     }
   }
