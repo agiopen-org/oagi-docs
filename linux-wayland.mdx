@@ -115,20 +115,26 @@ The CLI automatically detects Wayland and uses the ydotool action handler.
 
 ## Troubleshooting
 
-### ydotoold not running
-```
-Error: Cannot connect to ydotool socket
-```
-Start the daemon with `sudo ydotoold`.
+<AccordionGroup>
+  <Accordion title="ydotoold not running">
+    ```
+    Error: Cannot connect to ydotool socket
+    ```
+    Start the daemon with `sudo ydotoold --socket-perm 666`.
+  </Accordion>
 
-### Socket permission denied
-Ensure your user has access to the socket file, or run the agent with appropriate permissions.
+  <Accordion title="Socket permission denied">
+    Ensure your user has access to the socket file, or run ydotoold with `--socket-perm 666` flag.
+  </Accordion>
 
-### Screenshots not captured
-Verify flameshot is installed and accessible from command line:
-```bash
-flameshot --version
-```
+  <Accordion title="Screenshots not captured">
+    Verify flameshot is installed and accessible from command line:
+    ```bash
+    flameshot --version
+    ```
+  </Accordion>
 
-### Inaccurate clicks
-Disable mouse acceleration and ensure screen resolution is correctly detected.
+  <Accordion title="Inaccurate clicks">
+    Disable mouse acceleration (see Configure Mouse Acceleration section) and ensure screen resolution is correctly detected.
+  </Accordion>
+</AccordionGroup>
