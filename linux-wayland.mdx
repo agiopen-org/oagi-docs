@@ -1,0 +1,134 @@
+---
+title: 'Linux Wayland Setup'
+description: 'Set up OAGI Python SDK for Linux systems with Wayland display server'
+icon: 'linux'
+---
+
+<Note>
+Wayland support requires Python SDK version 0.13.0 or later.
+
+This feature is currently in beta and may not be stable.
+</Note>
+
+## Prerequisites
+
+- Python 3.10+
+- Linux with Wayland display server (GNOME, KDE Plasma, etc.)
+
+## Install System Dependencies
+
+### ydotool (Input Automation)
+
+[ydotool](https://github.com/ReimuNotMoe/ydotool) is a generic command-line input device emulator for Linux Wayland.
+
+<Warning>
+**Ubuntu users:** Do not install ydotool from apt as the version is outdated. Download from [GitHub releases](https://github.com/ReimuNotMoe/ydotool/releases) or build from source.
+</Warning>
+
+<Tabs>
+  <Tab title="Package Manager">
+    ```bash
+    # Arch Linux
+    sudo pacman -S ydotool
+
+    # Fedora
+    sudo dnf install ydotool
+    ```
+  </Tab>
+  <Tab title="GitHub Release">
+    Download the latest release from [ydotool releases](https://github.com/ReimuNotMoe/ydotool/releases) and install manually.
+  </Tab>
+  <Tab title="Build from Source">
+    ```bash
+    # Install build dependencies
+    sudo apt install cmake pkg-config scdoc
+
+    # Clone and build
+    git clone https://github.com/ReimuNotMoe/ydotool.git
+    cd ydotool
+    mkdir build && cd build
+    cmake ..
+    make
+    sudo make install
+    ```
+  </Tab>
+</Tabs>
+
+### flameshot (Screenshot Capture)
+
+```bash
+# Ubuntu/Debian
+sudo apt install flameshot
+
+# Fedora
+sudo dnf install flameshot
+
+# Arch Linux
+sudo pacman -S flameshot
+```
+
+## Start ydotool Daemon
+
+The ydotool daemon must be running for input automation to work.
+
+```bash
+sudo ydotoold --socket-perm 666
+```
+
+Note the socket path from the output (typically `/run/user/<uid>/.ydotool_socket`).
+
+<Tip>
+To run ydotoold automatically at boot, you can create a systemd service.
+</Tip>
+
+## Configure Environment
+
+Set the ydotool socket path:
+
+```bash
+export YDOTOOL_SOCKET=/run/user/$(id -u)/.ydotool_socket
+```
+
+Add this to your `~/.bashrc` or `~/.zshrc` for persistence.
+
+## Configure Mouse Acceleration (GNOME)
+
+For accurate mouse positioning, disable mouse acceleration:
+
+```bash
+gsettings set org.gnome.desktop.peripherals.mouse accel-profile 'flat'
+```
+
+<Warning>
+Without disabling mouse acceleration, click coordinates may be inaccurate.
+</Warning>
+
+## Run Agent
+
+Use the OAGI CLI to run agents:
+
+```bash
+oagi agent run "Open Firefox and navigate to google.com"
+```
+
+The CLI automatically detects Wayland and uses the ydotool action handler.
+
+## Troubleshooting
+
+### ydotoold not running
+```
+Error: Cannot connect to ydotool socket
+```
+Start the daemon with `sudo ydotoold`.
+
+### Socket permission denied
+Ensure your user has access to the socket file, or run the agent with appropriate permissions.
+
+### Screenshots not captured
+Verify flameshot is installed and accessible from command line:
+```bash
+flameshot --version
+```
+
+### Inaccurate clicks
+Disable mouse acceleration and ensure screen resolution is correctly detected.

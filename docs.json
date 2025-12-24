@@ -21,7 +21,8 @@
               "agent",
               "models",
               "pricing",
-              "desktop-application"
+              "desktop-application",
+              "linux-wayland"
             ]
           },
           {
