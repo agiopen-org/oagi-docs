@@ -104,6 +104,45 @@ Here's the expected behavior of the code snippet above when run with the correct
 />
 
 
+### lux-thinker-1: Careful Planning
+
+**Best for:**
+- Tasks requiring multi-step planning
+- Non-obvious action sequences
+- Brittle or complex workflows
+- Scenarios where errors are costly
+- **Additional Examples:**
+    - "Search for the top 3 coffee shops in Tokyo and save their names to a text editor"
+    - "Look up the store hours for the nearest Apple Store to zip code 23456"
+    - "Find the baggage policy for international flights on Delta's website"
+
+Uses the same API as Actor, just with a different model:
+
+<CodeGroup>
+```python
+agent = AsyncDefaultAgent(model="lux-thinker-1")
+```
+
+```typescript
+const agent = new DefaultAgent(process.env.OAGI_API_KEY, undefined, "lux-thinker-1");
+```
+</CodeGroup>
+
+### Usage in CLI and Custom Apps
+
+`lux-thinker-1` is best suited for asynchronous workflows where a human is not waiting for immediate feedback, such as:
+
+**CLI Tools:** Running complex analysis or setup tasks via the command line.
+
+```bash
+oagi agent run "Search for the top 3 coffee shops in Tokyo and save their names to a text editor" --model "lux-thinker-1"
+```
+
+<Vimeo
+  src="https://player.vimeo.com/video/1141308262?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
+  title="OpenAGI - Top Coffee Copy with Thinker"
+/>
+
 ### Tasker Agent
 The built-in `TaskerAgent` is designed for multi-step workflows, and it happily runs on top of `lux-actor-1`, which gives you fast, deterministic execution while the TaskerAgent handles planning, memory, and retries. You must define the task and sub-tasks (todos) before execution.
 
@@ -113,7 +152,7 @@ from oagi import TaskerAgent, AsyncPyautoguiActionHandler, AsyncScreenshotMaker
 
 async def run_tasker():
     agent = TaskerAgent(model="lux-actor-1")
-    
+
     # 1. Define the high-level task and breakdown
     agent.set_task(
         task="Find a flight from San Francisco",
@@ -123,7 +162,7 @@ async def run_tasker():
           "Click on the first flight of the 'Top departing flights' and click the first of the 'Top returning flights'"
         ]
     )
-    
+
     # 2. Execute the workflow
     await agent.execute(
         instruction="Find a flight", # Context for the agent
@@ -139,35 +178,6 @@ Here's what the run will look like with the correct desktop setup.
 <Vimeo
   src="https://player.vimeo.com/video/1140830837?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
   title="OpenAGI - Google Flights Example with TaskerAgent"
-/>
-
-
-
-### lux-thinker-1: Careful Planning
-
-**Best for:**
-- Tasks requiring multi-step planning
-- Non-obvious action sequences
-- Brittle or complex workflows
-- Scenarios where errors are costly
-- **Additional Examples:**
-    - "Search for the top 3 coffee shops in Tokyo and save their names to a text editor"
-    - "Look up the store hours for the nearest Apple Store to zip code 23456"
-    - "Find the baggage policy for international flights on Delta's website"
-
-### Usage in CLI and Custom Apps
-
-`lux-thinker-1` is best suited for asynchronous workflows where a human is not waiting for immediate feedback, such as:
-
-**CLI Tools:** Running complex analysis or setup tasks via the command line.
-
-```bash
-oagi agent run "Search for the top 3 coffee shops in Tokyo and save their names to a text editor" --model "lux-thinker-1"
-```
-
-<Vimeo
-  src="https://player.vimeo.com/video/1141308262?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1"
-  title="OpenAGI - Top Coffee Copy with Thinker"
 />
 
 ## Performance Characteristics
