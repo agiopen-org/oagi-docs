@@ -1,0 +1,116 @@
+---
+title: 'Work With Multi-Screen'
+description: 'Specify a screen for OAGI Python SDK to run the task'
+icon: 'display'
+---
+
+<Note>
+Multi-Screen support requires Python SDK version 0.14.0 or later.
+
+This feature is currently in beta and may not be stable.
+</Note>
+
+## How To Set Up
+With multiple monitors configured, you can choose one to serve as the task environment when executing the task. 
+
+### 1. Display all screens and pick one
+The class `ScreenManager` is provided to manage the information of all connected monitors. Use it to get all screens and write down the index of the desired screen.
+```python
+from oagi import ScreenManager
+
+def print_all_screens():
+    """Print all available screens."""
+    screen_manager = ScreenManager()
+    all_screens = screen_manager.get_all_screens()
+    print("Available screens:")
+    for screen_index, screen in enumerate(all_screens):
+        print(f"  - Index {screen_index}: {screen}")
+
+print_all_screens()
+```
+The result is printed as shown below and you can choose the screen on which to execute the task.
+```bash
+Available screens:
+  - Index 0: Screen(name='Built-in Retina Display', x=0, y=0, width=1512, height=982, is_primary=True)
+  - Index 1: Screen(name='U2790B', x=-193, y=-1080, width=1920, height=1080, is_primary=False)
+```
+Alternatively, you can simply run the oagi agent to get the same result:
+```bash
+oagi agent screens
+```
+
+### 2. Run with the desired screen
+Once you know which screen to use, you can execute the task with the desired screen as shown below. Get the target screen information from `ScreenManager` with the corresponding `screen_index`, and then configure it on the `ActionHandler` and `ScreenshotMaker`.
+<Tip>
+  **Before you run:** On a Windows system with mixed scaling between monitors, applications that are not DPI-aware will have their coordinates virtualized, causing clicks/moves to land at incorrect positions. So make sure to call `ScreenManager.enable_windows_dpi_awareness()` before importing `AsyncPyautoguiActionHandler`, `AsyncScreenshotMaker` or any dependency using `pyautogui` for precise execution.
+</Tip>
+```python
+import asyncio
+import sys
+from oagi import ScreenManager
+
+# Must be initialized before importing pyautogui to ensure correct DPI awareness in Windows
+if sys.platform == "win32":
+    ScreenManager.enable_windows_dpi_awareness()
+
+from oagi import (
+    AsyncDefaultAgent,
+    AsyncPyautoguiActionHandler,
+    AsyncScreenshotMaker,
+)
+
+async def async_execute_task_on_specific_screen(task_desc, max_steps=5, screen_index=0):
+    # set OAGI_API_KEY and OAGI_BASE_URL
+    # or AsyncDefaultAgent(api_key="your_api_key", base_url="your_base_url")
+    agent = AsyncDefaultAgent(max_steps=max_steps)
+    action_handler = AsyncPyautoguiActionHandler()
+    image_provider = AsyncScreenshotMaker()
+
+    # Get the target screen info for task execution
+    screen_manager = ScreenManager()
+    all_screens = screen_manager.get_all_screens()
+    screen = all_screens[screen_index]
+    # Set the screen index for handlers
+    action_handler.set_target_screen(screen)
+    image_provider.set_target_screen(screen)
+
+    is_completed = await agent.execute(
+        task_desc,
+        action_handler=action_handler,
+        image_provider=image_provider,
+    )
+
+    return is_completed, await image_provider.last_image()
+  
+
+if __name__ == "__main__":
+    task_desc = "Open Chrome and navigate to google.com"
+    screen_index = 1  # The index of the desired screen
+    success, image = asyncio.run(
+        async_execute_task_on_specific_screen(task_desc, screen_index=screen_index)
+    )
+    print(f"\nFinal result: {'Success' if success else 'Failed'}")
+```
+
+If you are using the oagi agent, just run the agent with the `--screen-index` parameter as follows:
+```bash
+oagi agent run "Go to https://agiopen.org" --model "lux-thinker-1" --screen-index 1
+```
+
+## Find the correct screen
+Suppose you have multiple monitors connected. The ScreenManager gives you a list of all screens — **how do you pick the one you need?**
+
+The basic principle is: In the results returned by `ScreenManager.get_all_screens()`, the primary screen is always the first element. The other screens are then appended into the result in ascending order of their origin (x, y) coordinates.
+
+When multiple monitors are connected, the OS usually stitches them together onto one single, giant canvas. The X and Y coordinate values of one screen's top-left corner are called its `Origin Coordinate`. In this giant canvas, the origin coordinate of the primary screen is always fixed at (0, 0), while the origin coordinate of other screens depends on their position relative to the primary:
+- Right: Origin is (Positive Number, 0) (e.g., (1920, 0)).
+- Left: Origin is (Negative Number, 0) (e.g., (-1920, 0)).
+- Above: Origin is (0, Negative Number) (e.g., (0, -1080)).
+- Below: Origin is (0, Positive Number) (e.g., (0, 1080)).
+
+<CardGroup cols={1}>
+  <Card title="Example">
+    <img className="block dark:hidden" src="/images/multi-screen-examples.png" alt="multi-screen examples" />
+    Check the display settings and see how all screens are arranged. Imagining their origin coordinates, you can easily determine the order of all screens.
+  </Card>
+</CardGroup>

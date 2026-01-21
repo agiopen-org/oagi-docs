@@ -22,7 +22,8 @@
               "models",
               "pricing",
               "desktop-application",
-              "linux-wayland"
+              "linux-wayland",
+              "multi-screen"
             ]
           },
           {
