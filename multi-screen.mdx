@@ -48,7 +48,7 @@ oagi agent run "Go to https://agiopen.org" --model "lux-thinker-1" --screen-inde
 
 When building your own agent, get the target screen information from `ScreenManager` with the corresponding `screen_index`, and then configure it on the `ActionHandler` and `ScreenshotMaker`.
 <Tip>
-  **Before you run:** On a Windows system with mixed scaling between monitors, applications that are not DPI-aware will have their coordinates virtualized, causing clicks/moves to land at incorrect positions. So make sure to call `ScreenManager.enable_windows_dpi_awareness()` before importing `AsyncPyautoguiActionHandler`, `AsyncScreenshotMaker` or any dependency using `pyautogui` for precise execution.
+  **Before you run:** On a Windows system with mixed scaling between monitors, applications that are not DPI-aware will have their coordinates virtualized, causing clicks/moves to land at incorrect positions. So make sure to call **enable_windows_dpi_awareness()** of ScreenManager before importing AsyncPyautoguiActionHandler, AsyncScreenshotMaker or any dependency using **pyautogui** for precise execution.
 </Tip>
 ```python
 import asyncio
